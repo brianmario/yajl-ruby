@@ -2613,9 +2613,9 @@ _wrap_yajl_parse(int argc, VALUE *argv, VALUE self) {
   }
   arg1 = (yajl_handle)(argp1);
   res2 = SWIG_ConvertPtr(argv[1], &argp2,SWIGTYPE_p_unsigned_char, 0 |  0 );
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "yajl_parse" "', argument " "2"" of type '" "unsigned char const *""'"); 
-  }
+  // if (!SWIG_IsOK(res2)) {
+  //   SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "yajl_parse" "', argument " "2"" of type '" "unsigned char const *""'"); 
+  // }
   arg2 = (unsigned char *)(argp2);
   ecode3 = SWIG_AsVal_unsigned_SS_int(argv[2], &val3);
   if (!SWIG_IsOK(ecode3)) {
