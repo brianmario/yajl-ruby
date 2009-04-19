@@ -72,31 +72,36 @@ static yajl_callbacks callbacks = {
 
 // ruby-specific awesomeness
 
-static VALUE t_parse(VALUE self, VALUE io) {
+static VALUE t_parse(VALUE io) {
     yajl_handle hand;
     yajl_status stat;
-    static unsigned char fileData[65536];
     size_t rd;
     int done = 0;
+    int bufferSize = 65536;
     yajl_parser_config cfg = {1, 1};
+    const char* emptyStr;
     VALUE ctx = rb_hash_new();
+    VALUE streamData = rb_str_new(emptyStr, bufferSize);
 
     // allocate our parser
-    hand = yajl_alloc(&callbacks, &cfg, NULL, (void *) ctx);
+    hand = yajl_alloc(&callbacks, &cfg, NULL, (void *) &ctx);
     
-    while (!done) {
-        // parse a chunk from our IO
-        
-        // if (read from IO was empty or EOF) {
-        //    done = 1;
-        // }
-        done = 1;
+    // parse from IO
+    while (rb_funcall(io, rb_intern('read'), 2, bufferSize, streamData)) {
+        stat = yajl_parse(hand, (unsigned char const *)RSTRING_PTR(streamData), RSTRING_LEN(streamData));
     }
+    
+    // parse any remaining buffered data
+    stat = yajl_parse_complete(hand);
+    
+    yajl_free(hand);
+    
+    return ctx;
 }
 
 VALUE cYajl;
 
-void Init_Yajl() {
+void Init_yajl() {
     cYajl = rb_define_class("Yajl", rb_cObject);
-    rb_define_singleton_method(cYajl, "parse", t_parse, 2);
+    rb_define_singleton_method(cYajl, "parse", t_parse, 1);
 }
