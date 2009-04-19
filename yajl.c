@@ -85,7 +85,7 @@ static yajl_callbacks callbacks = {
 static VALUE t_parse(VALUE self, VALUE io) {
     yajl_handle hand;
     yajl_status stat;
-    int bufferSize = 65536;
+    // int bufferSize = 65536;
     yajl_parser_config cfg = {1, 1};
     VALUE ctx = rb_hash_new();
     
@@ -113,8 +113,10 @@ static VALUE t_parse(VALUE self, VALUE io) {
 }
 
 VALUE cYajl;
+VALUE cNative;
 
 void Init_yajl() {
-    cYajl = rb_define_class("Yajl", rb_cObject);
-    rb_define_singleton_method(cYajl, "parse", t_parse, 1);
+    cYajl = rb_define_module("Yajl");
+    cNative = rb_define_module_under(cYajl, "Native");
+    rb_define_module_function(cNative, "parse", t_parse, 1);
 }
