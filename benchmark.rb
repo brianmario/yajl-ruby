@@ -2,9 +2,8 @@ require 'rubygems'
 
 require 'benchmark'
 require 'yajl.bundle'
-# require 'yajl-ffi'
-# require 'json'
-# require 'activesupport'
+require 'json'
+require 'activesupport'
 
 filename = ARGV[0] || 'json/search.json'
 json = File.new(filename, File::RDONLY | File::NONBLOCK)
@@ -19,26 +18,19 @@ Benchmark.bm { |x|
       Yajl::Native.parse(json)
     }
   }
-  # x.report {
-  #   puts "\nJSON.parser"
-  #   times.times {
-  #     json.rewind
-  #     JSON.parse(json.read)
-  #   }
-  # }
-  # x.report {
-  #   puts "\nActiveSupport::JSON.decode"
-  #   times.times {
-  #     json.rewind
-  #     ActiveSupport::JSON.decode(json.read)
-  #   }
-  # }
-  # x.report {
-  #   puts "\nYajl::FFI.parse"
-  #   times.times {
-  #     json.rewind
-  #     Yajl::FFI.parse(json, nil)
-  #   }
-  # }
+  x.report {
+    puts "\nJSON.parser"
+    times.times {
+      json.rewind
+      JSON.parse(json.read)
+    }
+  }
+  x.report {
+    puts "\nActiveSupport::JSON.decode"
+    times.times {
+      json.rewind
+      ActiveSupport::JSON.decode(json.read)
+    }
+  }
 }
 json.close
