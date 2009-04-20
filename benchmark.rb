@@ -5,7 +5,7 @@ require 'yajl.bundle'
 require 'json'
 require 'activesupport'
 
-filename = ARGV[0] || 'json/search.json'
+filename = ARGV[0] || 'benchmark/search.json'
 json = File.new(filename, File::RDONLY | File::NONBLOCK)
 
 times = ARGV[1] ? ARGV[1].to_i : 1
