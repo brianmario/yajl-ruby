@@ -10,7 +10,7 @@ static int parse_boolean(void * ctx, int boolean) {
     return 1;
 }
 
-static int parse_number(void * ctx, const char * s, unsigned int l) {
+static int parse_number(void * ctx, const char * s, unsigned int stringLen) {
     return 1;
 }
 
