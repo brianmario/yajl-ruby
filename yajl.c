@@ -89,11 +89,11 @@ static VALUE t_parse(VALUE self, VALUE io) {
     return ctx;
 }
 
-VALUE cYajl;
-VALUE cNative;
+VALUE mYajl;
+VALUE mNative;
 
 void Init_yajl() {
-    cYajl = rb_define_module("Yajl");
-    cNative = rb_define_module_under(cYajl, "Native");
-    rb_define_module_function(cNative, "parse", t_parse, 1);
+    mYajl = rb_define_module("Yajl");
+    mNative = rb_define_module_under(mYajl, "Native");
+    rb_define_module_function(mNative, "parse", t_parse, 1);
 }
