@@ -25,12 +25,12 @@ Benchmark.bm { |x|
       JSON.parse(json.read, :max_nesting => false)
     }
   }
-  x.report {
-    puts "\nActiveSupport::JSON.decode"
-    times.times {
-      json.rewind
-      ActiveSupport::JSON.decode(json.read)
-    }
-  }
+  # x.report {
+  #   puts "\nActiveSupport::JSON.decode"
+  #   times.times {
+  #     json.rewind
+  #     ActiveSupport::JSON.decode(json.read)
+  #   }
+  # }
 }
 json.close

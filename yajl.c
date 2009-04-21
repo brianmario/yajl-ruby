@@ -3,29 +3,36 @@
 #include <ruby.h>
 
 static int found_null(void * ctx) {
+    // Qnil
     return 1;
 }
 
 static int found_boolean(void * ctx, int boolean) {
+    if (boolean) {
+        // Qtrue
+    } else {
+        // Qfalse
+    }
     return 1;
 }
 
-static int found_integer(void * ctx, long integerVal) {
+static int found_integer(void * ctx, long val) {
+    VALUE i = INT2FIX(val);
     return 1;
 }
 
-static int found_double(void * ctx, double integerVal) {
+static int found_double(void * ctx, double val) {
+    VALUE f = rb_float_new(val);
     return 1;
 }
 
 static int found_string(void * ctx, const unsigned char * stringVal, unsigned int stringLen) {
+    VALUE s = rb_str_new(stringVal, stringLen);
     return 1;
 }
 
 static int found_map_key(void * ctx, const unsigned char * stringVal, unsigned int stringLen) {
-    char key[stringLen];
-    sprintf(key, "%.*s", stringLen, &stringVal[0]);
-    rb_hash_aset((VALUE)ctx, rb_str_new2(key), Qnil);
+    rb_hash_aset((VALUE)ctx, rb_str_new(stringVal, stringLen), Qnil);
     return 1;
 }
 
@@ -34,19 +41,24 @@ static int found_start_map(void * ctx) {
        ctx = (void *)rb_hash_new();
     } else {
         // TODO - nested hash
+        // push context stack?
     }
     return 1;
 }
 
 static int found_end_map(void * ctx) {
+    // TODO: pop off context stack?
     return 1;
 }
 
 static int found_start_array(void * ctx) {
+    // rb_ary_new
+    // push onto context stack?
     return 1;
 }
 
 static int found_end_array(void * ctx) {
+    // pop off context stack?
     return 1;
 }
 
@@ -69,7 +81,7 @@ ID intern_io_read;
 static VALUE t_parse(VALUE self, VALUE io) {
     yajl_handle hand;
     yajl_status stat;
-    int bufferSize = 1024;
+    int bufferSize = 8192;
     yajl_parser_config cfg = {1, 1};
     VALUE ctx = rb_hash_new();
     intern_io_read = rb_intern("read");
