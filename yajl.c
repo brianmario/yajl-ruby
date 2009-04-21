@@ -2,134 +2,90 @@
 #include <yajl/yajl_gen.h>
 #include <ruby.h>
 
-VALUE currentNest, context;
+void set_static_value(void * ctx, VALUE val) {
+    VALUE len = RARRAY((VALUE)ctx)->len;
+    
+    if (len > 0) {
+        VALUE lastEntry = rb_ary_entry((VALUE)ctx, len-1);
+        VALUE hash;
+        // fprintf(stdout, "%s\n", rb_obj_classname(val));
+        // fprintf(stdout, "%s\n", rb_obj_classname(lastEntry));
+        switch (TYPE(lastEntry)) {
+            case T_ARRAY:
+                rb_ary_push(lastEntry, val);
+                break;
+            case T_HASH:
+                rb_hash_aset(lastEntry, val, Qnil);
+                rb_ary_push((VALUE)ctx, val);
+                break;
+            case T_STRING:
+                hash = rb_ary_entry((VALUE)ctx, len-2);
+                if (TYPE(hash) == T_HASH) {
+                    rb_hash_aset(hash, lastEntry, val);
+                    rb_ary_pop((VALUE)ctx);
+                    if (TYPE(val) == T_HASH) {
+                        rb_ary_push((VALUE)ctx, val);
+                    }
+                }
+                break;
+        }
+    } else {
+        // fprintf(stdout, "%s\n", rb_obj_classname(val));
+        rb_ary_push((VALUE)ctx, val);
+    }
+}
 
 static int found_null(void * ctx) {
-    VALUE val = Qnil;
-    
-    switch (TYPE(currentNest)) {
-        case T_HASH:
-            rb_hash_aset(currentNest, context, val);
-            context = currentNest;
-            break;
-        case T_ARRAY:
-            rb_ary_push(currentNest, val);
-            context = currentNest;
-            break;
-        default:
-            context = val;
-            break;
-    }
+    set_static_value(ctx, Qnil);
     return 1;
 }
 
 static int found_boolean(void * ctx, int boolean) {
-    VALUE val = boolean ? Qtrue : Qfalse;
-    
-    switch (TYPE(currentNest)) {
-        case T_HASH:
-            rb_hash_aset(currentNest, context, val);
-            context = currentNest;
-            break;
-        case T_ARRAY:
-            rb_ary_push(currentNest, val);
-            context = currentNest;
-            break;
-        default:
-            context = val;
-            break;
-    }
+    set_static_value(ctx, boolean ? Qtrue : Qfalse);
     return 1;
 }
 
 static int found_integer(void * ctx, long integerVal) {
-    VALUE val = LONG2FIX(integerVal);
-    
-    switch (TYPE(currentNest)) {
-        case T_HASH:
-            rb_hash_aset(currentNest, context, val);
-            context = currentNest;
-            break;
-        case T_ARRAY:
-            rb_ary_push(currentNest, val);
-            context = currentNest;
-            break;
-        default:
-            context = val;
-            break;
-    }
+    set_static_value(ctx, LONG2FIX(integerVal));
     return 1;
 }
 
 static int found_double(void * ctx, double doubleVal) {
-    VALUE val = rb_float_new(doubleVal);
-    
-    switch (TYPE(currentNest)) {
-        case T_HASH:
-            rb_hash_aset(currentNest, context, val);
-            context = currentNest;
-            break;
-        case T_ARRAY:
-            rb_ary_push(currentNest, val);
-            context = currentNest;
-            break;
-        default:
-            context = val;
-            break;
-    }
+    set_static_value(ctx, rb_float_new(doubleVal));
     return 1;
 }
 
 static int found_string(void * ctx, const unsigned char * stringVal, unsigned int stringLen) {
-    VALUE val = rb_str_new((char *)stringVal, stringLen);
-    
-    switch (TYPE(currentNest)) {
-        case T_HASH:
-            rb_hash_aset(currentNest, context, val);
-            context = currentNest;
-            break;
-        case T_ARRAY:
-            rb_ary_push(currentNest, val);
-            context = currentNest;
-            break;
-        default:
-            context = val;
-            break;
-    }
+    set_static_value(ctx, rb_str_new((char *)stringVal, stringLen));
     return 1;
 }
 
 static int found_hash_key(void * ctx, const unsigned char * stringVal, unsigned int stringLen) {
-    VALUE str = rb_str_new((char *)stringVal, stringLen);
-    context = str;
-    
-    if (currentNest != Qnil) {
-        rb_hash_aset(currentNest, str, Qnil);
-    }
+    set_static_value(ctx, rb_str_new((char *)stringVal, stringLen));
     return 1;
 }
 
 static int found_start_hash(void * ctx) {
-    currentNest = rb_hash_new();
-    context = currentNest;
+    set_static_value(ctx, rb_hash_new());
     return 1;
 }
 
 static int found_end_hash(void * ctx) {
-    context = currentNest;
-    currentNest = Qnil;
+    if (RARRAY((VALUE)ctx)->len > 1) {
+        rb_ary_pop((VALUE)ctx);
+    }
     return 1;
 }
 
 static int found_start_array(void * ctx) {
-    currentNest = rb_ary_new();
-    context = currentNest;
+    set_static_value(ctx, rb_ary_new());
     return 1;
 }
 
 static int found_end_array(void * ctx) {
-    context = currentNest;
-    currentNest = Qnil;
+    if (RARRAY((VALUE)ctx)->len > 1) {
+        rb_ary_pop((VALUE)ctx);
+    }
     return 1;
 }
 
@@ -155,10 +111,10 @@ static VALUE t_parse(VALUE self, VALUE io) {
     int bufferSize = 8192;
     yajl_parser_config cfg = {1, 1};
     intern_io_read = rb_intern("read");
-    // VALUE ctx = Qnil;
+    VALUE ctx = rb_ary_new();
     
     // allocate our parser
-    hand = yajl_alloc(&callbacks, &cfg, NULL, (void *)context);
+    hand = yajl_alloc(&callbacks, &cfg, NULL, (void *)ctx);
     VALUE parsed = rb_str_new2("");
     VALUE rbufsize = INT2FIX(bufferSize);
     
@@ -179,8 +135,8 @@ static VALUE t_parse(VALUE self, VALUE io) {
     // parse any remaining buffered data
     stat = yajl_parse_complete(hand);
     yajl_free(hand);
-    
-    return context;
+
+    return rb_ary_pop(ctx);
 }
 
 VALUE mYajl;

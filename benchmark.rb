@@ -2,7 +2,7 @@ require 'rubygems'
 require 'benchmark'
 require 'yajl.bundle'
 require 'json'
-require 'activesupport'
+# require 'activesupport'
 
 filename = ARGV[0] || 'benchmark/search.json'
 json = File.new(filename, 'r')
@@ -14,16 +14,16 @@ Benchmark.bm { |x|
     puts "Yajl::Native.parse (C)"
     times.times {
       json.rewind
-      puts Yajl::Native.parse(json).inspect
+      Yajl::Native.parse(json)
     }
   }
-  # x.report {
-  #   puts "\nJSON.parser"
-  #   times.times {
-  #     json.rewind
-  #     JSON.parse(json.read, :max_nesting => false)
-  #   }
-  # }
+  x.report {
+    puts "\nJSON.parser"
+    times.times {
+      json.rewind
+      JSON.parse(json.read, :max_nesting => false)
+    }
+  }
   # x.report {
   #   puts "\nActiveSupport::JSON.decode"
   #   times.times {
