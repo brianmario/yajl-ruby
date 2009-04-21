@@ -8,8 +8,6 @@ void set_static_value(void * ctx, VALUE val) {
     if (len > 0) {
         VALUE lastEntry = rb_ary_entry((VALUE)ctx, len-1);
         VALUE hash;
-        // fprintf(stdout, "%s\n", rb_obj_classname(val));
-        // fprintf(stdout, "%s\n", rb_obj_classname(lastEntry));
         switch (TYPE(lastEntry)) {
             case T_ARRAY:
                 rb_ary_push(lastEntry, val);
@@ -30,7 +28,6 @@ void set_static_value(void * ctx, VALUE val) {
                 break;
         }
     } else {
-        // fprintf(stdout, "%s\n", rb_obj_classname(val));
         rb_ary_push((VALUE)ctx, val);
     }
 }
