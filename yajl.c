@@ -2,6 +2,8 @@
 #include <yajl/yajl_gen.h>
 #include <ruby.h>
 
+ID intern_io_read;
+
 static int parse_null(void * ctx) {
     return 1;
 }
@@ -19,11 +21,11 @@ static int parse_string(void * ctx, const unsigned char * stringVal, unsigned in
 }
 
 static int parse_map_key(void * ctx, const unsigned char * stringVal, unsigned int stringLen) {
-    // fprintf(stdout, "hash");
     return 1;
 }
 
 static int parse_start_map(void * ctx) {
+    // cast with: (VALUE) ctx
     return 1;
 }
 
@@ -53,24 +55,22 @@ static yajl_callbacks callbacks = {
     parse_end_array
 };
 
-// ruby-specific awesomeness
-
 static VALUE t_parse(VALUE self, VALUE io) {
     yajl_handle hand;
     yajl_status stat;
     int bufferSize = 1024;
     yajl_parser_config cfg = {1, 1};
     VALUE ctx = rb_hash_new();
+    intern_io_read = rb_intern("read");
     
     // allocate our parser
-    hand = yajl_alloc(&callbacks, &cfg, NULL, (void *) &ctx);
+    hand = yajl_alloc(&callbacks, &cfg, NULL, (void *)ctx);
     VALUE parsed = rb_str_new2("");
-    ID io_read = rb_intern("read");
     VALUE rbufsize = INT2NUM(bufferSize);
     
     // now parse from the IO
     while (rb_io_eof(io) == Qfalse) {
-        rb_funcall(io, io_read, 2, rbufsize, parsed);
+        rb_funcall(io, intern_io_read, 2, rbufsize, parsed);
         
         stat = yajl_parse(hand, (unsigned char const *)RSTRING_PTR(parsed), RSTRING_LEN(parsed));
         
