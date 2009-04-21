@@ -5,7 +5,7 @@ require 'json'
 require 'activesupport'
 
 filename = ARGV[0] || 'benchmark/search.json'
-json = File.new(filename, File::RDONLY | File::NONBLOCK)
+json = File.new(filename, 'r')
 
 times = ARGV[1] ? ARGV[1].to_i : 1
 puts "Starting benchmark parsing #{File.size(filename)} bytes of JSON data #{times} times\n\n"
