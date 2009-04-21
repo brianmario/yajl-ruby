@@ -1,5 +1,4 @@
 require 'rubygems'
-
 require 'benchmark'
 require 'yajl.bundle'
 require 'json'
@@ -15,16 +14,16 @@ Benchmark.bm { |x|
     puts "Yajl::Native.parse (C)"
     times.times {
       json.rewind
-      Yajl::Native.parse(json)
+      puts Yajl::Native.parse(json).inspect
     }
   }
-  x.report {
-    puts "\nJSON.parser"
-    times.times {
-      json.rewind
-      JSON.parse(json.read, :max_nesting => false)
-    }
-  }
+  # x.report {
+  #   puts "\nJSON.parser"
+  #   times.times {
+  #     json.rewind
+  #     JSON.parse(json.read, :max_nesting => false)
+  #   }
+  # }
   # x.report {
   #   puts "\nActiveSupport::JSON.decode"
   #   times.times {
