@@ -1,6 +1,6 @@
 #include <yajl/yajl_parse.h>
 #include <yajl/yajl_gen.h>
-#include "ruby.h"
+#include <ruby.h>
 
 static int parse_null(void * ctx) {
     return 1;
@@ -19,6 +19,7 @@ static int parse_string(void * ctx, const unsigned char * stringVal, unsigned in
 }
 
 static int parse_map_key(void * ctx, const unsigned char * stringVal, unsigned int stringLen) {
+    // fprintf(stdout, "hash");
     return 1;
 }
 
@@ -69,10 +70,10 @@ static VALUE t_parse(VALUE self, VALUE io) {
     
     // now parse from the IO
     while (rb_io_eof(io) == Qfalse) {
-        rb_funcall(io, io_read, 1, rbufsize, parsed);
+        rb_funcall(io, io_read, 2, rbufsize, parsed);
         
         stat = yajl_parse(hand, (unsigned char const *)RSTRING_PTR(parsed), RSTRING_LEN(parsed));
-
+        
         if (stat != yajl_status_ok &&
             stat != yajl_status_insufficient_data)
         {
