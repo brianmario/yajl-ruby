@@ -11,6 +11,9 @@ void set_static_value(void * ctx, VALUE val) {
         switch (TYPE(lastEntry)) {
             case T_ARRAY:
                 rb_ary_push(lastEntry, val);
+                if (TYPE(val) == T_HASH || TYPE(val) == T_ARRAY) {
+                    rb_ary_push((VALUE)ctx, val);
+                }
                 break;
             case T_HASH:
                 rb_hash_aset(lastEntry, val, Qnil);
@@ -101,26 +104,26 @@ static yajl_callbacks callbacks = {
 };
 
 ID intern_io_read, intern_eof;
+yajl_parser_config cfg = {1, 1};
 
 static VALUE t_parse(VALUE self, VALUE io) {
     yajl_handle hand;
     yajl_status stat;
     int bufferSize = 8192;
-    yajl_parser_config cfg = {1, 1};
     intern_io_read = rb_intern("read");
     intern_eof = rb_intern("eof?");
     VALUE ctx = rb_ary_new();
     
     // allocate our parser
     hand = yajl_alloc(&callbacks, &cfg, NULL, (void *)ctx);
-    VALUE parsed = rb_str_new2("");
+    VALUE parsed = rb_str_new("", 0);
     VALUE rbufsize = INT2FIX(bufferSize);
     
     // now parse from the IO
     while (rb_funcall(io, intern_eof, 0) == Qfalse) {
         rb_funcall(io, intern_io_read, 2, rbufsize, parsed);
         
-        stat = yajl_parse(hand, (const unsigned char *)RSTRING_PTR(parsed), RSTRING_LEN(parsed));
+        stat = yajl_parse(hand, (const unsigned char *)RSTRING(parsed)->ptr, RSTRING(parsed)->len);
         
         if (stat != yajl_status_ok && stat != yajl_status_insufficient_data) {
             unsigned char * str = yajl_get_error(hand, 1, (const unsigned char *)RSTRING_PTR(parsed), RSTRING_LEN(parsed));

@@ -6,13 +6,44 @@ You can read more info at the projects website http://lloydforge.org/projects/ya
 
 == Example of use
 
-For now, just check out the benchmark.rb script.
-Basically Yajl::Native.parse accepts a single parameter, which is a descendant of IO that responds to read(size, buffer)
+File IO
+
+ json_contents = File.new('test.json', 'r')
+ hash = Yajl::Native.parse(json)
+ 
+OR StringIO
+
+ json_contents = StringIO.new
+ hash = Yajl::Native.parse(json)
+
+OR maybe STDIN
+
+ cat someJsonFile.json | ruby -ryajl -e "puts Yajl::Native.parse(STDIN).inspect"
+
+There are a lot more possibilities, some of which I'm going to write other gems/plugins for.
+
+Some ideas are parsing logs in JSON format, an ActiveSupport patch, Rack middleware, use with ohai, JSON API clients, etc...
 
 == How to install
 
-I'm still working on the Hash generation, but you'll be able to install it like any other github gem when I get that finished.
+I'm still working on getting the gem setup, and a gemspec built. Soon I promise!
+
+ sudo gem install brianmario-yajl-ruby
 
 == Benchmarks
 
-I'm refining them and will post soon.
+I'll update this readme with some actual data soon.
+
+After I finished implementation - this library performs close to the same as the current JSON.parse (C gem) does on small/medium files.
+
+But on larger files, and higher amounts of iteration, this library was around 2x faster than JSON.parse.
+
+The main benefit of this library is in it's memory usage.
+
+Since it's able to parse the stream in chunks, it's memory requirements are very, very low.
+
+Again, I'll post some actual data on this; but in my testing here's what my ruby executable was using to parse a 10MB JSON file 100 times:
+
+ JSON.parse ~60MB
+ 
+ Yajl::Native.parse ~30MB
