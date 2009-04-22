@@ -1,6 +1,6 @@
 require 'rubygems'
 require 'benchmark'
-require 'yajl.bundle'
+require '../yajl.bundle'
 require 'json'
 require 'activesupport'
 
@@ -28,12 +28,12 @@ Benchmark.bm { |x|
       JSON.parse(json.read, :max_nesting => false)
     }
   }
-  # x.report {
-  #   puts "ActiveSupport::JSON.decode"
-  #   times.times {
-  #     json.rewind
-  #     ActiveSupport::JSON.decode(json.read)
-  #   }
-  # }
+  x.report {
+    puts "ActiveSupport::JSON.decode"
+    times.times {
+      json.rewind
+      ActiveSupport::JSON.decode(json.read)
+    }
+  }
 }
 json.close
