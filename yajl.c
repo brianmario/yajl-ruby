@@ -100,7 +100,7 @@ static yajl_callbacks callbacks = {
     found_end_array
 };
 
-ID intern_io_read;
+ID intern_io_read, intern_eof;
 
 static VALUE t_parse(VALUE self, VALUE io) {
     yajl_handle hand;
@@ -108,6 +108,7 @@ static VALUE t_parse(VALUE self, VALUE io) {
     int bufferSize = 8192;
     yajl_parser_config cfg = {1, 1};
     intern_io_read = rb_intern("read");
+    intern_eof = rb_intern("eof?");
     VALUE ctx = rb_ary_new();
     
     // allocate our parser
@@ -116,7 +117,7 @@ static VALUE t_parse(VALUE self, VALUE io) {
     VALUE rbufsize = INT2FIX(bufferSize);
     
     // now parse from the IO
-    while (rb_io_eof(io) == Qfalse) {
+    while (rb_funcall(io, intern_eof, 0) == Qfalse) {
         rb_funcall(io, intern_io_read, 2, rbufsize, parsed);
         
         stat = yajl_parse(hand, (const unsigned char *)RSTRING_PTR(parsed), RSTRING_LEN(parsed));
