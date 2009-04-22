@@ -26,8 +26,13 @@ Some ideas are parsing logs in JSON format, an ActiveSupport patch, Rack middlew
 
 == How to install
 
-I'm still working on getting the gem setup, and a gemspec built. Soon I promise!
+First, Yajl uses CMake to build itself (yes, the author realizes this isn't the norm for open source and is willing and ready to accept patches, fork away kids!) so you'll need to grab it first from http://www.cmake.org/.
 
+After you've got that, grab the latest version of Yajl itself from the Githubs at ttp://github.com/lloyd/yajl.
+
+After you have that installed, you should be able to install it like any other gem hosted here like so:
+
+ (instructions here: http://gems.github.com/)
  sudo gem install brianmario-yajl-ruby
 
 == Benchmarks
