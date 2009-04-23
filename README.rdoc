@@ -59,3 +59,17 @@ Again, I'll post some actual data on this; but in my testing here's what my ruby
  JSON.parse ~60MB
  
  Yajl::Native.parse ~30MB
+
+== Status
+
+This library is still being refined and should by no means be used in production.
+That being said, I'd like to invite you to clone/fork and test the crap out of it! ;)
+
+== TODO
+
+While parsing is working for the most part, there are still some edge cases I need to tackle.
+Here's a list of things I need to get done to improve the awesomeness of this library.
+
+* Write up a test suite 
+* Fix known parsing issues with certain JSON strings (Yajl itself works fine, it's the logic in this library that needs a little tweaking)
+* Write more docs
