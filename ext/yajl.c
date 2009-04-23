@@ -24,7 +24,7 @@ void set_static_value(void * ctx, VALUE val) {
                 if (TYPE(hash) == T_HASH) {
                     rb_hash_aset(hash, lastEntry, val);
                     rb_ary_pop((VALUE)ctx);
-                    if (TYPE(val) == T_HASH) {
+                    if (TYPE(val) == T_HASH || TYPE(val) == T_ARRAY) {
                         rb_ary_push((VALUE)ctx, val);
                     }
                 }
