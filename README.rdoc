@@ -28,7 +28,7 @@ or maybe STDIN
 
 There are a lot more possibilities, some of which I'm going to write other gems/plugins for.
 
-Some ideas are parsing logs in JSON format, an ActiveSupport patch (technoweenie/rails@ f9abcc93a3660fcf46172c4cd8a2f36ba5a5510d), Rack middleware, use with ohai, JSON API clients, etc...
+Some ideas are parsing logs in JSON format, an ActiveSupport patch (http://github.com/technoweenie/rails/commit/f9abcc93a3660fcf46172c4cd8a2f36ba5a5510d), Rack middleware, use with ohai, JSON API clients, etc...
 
 == How to install
 
