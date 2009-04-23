@@ -6,17 +6,23 @@ You can read more info at the projects website http://lloydforge.org/projects/ya
 
 == Example of use
 
-File IO
+First, you're probably gonna want to include it:
+
+ include 'yajl'
+
+Then maybe parse some JSON from:
+
+a File IO
 
  json_contents = File.new('test.json', 'r')
  hash = Yajl::Native.parse(json)
  
-OR StringIO
+or maybe a StringIO
 
  json_contents = StringIO.new
  hash = Yajl::Native.parse(json)
 
-OR maybe STDIN
+or maybe STDIN
 
  cat someJsonFile.json | ruby -ryajl -e "puts Yajl::Native.parse(STDIN).inspect"
 
