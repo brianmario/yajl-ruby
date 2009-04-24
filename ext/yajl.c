@@ -5,7 +5,7 @@
 static VALUE cParseError;
 
 void set_static_value(void * ctx, VALUE val) {
-    VALUE len = RARRAY((VALUE)ctx)->len;
+    VALUE len = RARRAY_LEN((VALUE)ctx);
     
     if (len > 0) {
         VALUE lastEntry = rb_ary_entry((VALUE)ctx, len-1);
@@ -68,7 +68,7 @@ static int found_start_hash(void * ctx) {
 }
 
 static int found_end_hash(void * ctx) {
-    if (RARRAY((VALUE)ctx)->len > 1) {
+    if (RARRAY_LEN((VALUE)ctx) > 1) {
         rb_ary_pop((VALUE)ctx);
     }
     return 1;
@@ -80,7 +80,7 @@ static int found_start_array(void * ctx) {
 }
 
 static int found_end_array(void * ctx) {
-    if (RARRAY((VALUE)ctx)->len > 1) {
+    if (RARRAY_LEN((VALUE)ctx) > 1) {
         rb_ary_pop((VALUE)ctx);
     }
     return 1;
@@ -120,7 +120,7 @@ static VALUE t_parse(VALUE self, VALUE io) {
     while (rb_funcall(io, intern_eof, 0) == Qfalse) {
         rb_funcall(io, intern_io_read, 2, rbufsize, parsed);
         
-        stat = yajl_parse(hand, (const unsigned char *)RSTRING(parsed)->ptr, RSTRING(parsed)->len);
+        stat = yajl_parse(hand, (const unsigned char *)RSTRING_PTR(parsed), RSTRING_LEN(parsed));
         
         if (stat != yajl_status_ok && stat != yajl_status_insufficient_data) {
             unsigned char * str = yajl_get_error(hand, 1, (const unsigned char *)RSTRING_PTR(parsed), RSTRING_LEN(parsed));

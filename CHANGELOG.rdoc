@@ -1,5 +1,8 @@
 = Changelog
 
+0.3.3 (April 24th, 2009)
+ * 1.9 compatibility
+
 0.3.2 (April 24th, 2009)
  * version bump: forgot to include yajl.c in the gem
 
