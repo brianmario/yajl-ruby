@@ -47,13 +47,18 @@ static int found_boolean(void * ctx, int boolean) {
     return 1;
 }
 
-static int found_integer(void * ctx, long integerVal) {
-    set_static_value(ctx, LONG2FIX(integerVal));
-    return 1;
-}
+// static int found_integer(void * ctx, long integerVal) {
+//     set_static_value(ctx, LONG2FIX(integerVal));
+//     return 1;
+// }
+// 
+// static int found_double(void * ctx, double doubleVal) {
+//     set_static_value(ctx, rb_float_new(doubleVal));
+//     return 1;
+// }
 
-static int found_double(void * ctx, double doubleVal) {
-    set_static_value(ctx, rb_float_new(doubleVal));
+static int found_number(void * ctx, const char * numberVal, unsigned int numberLen) {
+    set_static_value(ctx, rb_float_new(rb_str_new(numberVal, numberLen)));
     return 1;
 }
 
@@ -94,9 +99,9 @@ static int found_end_array(void * ctx) {
 static yajl_callbacks callbacks = {
     found_null,
     found_boolean,
-    found_integer,
-    found_double,
     NULL,
+    NULL,
+    found_number,
     found_string,
     found_start_hash,
     found_hash_key,
@@ -106,7 +111,7 @@ static yajl_callbacks callbacks = {
 };
 
 static ID intern_io_read, intern_eof;
-yajl_parser_config cfg = {1, 1};
+yajl_parser_config cfg = {1, 0};
 
 static VALUE t_parse(VALUE self, VALUE io) {
     yajl_handle hand;
