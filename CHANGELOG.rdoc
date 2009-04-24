@@ -1,5 +1,8 @@
 = Changelog
 
+0.3.1 (April 23rd, 2009)
+ * fixed borked gemspec
+
 0.3.0 (April 23rd, 2009)
  * slight refactor of ActiveSupport tests to better reflect how they actually
  exist in ActiveSupport

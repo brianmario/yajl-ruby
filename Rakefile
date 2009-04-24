@@ -7,6 +7,7 @@ begin
     gem.homepage = "http://github.com/brianmario/yajl-ruby"
     gem.authors = ["Brian Lopez"]
     gem.require_paths = ["ext"]
+    gem.extensions = ["ext/extconf.rb"]
     gem.files.include %w(lib/jeweler/templates/.document lib/jeweler/templates/.gitignore)
     # gem.rubyforge_project = "yajl-ruby"
   end
