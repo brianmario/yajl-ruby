@@ -8,7 +8,8 @@ begin
     gem.authors = ["Brian Lopez"]
     gem.require_paths = ["ext"]
     gem.extra_rdoc_files = [
-      "README.rdoc"
+      "README.rdoc",
+      "CHANGELOG.rdoc"
     ]
     gem.files = [
       "CHANGELOG.rdoc",
