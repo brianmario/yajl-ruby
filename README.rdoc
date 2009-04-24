@@ -40,7 +40,7 @@ Some ideas are:
 
 First, Yajl uses CMake to build itself (yes, the author realizes this isn't the norm for open source and is willing and ready to accept patches, fork away kids!) so you'll need to grab it first from http://www.cmake.org.
 
-After you've got that, grab the latest version of Yajl itself from the Githubs at http://github.com/lloyd/yajl.
+After you've got that, grab the latest version (I suggest at least 1.0.4 as it contains fixes for Unicode parsing) of Yajl itself from the Githubs at http://github.com/lloyd/yajl.
 
 After you have that installed, you should be able to install it like any other gem hosted here like so:
 
