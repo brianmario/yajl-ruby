@@ -48,7 +48,7 @@ static int found_boolean(void * ctx, int boolean) {
 }
 
 static int found_number(void * ctx, const char * numberVal, unsigned int numberLen) {
-    set_static_value(ctx, rb_float_new(rb_str_new(numberVal, numberLen)));
+    set_static_value(ctx, rb_str2inum(rb_str_new(numberVal, numberLen), 10));
     return 1;
 }
 
