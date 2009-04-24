@@ -79,3 +79,4 @@ Here's a list of things I need to get done to improve the awesomeness of this li
 * Write up a test suite 
 * Fix known parsing issues with certain JSON strings (Yajl itself works fine, it's the logic in this library that needs a little tweaking)
 * Write more docs
+* Change API so it can accept a String or an IO
