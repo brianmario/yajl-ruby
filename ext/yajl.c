@@ -48,7 +48,14 @@ static int found_boolean(void * ctx, int boolean) {
 }
 
 static int found_number(void * ctx, const char * numberVal, unsigned int numberLen) {
-    set_static_value(ctx, rb_str2inum(rb_str_new(numberVal, numberLen), 10));
+    if (strstr(numberVal, ".") != NULL
+        || strstr(numberVal, "e") != NULL
+        || strstr(numberVal, "E") != NULL) {
+        set_static_value(ctx, rb_Float(rb_str_new(numberVal, numberLen)));
+    } else {
+        set_static_value(ctx, rb_Integer(rb_str_new(numberVal, numberLen)));
+    }
+    
     return 1;
 }
 
@@ -101,7 +108,7 @@ static yajl_callbacks callbacks = {
 };
 
 static ID intern_io_read, intern_eof;
-yajl_parser_config cfg = {1, 0};
+static yajl_parser_config cfg = {1, 1};
 
 static VALUE t_parse(VALUE self, VALUE io) {
     yajl_handle hand;

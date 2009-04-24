@@ -1,5 +1,12 @@
 = Changelog
 
+0.3.4 (April 24th, 2009)
+ * turned Unicode checks back on in the Yajl parser now that it's fixed (thanks Lloyd!)
+ ** this also bumps the yajl version dependency requirement to 1.0.4
+ * better guessing of Integer/Float from number found instead of just trying to create a BigNum no matter what
+ * changed extconf.rb to fail Makefile creation if yajl isn't found
+ * added a test to check for parsing Infinity due to a Float overflow
+
 0.3.3 (April 24th, 2009)
  * 1.9 compatibility
 
@@ -16,13 +23,12 @@
  * added some initial spec tests
  ** ported some from ActiveSupport to ensure proper compatibility
  ** included 57 JSON fixtures to test against, all of which pass
- * changed parser config to not check for invalid unicode characters as Ruby is
- going to do this anyway (?). This resolves the remaining test failures around unicode.
+ * changed parser config to not check for invalid unicode characters as Ruby is going to do this anyway (?).
+ This resolves the remaining test failures around unicode.
  * changed how the parser was dealing with numbers to prevent overflows
- * added an exception class Yajl::ParseError which is now used in place of simply
- printing to STDERR upon a parsing error
- * renamed a couple of JSON test files in the benchmark folder to better represent their
- contents
+ * added an exception class Yajl::ParseError which is now used in place of simply printing to STDERR upon a parsing
+ error
+ * renamed a couple of JSON test files in the benchmark folder to better represent their contents
  * misc README updates
 
 0.2.1 (April 23rd, 2009)

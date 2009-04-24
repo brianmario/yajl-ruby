@@ -2,7 +2,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper.rb')
 
 describe "Parsing JSON Fixtures" do
-  
   fixtures = File.join(File.dirname(__FILE__), 'fixtures/*.json')
   passed, failed = Dir[fixtures].partition { |f| f['pass'] }
   PASSED = passed.inject([]) { |a, f| a << [ f, File.read(f) ] }.sort

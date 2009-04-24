@@ -33,18 +33,16 @@ describe "ActiveSupport test cases" do
     %q({"a": "\u003cbr /\u003e"}) => {'a' => "<br />"},
     %q({"b":["\u003ci\u003e","\u003cb\u003e","\u003cu\u003e"]}) => {'b' => ["<i>","<b>","<u>"]}
   }
-
+  
   TESTS.each do |json, expected|
     it "should be able to parse #{json}" do
-      hash = {}
       lambda {
-        hash = Yajl::Native.parse(StringIO.new(json))
+        Yajl::Native.parse(StringIO.new(json)).should == expected
       }.should_not raise_error(Yajl::ParseError)
-      hash.should == expected
     end
   end
 
-  it "should fail parsing #{@bad}" do
+  it "should fail parsing {: 1}" do
     lambda {
       Yajl::Native.parse(StringIO.new("{: 1}"))
       }.should raise_error(Yajl::ParseError)
