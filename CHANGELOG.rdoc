@@ -1,11 +1,27 @@
 = Changelog
 
+0.3.0 (April 23rd, 2009)
+ * slight refactor of ActiveSupport tests to better reflect how they actually
+ exist in ActiveSupport
+ * typo correction in the changelog which had the years in 2008
+ * added some initial spec tests
+ ** ported some from ActiveSupport to ensure proper compatibility
+ ** included 57 JSON fixtures to test against, all of which pass
+ * changed parser config to not check for invalid unicode characters as Ruby is
+ going to do this anyway (?). This resolves the remaining test failures around unicode.
+ * changed how the parser was dealing with numbers to prevent overflows
+ * added an exception class Yajl::ParseError which is now used in place of simply
+ printing to STDERR upon a parsing error
+ * renamed a couple of JSON test files in the benchmark folder to better represent their
+ contents
+ * misc README updates
+
 0.2.1 (April 23rd, 2009)
-* fixed parsing bug - also fixed failing ActiveSupport test failures
-  (except for the unicode one, which is an issue in Yajl itself)
+ * fixed parsing bug - also fixed failing ActiveSupport test failures
+ (except for the unicode one, which is an issue in Yajl itself)
 
 0.2.0 (April 22nd, 2009)
-* updated gemspec and README
+ * updated gemspec and README
 
 0.1.0 (April 21st, 2009)
-* initial release - gemified
+ * initial release - gemified
