@@ -1,11 +1,11 @@
 = Changelog
 
-0.2.1 - 4/23/08
+0.2.1 (April 23rd, 2009)
 * fixed parsing bug - also fixed failing ActiveSupport test failures
   (except for the unicode one, which is an issue in Yajl itself)
 
-0.2.0 - 4/22/08
+0.2.0 (April 22nd, 2009)
 * updated gemspec and README
 
-0.1.0 - 4/21/08
+0.1.0 (April 21st, 2009)
 * initial release - gemified
