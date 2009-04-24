@@ -2,6 +2,8 @@
 #include <yajl/yajl_gen.h>
 #include <ruby.h>
 
+static VALUE cParserError;
+
 void set_static_value(void * ctx, VALUE val) {
     VALUE len = RARRAY((VALUE)ctx)->len;
     
@@ -103,7 +105,7 @@ static yajl_callbacks callbacks = {
     found_end_array
 };
 
-ID intern_io_read, intern_eof;
+static ID intern_io_read, intern_eof;
 yajl_parser_config cfg = {1, 1};
 
 static VALUE t_parse(VALUE self, VALUE io) {
@@ -127,7 +129,7 @@ static VALUE t_parse(VALUE self, VALUE io) {
         
         if (stat != yajl_status_ok && stat != yajl_status_insufficient_data) {
             unsigned char * str = yajl_get_error(hand, 1, (const unsigned char *)RSTRING_PTR(parsed), RSTRING_LEN(parsed));
-            fprintf(stderr, (const char *) str);
+            rb_raise(cParserError, "%s", (const char *) str);
             yajl_free_error(hand, str);
             break;
         }
@@ -140,11 +142,12 @@ static VALUE t_parse(VALUE self, VALUE io) {
     return rb_ary_pop(ctx);
 }
 
-VALUE mYajl;
-VALUE mNative;
+static VALUE mYajl, mNative;
 
 void Init_yajl() {
     mYajl = rb_define_module("Yajl");
     mNative = rb_define_module_under(mYajl, "Native");
     rb_define_module_function(mNative, "parse", t_parse, 1);
+    VALUE rb_cStandardError = rb_const_get(rb_cObject, rb_intern("StandardError"));
+    cParserError = rb_define_class_under(mYajl, "ParserError", rb_cStandardError);
 }
