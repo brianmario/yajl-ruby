@@ -2,7 +2,7 @@
 #include <yajl/yajl_gen.h>
 #include <ruby.h>
 
-static VALUE cParserError;
+static VALUE cParseError;
 
 void set_static_value(void * ctx, VALUE val) {
     VALUE len = RARRAY((VALUE)ctx)->len;
@@ -129,7 +129,7 @@ static VALUE t_parse(VALUE self, VALUE io) {
         
         if (stat != yajl_status_ok && stat != yajl_status_insufficient_data) {
             unsigned char * str = yajl_get_error(hand, 1, (const unsigned char *)RSTRING_PTR(parsed), RSTRING_LEN(parsed));
-            rb_raise(cParserError, "%s", (const char *) str);
+            rb_raise(cParseError, "%s", (const char *) str);
             yajl_free_error(hand, str);
             break;
         }
@@ -149,5 +149,5 @@ void Init_yajl() {
     mNative = rb_define_module_under(mYajl, "Native");
     rb_define_module_function(mNative, "parse", t_parse, 1);
     VALUE rb_cStandardError = rb_const_get(rb_cObject, rb_intern("StandardError"));
-    cParserError = rb_define_class_under(mYajl, "ParserError", rb_cStandardError);
+    cParseError = rb_define_class_under(mYajl, "ParseError", rb_cStandardError);
 }
