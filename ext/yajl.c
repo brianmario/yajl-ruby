@@ -47,16 +47,6 @@ static int found_boolean(void * ctx, int boolean) {
     return 1;
 }
 
-// static int found_integer(void * ctx, long integerVal) {
-//     set_static_value(ctx, LONG2FIX(integerVal));
-//     return 1;
-// }
-// 
-// static int found_double(void * ctx, double doubleVal) {
-//     set_static_value(ctx, rb_float_new(doubleVal));
-//     return 1;
-// }
-
 static int found_number(void * ctx, const char * numberVal, unsigned int numberLen) {
     set_static_value(ctx, rb_float_new(rb_str_new(numberVal, numberLen)));
     return 1;
