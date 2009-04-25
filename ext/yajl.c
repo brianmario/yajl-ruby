@@ -120,7 +120,7 @@ static VALUE t_parse(VALUE self, VALUE io) {
     
     // allocate our parser
     hand = yajl_alloc(&callbacks, &cfg, NULL, (void *)ctx);
-    VALUE parsed = rb_str_new("", 0);
+    VALUE parsed = rb_str_new("", bufferSize);
     VALUE rbufsize = INT2FIX(bufferSize);
     
     // now parse from the IO
