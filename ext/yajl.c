@@ -2,7 +2,7 @@
 #include <yajl/yajl_gen.h>
 #include <ruby.h>
 
-#define READ_BUFSIZE 8192
+#define READ_BUFSIZE 4096
 
 static VALUE cParseError, hashFoundCallback = Qnil;
 static ID intern_io_read, intern_eof, intern_respond_to;
