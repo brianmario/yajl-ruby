@@ -2,7 +2,11 @@
 #include <yajl/yajl_gen.h>
 #include <ruby.h>
 
-static VALUE cParseError;
+#define READ_BUFSIZE 8192
+
+static VALUE cParseError, hashFoundCallback = Qnil;
+static ID intern_io_read, intern_eof, intern_respond_to;
+static int readBufferSize = READ_BUFSIZE;
 
 void set_static_value(void * ctx, VALUE val) {
     VALUE len = RARRAY_LEN((VALUE)ctx);
@@ -107,21 +111,18 @@ static yajl_callbacks callbacks = {
     found_end_array
 };
 
-static ID intern_io_read, intern_eof;
 static yajl_parser_config cfg = {1, 1};
 
 static VALUE t_parse(VALUE self, VALUE io) {
     yajl_handle hand;
     yajl_status stat;
-    int bufferSize = 8192;
-    intern_io_read = rb_intern("read");
-    intern_eof = rb_intern("eof?");
+    
     VALUE ctx = rb_ary_new();
     
     // allocate our parser
     hand = yajl_alloc(&callbacks, &cfg, NULL, (void *)ctx);
-    VALUE parsed = rb_str_new("", bufferSize);
-    VALUE rbufsize = INT2FIX(bufferSize);
+    VALUE parsed = rb_str_new("", readBufferSize);
+    VALUE rbufsize = INT2FIX(readBufferSize);
     
     // now parse from the IO
     while (rb_funcall(io, intern_eof, 0) == Qfalse) {
@@ -152,4 +153,8 @@ void Init_yajl() {
     rb_define_module_function(mNative, "parse", t_parse, 1);
     VALUE rb_cStandardError = rb_const_get(rb_cObject, rb_intern("StandardError"));
     cParseError = rb_define_class_under(mYajl, "ParseError", rb_cStandardError);
+    
+    intern_io_read = rb_intern("read");
+    intern_eof = rb_intern("eof?");
+    intern_respond_to = rb_intern("respond_to?");
 }
