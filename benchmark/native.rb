@@ -5,7 +5,7 @@ require '../yajl.bundle'
 require 'json'
 require 'activesupport'
 
-filename = ARGV[0] || 'twitter_search.json'
+filename = ARGV[0] || 'subjects/twitter_search.json'
 json = File.new(filename, 'r')
 
 # warm up the fs
