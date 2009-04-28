@@ -1,5 +1,6 @@
-require 'socket'
-require 'yajl'
+require 'socket' unless defined?(Socket)
+require 'zlib' unless defined?(Zlib)
+require 'zlib' unless defined?(Yajl)
 
 module Yajl
   class HttpStream
@@ -11,7 +12,7 @@ module Yajl
       socket = Socket.new(Socket::Constants::AF_INET, Socket::Constants::SOCK_STREAM, 0)
       sockaddr = Socket.pack_sockaddr_in(uri.port, uri.host)
       socket.connect(sockaddr)
-      socket.write("GET #{uri.path}?#{uri.query} HTTP/1.0\r\n\r\n")
+      socket.write("GET #{uri.path}?#{uri.query} HTTP/1.0\r\nAccept-encoding: gzip,deflate\r\n\r\n")
       
       response_head = {}
       response_head[:headers] = {}
@@ -34,10 +35,13 @@ module Yajl
       end
       
       if response_head[:headers]["Content-Type"].include?(MIME_TYPE)
-        # parse off the rest of the socket
-        return hash = Yajl::Native.parse(socket)
+        case response_head[:headers]["Content-Encoding"]
+        when "gzip"
+          socket = Zlib::GzipReader.new(socket)
+        end
+        return Yajl::Native.parse(socket)
       else
-        raise InvalidContentType, "The response MIME type wasn't #{MIME_TYPE}, skipping parse."
+        raise InvalidContentType, "The response MIME type #{response_head[:headers]["Content-Type"]}"
       end
     ensure
       socket.close

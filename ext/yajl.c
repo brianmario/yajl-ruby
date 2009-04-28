@@ -4,7 +4,7 @@
 
 #define READ_BUFSIZE 4096
 
-static VALUE cParseError, hashFoundCallback = Qnil;
+static VALUE cParseError;
 static ID intern_io_read, intern_eof, intern_respond_to;
 static int readBufferSize = READ_BUFSIZE;
 
@@ -126,7 +126,7 @@ static VALUE t_parse(VALUE self, VALUE io) {
     
     // now parse from the IO
     while (rb_funcall(io, intern_eof, 0) == Qfalse) {
-        rb_funcall(io, intern_io_read, 2, rbufsize, parsed);
+        parsed = rb_funcall(io, intern_io_read, 1, rbufsize);
         
         stat = yajl_parse(hand, (const unsigned char *)RSTRING_PTR(parsed), RSTRING_LEN(parsed));
         
