@@ -1,6 +1,6 @@
 require 'socket' unless defined?(Socket)
 require 'zlib' unless defined?(Zlib)
-require 'zlib' unless defined?(Yajl)
+require 'yajl' unless defined?(Yajl)
 
 module Yajl
   class HttpStream
