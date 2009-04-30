@@ -91,11 +91,6 @@ Again, I'll post some actual data on this; but in my testing here's what my ruby
  
  Yajl::Native.parse ~30MB
 
-== Status
-
-This library is still being refined and should by no means be used in production.
-That being said, I'd like to invite you to clone/fork and test the crap out of it! ;)
-
 == Special Thanks
 
 I've had a lot of inspiration, and a lot of help. Thanks to everyone who's been a part of this and those to come!
