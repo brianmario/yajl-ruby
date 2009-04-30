@@ -5,8 +5,25 @@
 #define READ_BUFSIZE 4096
 
 static VALUE cParseError;
-static ID intern_io_read, intern_eof, intern_respond_to;
+static ID intern_io_read, intern_eof, intern_respond_to, intern_call;
 static int readBufferSize = READ_BUFSIZE;
+
+static yajl_parser_config cfg = {1, 1};
+
+yajl_handle parser = NULL;
+VALUE context = Qnil;
+VALUE parse_complete_callback = Qnil;
+
+void check_and_fire_callback(void * ctx) {
+    yajl_status stat;
+    
+    if (RARRAY_LEN((VALUE)ctx) == 1 && parse_complete_callback != Qnil) {
+        // parse any remaining buffered data
+        stat = yajl_parse_complete(parser);
+        
+        rb_funcall(parse_complete_callback, intern_call, 1, rb_ary_pop((VALUE)ctx));
+    }
+}
 
 void set_static_value(void * ctx, VALUE val) {
     VALUE len = RARRAY_LEN((VALUE)ctx);
@@ -43,11 +60,13 @@ void set_static_value(void * ctx, VALUE val) {
 
 static int found_null(void * ctx) {
     set_static_value(ctx, Qnil);
+    check_and_fire_callback(ctx);
     return 1;
 }
 
 static int found_boolean(void * ctx, int boolean) {
     set_static_value(ctx, boolean ? Qtrue : Qfalse);
+    check_and_fire_callback(ctx);
     return 1;
 }
 
@@ -59,12 +78,13 @@ static int found_number(void * ctx, const char * numberVal, unsigned int numberL
     } else {
         set_static_value(ctx, rb_Integer(rb_str_new(numberVal, numberLen)));
     }
-    
+    check_and_fire_callback(ctx);
     return 1;
 }
 
 static int found_string(void * ctx, const unsigned char * stringVal, unsigned int stringLen) {
     set_static_value(ctx, rb_str_new((char *)stringVal, stringLen));
+    check_and_fire_callback(ctx);
     return 1;
 }
 
@@ -82,6 +102,7 @@ static int found_end_hash(void * ctx) {
     if (RARRAY_LEN((VALUE)ctx) > 1) {
         rb_ary_pop((VALUE)ctx);
     }
+    check_and_fire_callback(ctx);
     return 1;
 }
 
@@ -94,6 +115,7 @@ static int found_end_array(void * ctx) {
     if (RARRAY_LEN((VALUE)ctx) > 1) {
         rb_ary_pop((VALUE)ctx);
     }
+    check_and_fire_callback(ctx);
     return 1;
 }
 
@@ -111,16 +133,52 @@ static yajl_callbacks callbacks = {
     found_end_array
 };
 
-static yajl_parser_config cfg = {1, 1};
+static VALUE t_setParseComplete(VALUE self, VALUE callback) {
+    parse_complete_callback = callback;
+    return Qnil;
+}
 
-static VALUE t_parse(VALUE self, VALUE io) {
-    yajl_handle hand;
+static VALUE t_parseSome(VALUE self, VALUE string) {
     yajl_status stat;
     
-    VALUE ctx = rb_ary_new();
+    if (string == Qnil) {
+        rb_raise(cParseError, "%s", "Can't parse a nil string.");
+        return Qnil;
+    }
+    
+    if (parse_complete_callback != Qnil) {
+        if (context == Qnil) {
+            context = rb_ary_new();
+        }
+        if (parser == NULL) {
+            // allocate our parser
+            parser = yajl_alloc(&callbacks, &cfg, NULL, (void *)context);
+        }
+        
+        stat = yajl_parse(parser, (const unsigned char *)RSTRING_PTR(string), RSTRING_LEN(string));
+        if (stat != yajl_status_ok && stat != yajl_status_insufficient_data) {
+            unsigned char * str = yajl_get_error(parser, 1, (const unsigned char *)RSTRING_PTR(string), RSTRING_LEN(string));
+            rb_raise(cParseError, "%s", (const char *) str);
+            yajl_free_error(parser, str);
+        }
+    } else {
+        rb_raise(cParseError, "%s", "The on_parse_complete callback isn't setup, parsing useless.");
+    }
+    
+    if (RARRAY_LEN(context) == 0) {
+        yajl_free(parser);
+    }
+    
+    return Qnil;
+}
+
+static VALUE t_parse(VALUE self, VALUE io) {
+    yajl_status stat;
+    context = rb_ary_new();
     
     // allocate our parser
-    hand = yajl_alloc(&callbacks, &cfg, NULL, (void *)ctx);
+    parser = yajl_alloc(&callbacks, &cfg, NULL, (void *)context);
+    
     VALUE parsed = rb_str_new("", readBufferSize);
     VALUE rbufsize = INT2FIX(readBufferSize);
     
@@ -128,21 +186,26 @@ static VALUE t_parse(VALUE self, VALUE io) {
     while (rb_funcall(io, intern_eof, 0) == Qfalse) {
         parsed = rb_funcall(io, intern_io_read, 1, rbufsize);
         
-        stat = yajl_parse(hand, (const unsigned char *)RSTRING_PTR(parsed), RSTRING_LEN(parsed));
+        stat = yajl_parse(parser, (const unsigned char *)RSTRING_PTR(parsed), RSTRING_LEN(parsed));
         
         if (stat != yajl_status_ok && stat != yajl_status_insufficient_data) {
-            unsigned char * str = yajl_get_error(hand, 1, (const unsigned char *)RSTRING_PTR(parsed), RSTRING_LEN(parsed));
+            unsigned char * str = yajl_get_error(parser, 1, (const unsigned char *)RSTRING_PTR(parsed), RSTRING_LEN(parsed));
             rb_raise(cParseError, "%s", (const char *) str);
-            yajl_free_error(hand, str);
+            yajl_free_error(parser, str);
             break;
         }
     }
     
     // parse any remaining buffered data
-    stat = yajl_parse_complete(hand);
-    yajl_free(hand);
+    stat = yajl_parse_complete(parser);
+    yajl_free(parser);
+    
+    if (parse_complete_callback != Qnil) {
+        check_and_fire_callback((void *)context);
+        return Qnil;
+    }
 
-    return rb_ary_pop(ctx);
+    return rb_ary_pop(context);
 }
 
 static VALUE mYajl, mNative;
@@ -151,10 +214,14 @@ void Init_yajl() {
     mYajl = rb_define_module("Yajl");
     mNative = rb_define_module_under(mYajl, "Native");
     rb_define_module_function(mNative, "parse", t_parse, 1);
+    rb_define_module_function(mNative, "parse_some", t_parseSome, 1);
+    rb_define_module_function(mNative, "<<", t_parseSome, 1);
+    rb_define_module_function(mNative, "on_parse_complete=", t_setParseComplete, 1);
     VALUE rb_cStandardError = rb_const_get(rb_cObject, rb_intern("StandardError"));
     cParseError = rb_define_class_under(mYajl, "ParseError", rb_cStandardError);
     
     intern_io_read = rb_intern("read");
     intern_eof = rb_intern("eof?");
     intern_respond_to = rb_intern("respond_to?");
+    intern_call = rb_intern("call");
 }
