@@ -82,14 +82,29 @@ After I finished implementation - this library performs close to the same as the
 But on larger files, and higher amounts of iteration, this library was around 2x faster than JSON.parse.
 
 The main benefit of this library is in it's memory usage.
-
 Since it's able to parse the stream in chunks, it's memory requirements are very, very low.
 
-Again, I'll post some actual data on this; but in my testing here's what my ruby executable was using to parse a 10MB JSON file 100 times:
+Here's what parsing a 2.43MB JSON file off the filesystem 20 times looks like:
 
- JSON.parse ~60MB
- 
- Yajl::Native.parse ~30MB
+=== Memory Usage
+
+==== Average
+
+* Yajl::Stream.parse: 32MB
+* JSON.parse: 54MB
+* ActiveSupport::JSON.decode: 63MB
+
+==== Peak
+
+* Yajl::Stream.parse: 32MB
+* JSON.parse: 57MB
+* ActiveSupport::JSON.decode: 67MB
+
+=== Parse Time
+
+* Yajl::Stream.parse: 4.54s
+* JSON.parse: 5.47s
+* ActiveSupport::JSON.decode: 64.42s
 
 == Special Thanks
 
