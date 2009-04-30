@@ -21,7 +21,7 @@ Gem::Specification.new do |s|
     "Rakefile",
     "VERSION.yml",
     "benchmark/http.rb",
-    "benchmark/native.rb",
+    "benchmark/stream.rb",
     "benchmark/subjects/contacts.json",
     "benchmark/subjects/item.json",
     "benchmark/subjects/ohai.json",
