@@ -1,5 +1,6 @@
 # encoding: UTF-8
-require 'yajl'
+require 'yajl.bundle'
+require 'yajl/http_stream.rb' unless defined?(Yajl::HttpStream)
 
 # = Yajl
 #

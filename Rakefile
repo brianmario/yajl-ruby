@@ -7,7 +7,7 @@ begin
     gem.email = "seniorlopez@gmail.com"
     gem.homepage = "http://github.com/brianmario/yajl-ruby"
     gem.authors = ["Brian Lopez"]
-    gem.require_paths = ["ext", "lib"]
+    gem.require_paths = ["lib", "ext"]
     gem.extra_rdoc_files = `git ls-files *.rdoc`.split("\n")
     gem.files = `git ls-files`.split("\n")
     gem.extensions = ["ext/extconf.rb"]

@@ -1,5 +1,10 @@
 = Changelog
 
+0.4.2 (April 30th, 2009)
+ * Yajl::HttpStream is now sending "proper" http request headers
+ * Yajl::HttpStream will request HTTP-Basic auth if credentials are provided in the passed URI
+ * cleanup requires
+
 0.4.1 (April 30th, 2009)
  * fixed a typo in the stream.rb benchmark file
  * fixed a bug in Yajl::Stream.parse that was causing "strange" Ruby malloc errors on large files, with large strings

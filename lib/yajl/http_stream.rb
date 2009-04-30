@@ -1,7 +1,7 @@
 # encoding: UTF-8
 require 'socket' unless defined?(Socket)
 require 'zlib' unless defined?(Zlib)
-require 'yajl' unless defined?(Yajl)
+require 'yajl.rb' unless defined?(Yajl)
 
 module Yajl
   # == Yajl::HttpStream
@@ -29,8 +29,15 @@ module Yajl
       socket = Socket.new(Socket::Constants::AF_INET, Socket::Constants::SOCK_STREAM, 0)
       sockaddr = Socket.pack_sockaddr_in(uri.port, uri.host)
       socket.connect(sockaddr)
-      socket.write("GET #{uri.path}?#{uri.query} HTTP/1.0\r\nAccept-encoding: gzip\r\n\r\n")
-      
+      request = "GET #{uri.path}#{uri.query ? "?"+uri.query : nil} HTTP/1.0\r\n"
+      request << "Host: #{uri.host}\r\n"
+      request << "Authorization: Basic #{[userinfo].pack('m')}\r\n" unless uri.userinfo.nil?
+      request << "User-Agent: Yajl::HttpStream #{Yajl::VERSION}\r\n"
+      request << "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\r\n"
+      request << "Accept-Encoding: gzip\r\n"
+      request << "Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7\r\n"
+      request << "\r\n\r\n"
+      socket.write(request)
       response_head = {}
       response_head[:headers] = {}
       
@@ -70,9 +77,10 @@ module Yajl
   # This is a wrapper around Zlib::GzipReader to allow it's #read method to adhere
   # to the IO spec, allowing for two parameters (length, and buffer)
   class GzipStreamReader < ::Zlib::GzipReader
-    def read(len, buffer=nil)
-      buffer.gsub!(/.*/, '')
-      buffer << super(len)
+    def read(len=nil, buffer=nil)
+      buffer.gsub!(/.*/, '') unless buffer.nil?
+      buffer << super(len) and return unless buffer.nil?
+      super(len)
     end
   end
 end
