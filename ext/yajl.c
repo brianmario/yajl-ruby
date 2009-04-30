@@ -10,7 +10,7 @@ static int readBufferSize = READ_BUFSIZE;
 
 static yajl_parser_config cfg = {1, 1};
 
-yajl_handle parser = NULL;
+yajl_handle streamParser = NULL, chunkedParser = NULL;
 VALUE context = Qnil;
 VALUE parse_complete_callback = Qnil;
 
@@ -19,7 +19,7 @@ void check_and_fire_callback(void * ctx) {
     
     if (RARRAY_LEN((VALUE)ctx) == 1 && parse_complete_callback != Qnil) {
         // parse any remaining buffered data
-        stat = yajl_parse_complete(parser);
+        stat = yajl_parse_complete(chunkedParser);
         
         rb_funcall(parse_complete_callback, intern_call, 1, rb_ary_pop((VALUE)ctx));
     }
@@ -150,23 +150,23 @@ static VALUE t_parseSome(VALUE self, VALUE string) {
         if (context == Qnil) {
             context = rb_ary_new();
         }
-        if (parser == NULL) {
+        if (chunkedParser == NULL) {
             // allocate our parser
-            parser = yajl_alloc(&callbacks, &cfg, NULL, (void *)context);
+            chunkedParser = yajl_alloc(&callbacks, &cfg, NULL, (void *)context);
         }
         
-        stat = yajl_parse(parser, (const unsigned char *)RSTRING_PTR(string), RSTRING_LEN(string));
+        stat = yajl_parse(chunkedParser, (const unsigned char *)RSTRING_PTR(string), RSTRING_LEN(string));
         if (stat != yajl_status_ok && stat != yajl_status_insufficient_data) {
-            unsigned char * str = yajl_get_error(parser, 1, (const unsigned char *)RSTRING_PTR(string), RSTRING_LEN(string));
+            unsigned char * str = yajl_get_error(chunkedParser, 1, (const unsigned char *)RSTRING_PTR(string), RSTRING_LEN(string));
             rb_raise(cParseError, "%s", (const char *) str);
-            yajl_free_error(parser, str);
+            yajl_free_error(chunkedParser, str);
         }
     } else {
         rb_raise(cParseError, "%s", "The on_parse_complete callback isn't setup, parsing useless.");
     }
     
     if (RARRAY_LEN(context) == 0) {
-        yajl_free(parser);
+        yajl_free(chunkedParser);
     }
     
     return Qnil;
@@ -177,7 +177,7 @@ static VALUE t_parse(VALUE self, VALUE io) {
     context = rb_ary_new();
     
     // allocate our parser
-    parser = yajl_alloc(&callbacks, &cfg, NULL, (void *)context);
+    streamParser = yajl_alloc(&callbacks, &cfg, NULL, (void *)context);
     
     VALUE parsed = rb_str_new("", readBufferSize);
     VALUE rbufsize = INT2FIX(readBufferSize);
@@ -186,19 +186,19 @@ static VALUE t_parse(VALUE self, VALUE io) {
     while (rb_funcall(io, intern_eof, 0) == Qfalse) {
         parsed = rb_funcall(io, intern_io_read, 1, rbufsize);
         
-        stat = yajl_parse(parser, (const unsigned char *)RSTRING_PTR(parsed), RSTRING_LEN(parsed));
+        stat = yajl_parse(streamParser, (const unsigned char *)RSTRING_PTR(parsed), RSTRING_LEN(parsed));
         
         if (stat != yajl_status_ok && stat != yajl_status_insufficient_data) {
-            unsigned char * str = yajl_get_error(parser, 1, (const unsigned char *)RSTRING_PTR(parsed), RSTRING_LEN(parsed));
+            unsigned char * str = yajl_get_error(streamParser, 1, (const unsigned char *)RSTRING_PTR(parsed), RSTRING_LEN(parsed));
             rb_raise(cParseError, "%s", (const char *) str);
-            yajl_free_error(parser, str);
+            yajl_free_error(streamParser, str);
             break;
         }
     }
     
     // parse any remaining buffered data
-    stat = yajl_parse_complete(parser);
-    yajl_free(parser);
+    stat = yajl_parse_complete(streamParser);
+    yajl_free(streamParser);
     
     if (parse_complete_callback != Qnil) {
         check_and_fire_callback((void *)context);
@@ -208,15 +208,19 @@ static VALUE t_parse(VALUE self, VALUE io) {
     return rb_ary_pop(context);
 }
 
-static VALUE mYajl, mNative;
+static VALUE mYajl, mStream, mChunked;
 
 void Init_yajl() {
     mYajl = rb_define_module("Yajl");
-    mNative = rb_define_module_under(mYajl, "Native");
-    rb_define_module_function(mNative, "parse", t_parse, 1);
-    rb_define_module_function(mNative, "parse_some", t_parseSome, 1);
-    rb_define_module_function(mNative, "<<", t_parseSome, 1);
-    rb_define_module_function(mNative, "on_parse_complete=", t_setParseComplete, 1);
+    
+    mStream = rb_define_module_under(mYajl, "Stream");
+    rb_define_module_function(mStream, "decode", t_parse, 1);
+    
+    mChunked = rb_define_module_under(mYajl, "Chunked");
+    rb_define_module_function(mChunked, "parse_some", t_parseSome, 1);
+    rb_define_module_function(mChunked, "<<", t_parseSome, 1);
+    rb_define_module_function(mChunked, "on_parse_complete=", t_setParseComplete, 1);
+    
     VALUE rb_cStandardError = rb_const_get(rb_cObject, rb_intern("StandardError"));
     cParseError = rb_define_class_under(mYajl, "ParseError", rb_cStandardError);
     
