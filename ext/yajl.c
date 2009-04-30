@@ -57,9 +57,7 @@ static int found_boolean(void * ctx, int boolean) {
 }
 
 static int found_number(void * ctx, const char * numberVal, unsigned int numberLen) {
-    if (strstr(numberVal, ".") != NULL
-        || strstr(numberVal, "e") != NULL
-        || strstr(numberVal, "E") != NULL) {
+    if (strstr(numberVal, ".") != NULL || strstr(numberVal, "e") != NULL || strstr(numberVal, "E") != NULL) {
         set_static_value(ctx, rb_Float(rb_str_new(numberVal, numberLen)));
     } else {
         set_static_value(ctx, rb_Integer(rb_str_new(numberVal, numberLen)));
@@ -156,7 +154,7 @@ static VALUE t_parse(VALUE self, VALUE io) {
     
     // now parse from the IO
     while (rb_funcall(io, intern_eof, 0) == Qfalse) {
-        parsed = rb_funcall(io, intern_io_read, 1, rbufsize);
+        rb_funcall(io, intern_io_read, 2, rbufsize, parsed);
         
         stat = yajl_parse(streamParser, (const unsigned char *)RSTRING_PTR(parsed), RSTRING_LEN(parsed));
         

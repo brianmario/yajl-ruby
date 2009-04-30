@@ -15,6 +15,17 @@ module Yajl
     # and therefore cannot be parsed.
     class InvalidContentType < Exception; end
     
+    # === Yajl::HttpStream::GzipStreamReader
+    #
+    # This is a wrapper around Zlib::GzipReader to allow it's #read method to adhere
+    # to the IO spec, allowing for two parameters (length, and buffer)
+    class GzipStreamReader < Zlib::GzipReader
+      def read(len, buffer=nil)
+        buffer.gsub!(/.*/, '')
+        buffer << super(len)
+      end
+    end
+    
     # The mime-type we expect the response to be. If it's anything else, we can't parse it
     # and an InvalidContentType is raised.
     MIME_TYPE = "application/json"
@@ -54,7 +65,7 @@ module Yajl
       if response_head[:headers]["Content-Type"].include?(MIME_TYPE)
         case response_head[:headers]["Content-Encoding"]
         when "gzip"
-          socket = Zlib::GzipReader.new(socket)
+          socket = GzipStreamReader.new(socket)
         end
         return Yajl::Stream.parse(socket)
       else

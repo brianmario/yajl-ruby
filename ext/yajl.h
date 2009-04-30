@@ -9,7 +9,7 @@ static ID intern_io_read, intern_eof, intern_respond_to, intern_call;
 static int readBufferSize = READ_BUFSIZE;
 static yajl_parser_config cfg = {1, 1};
 
-yajl_handle streamParser = NULL, chunkedParser = NULL;
+yajl_handle streamParser, chunkedParser;
 VALUE context = Qnil;
 VALUE parse_complete_callback = Qnil;
 

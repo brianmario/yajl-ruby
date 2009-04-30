@@ -16,7 +16,7 @@ times = ARGV[1] ? ARGV[1].to_i : 1
 puts "Starting benchmark parsing #{File.size(filename)} bytes of JSON data #{times} times\n\n"
 Benchmark.bm { |x|
   x.report {
-    puts "Yajl::Native.parse (C)"
+    puts "Yajl::Stream.parse (C)"
     times.times {
       json.rewind
       Yajl::Stream.parse(json)
