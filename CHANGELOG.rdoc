@@ -1,6 +1,12 @@
 = Changelog
 
-0.4.0 (?)
+0.4.1 (April 30th, 2009)
+ * fixed a typo in the stream.rb benchmark file
+ * fixed a bug in Yajl::Stream.parse that was causing "strange" Ruby malloc errors on large files, with large strings
+ * added Yajl::GzipStreamReader as a wrapper around Zlib::GzipReader to allow for standard IO#read behavior
+ ** this allows Yajl::Stream to read off of a Gzip stream directly
+ 
+0.4.0 (April 29th, 2009)
  * NOTE: Breaking API change:
  ** refactored Stream parsing methods out of Yajl::Native into Yajl::Stream
  ** removed Yajl::Native namespace/module
