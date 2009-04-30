@@ -1,4 +1,4 @@
 # encoding: UTF-8
-require '../yajl.bundle'
+require 'yajl'
 require 'stringio'
 require 'active_support/core_ext/kernel/reporting'
