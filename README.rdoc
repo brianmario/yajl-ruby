@@ -96,23 +96,13 @@ Again, I'll post some actual data on this; but in my testing here's what my ruby
 This library is still being refined and should by no means be used in production.
 That being said, I'd like to invite you to clone/fork and test the crap out of it! ;)
 
-== TODO
-
-While parsing is working for the most part, there are still some edge cases I need to tackle.
-Here's a list of things I need to get done to improve the awesomeness of this library.
-
-* Write up a test suite 
-* Fix known parsing issues with certain JSON strings (Yajl itself works fine, it's the logic in this library that needs a little tweaking)
-* Write more docs
-* Change API so it can accept a String or an IO
-
 == Special Thanks
 
 I've had a lot of inspiration, and a lot of help. Thanks to everyone who's been a part of this and those to come!
 
 * Lloyd Hilaiel (http://github.com/lloyd) - for writing Yajl!!
-* Josh Ferguson (http://github.com/besquared) - for peer-pressuring me into getting back into C; it worked ;)
-* Jonathan Novak (http://github.com/cypriss) - C hacking help
-* Tom Smith (http://github.com/rtomsmith) - C hacking help
+* Josh Ferguson (http://github.com/besquared) - for peer-pressuring me into getting back into C; it worked ;) Also tons of support over IM
+* Jonathan Novak (http://github.com/cypriss) - pointer-hacking help
+* Tom Smith (http://github.com/rtomsmith) - pointer-hacking help
 * Rick (http://github.com/technoweenie) - for making an ActiveSupport patch with support for this library and teasing me that it might go into Rails 3. You sure lit a fire under my ass and I got a ton of work done because of it! :)
 * The entire Github Crew - my inspiration, time spent writing this, finding Yajl, So many-MANY other things wouldn't have been possible without this awesome service. I owe you guys some whiskey at Kilowatt.
