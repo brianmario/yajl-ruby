@@ -7,19 +7,9 @@ begin
     gem.email = "seniorlopez@gmail.com"
     gem.homepage = "http://github.com/brianmario/yajl-ruby"
     gem.authors = ["Brian Lopez"]
-    gem.require_paths = ["ext"]
-    gem.extra_rdoc_files = [
-      "README.rdoc",
-      "CHANGELOG.rdoc"
-    ]
-    gem.files = [
-      "CHANGELOG.rdoc",
-      "README.rdoc",
-      "Rakefile",
-      "VERSION.yml",
-      "ext/yajl.c",
-      "ext/yajl.h"
-    ]
+    gem.require_paths = ["ext", "lib"]
+    gem.extra_rdoc_files = `git ls-files *.rdoc`.split("\n")
+    gem.files = `git ls-files`.split("\n")
     gem.extensions = ["ext/extconf.rb"]
     gem.files.include %w(lib/jeweler/templates/.document lib/jeweler/templates/.gitignore)
     # gem.rubyforge_project = "yajl-ruby"

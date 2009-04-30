@@ -1,8 +1,8 @@
 # encoding: UTF-8
 require 'rubygems'
 require 'benchmark'
-require '../yajl.bundle'
-require '../lib/yajl/http_stream'
+require 'yajl'
+require 'yajl/http_stream'
 require 'json'
 require 'activesupport'
 require 'uri'
@@ -22,8 +22,7 @@ Benchmark.bm { |x|
   x.report {
     puts "JSON.parser"
     times.times {
-      resp = Net::HTTP.get_response(uri)
-      JSON.parse(resp.body, :max_nesting => false)
+      JSON.parse(Net::HTTP.get_response(uri).body, :max_nesting => false)
     }
   }
 }

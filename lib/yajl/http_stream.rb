@@ -4,12 +4,12 @@ require 'zlib' unless defined?(Zlib)
 require 'yajl' unless defined?(Yajl)
 
 module Yajl
-  # == HttpStream
+  # == Yajl::HttpStream
   #
   # This module is for making HTTP requests to which the response bodies (and possibly requests in the near future)
   # are streamed directly into Yajl.
   class HttpStream
-    # === InvalidContentType
+    # === Yajl::HttpStream::InvalidContentType
     #
     # This Exception is thrown when an HTTP response isn't application/json
     # and therefore cannot be parsed.

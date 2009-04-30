@@ -7,7 +7,7 @@ require 'yajl'
 module Yajl
   VERSION = "0.3.4"
   
-  # == Chunked
+  # == Yajl::Chunked
   #
   # This module contains methods for parsing JSON in chunks.
   # The use case here is that the caller may not be able to get access to the IO to which
@@ -21,7 +21,7 @@ module Yajl
   # it respond to #call and accept a single parameter (the object that was created from parsing).
   module Chunked; end
   
-  # == Stream
+  # == Yajl::Stream
   #
   # This module contains methods for parsing JSON directly from an IO object.
   #
