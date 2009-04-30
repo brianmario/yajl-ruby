@@ -1,18 +1,4 @@
-#include <yajl/yajl_parse.h>
-#include <yajl/yajl_gen.h>
-#include <ruby.h>
-
-#define READ_BUFSIZE 4096
-
-static VALUE cParseError;
-static ID intern_io_read, intern_eof, intern_respond_to, intern_call;
-static int readBufferSize = READ_BUFSIZE;
-
-static yajl_parser_config cfg = {1, 1};
-
-yajl_handle streamParser = NULL, chunkedParser = NULL;
-VALUE context = Qnil;
-VALUE parse_complete_callback = Qnil;
+#include "yajl.h"
 
 void check_and_fire_callback(void * ctx) {
     yajl_status stat;
@@ -119,20 +105,6 @@ static int found_end_array(void * ctx) {
     return 1;
 }
 
-static yajl_callbacks callbacks = {
-    found_null,
-    found_boolean,
-    NULL,
-    NULL,
-    found_number,
-    found_string,
-    found_start_hash,
-    found_hash_key,
-    found_end_hash,
-    found_start_array,
-    found_end_array
-};
-
 static VALUE t_setParseComplete(VALUE self, VALUE callback) {
     parse_complete_callback = callback;
     return Qnil;
@@ -207,8 +179,6 @@ static VALUE t_parse(VALUE self, VALUE io) {
 
     return rb_ary_pop(context);
 }
-
-static VALUE mYajl, mStream, mChunked;
 
 void Init_yajl() {
     mYajl = rb_define_module("Yajl");
