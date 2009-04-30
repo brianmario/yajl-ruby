@@ -1,3 +1,4 @@
+# encoding: UTF-8
 require 'mkmf'
 dir_config('yajl')
 have_header('yajl/yajl_parse.h')

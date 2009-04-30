@@ -1,5 +1,18 @@
 = Changelog
 
+0.4.0 (?)
+ * NOTE: Breaking API change:
+ ** refactored Stream parsing methods out of Yajl::Native into Yajl::Stream
+ ** removed Yajl::Native namespace/module
+ * Addition of Yajl::HttpStream module
+ ** This module is for streaming JSON HTTP responses directly into Yajl (as they're being received) for increased awesomeness
+ ** it currently supports basic get requests with Yajl::HttpStream.get(uri)
+ ** it also supports (and prefers) output compressed (gzip) responses
+ * Addition Yajl::Chunked module
+ ** This module is for feeding Yajl JSON pieces at a time, instead of an entire IO object
+ ** This works very well in environments like an EventMachine app where data is received in chunks by design
+ * decreased read buffer for Yajl::Stream from 8kb to 4kb
+
 0.3.4 (April 24th, 2009)
  * turned Unicode checks back on in the Yajl parser now that it's fixed (thanks Lloyd!)
  ** this also bumps the yajl version dependency requirement to 1.0.4

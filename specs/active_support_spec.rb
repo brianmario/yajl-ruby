@@ -37,14 +37,14 @@ describe "ActiveSupport test cases" do
   TESTS.each do |json, expected|
     it "should be able to parse #{json}" do
       lambda {
-        Yajl::Native.parse(StringIO.new(json)).should == expected
+        Yajl::Stream.parse(StringIO.new(json)).should == expected
       }.should_not raise_error(Yajl::ParseError)
     end
   end
 
   it "should fail parsing {: 1}" do
     lambda {
-      Yajl::Native.parse(StringIO.new("{: 1}"))
+      Yajl::Stream.parse(StringIO.new("{: 1}"))
       }.should raise_error(Yajl::ParseError)
   end
 end

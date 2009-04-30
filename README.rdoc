@@ -26,11 +26,36 @@ or maybe STDIN
 
  cat someJsonFile.json | ruby -ryajl -e "puts Yajl::Native.parse(STDIN).inspect"
 
+
+Or lets say you didn't have access to the IO object that contained JSON data, but instead
+only had access to chunks of it at a time. No problem!
+
+(Assume we're in an EventMachine::Connection instance)
+
+ def object_parsed(obj)
+    puts "Sometimes one pays most for the things one gets for nothing. - Albert Einstein"
+    puts obj.inspect
+  end
+  
+ def connection_completed
+   # once a full JSON object has been parsed from the stream
+   # object_parsed will be called, and passed the constructed object
+   Yajl::Chunked.on_parse_complete = method(:object_parsed)
+ end
+ 
+ def receive_data(data)
+   # continue passing chunks
+   Yajl::Chunked.parse_some(data)
+   
+   # Or as an alias, you could have done:
+   # Yajl::Chunked << data
+ end
+
 There are a lot more possibilities, some of which I'm going to write other gems/plugins for.
 
 Some ideas are:
 * parsing logs in JSON format
-* an  ActiveSupport patch (http://github.com/technoweenie/rails/commit/f9abcc93a3660fcf46172c4cd8a2f36ba5a5510d)
+* an ActiveSupport patch (http://github.com/technoweenie/rails/commit/f9abcc93a3660fcf46172c4cd8a2f36ba5a5510d)
 * Rack middleware (ideally the JSON body could be handed to the parser while it's still being received)
 * use with ohai
 * JSON API clients
@@ -80,3 +105,14 @@ Here's a list of things I need to get done to improve the awesomeness of this li
 * Fix known parsing issues with certain JSON strings (Yajl itself works fine, it's the logic in this library that needs a little tweaking)
 * Write more docs
 * Change API so it can accept a String or an IO
+
+== Special Thanks
+
+I've had a lot of inspiration, and a lot of help. Thanks to everyone who's been a part of this and those to come!
+
+* Lloyd Hilaiel (http://github.com/lloyd) - for writing Yajl!!
+* Josh Ferguson (http://github.com/besquared) - for peer-pressuring me into getting back into C; it worked ;)
+* Jonathan Novak (http://github.com/cypriss) - C hacking help
+* Tom Smith (http://github.com/rtomsmith) - C hacking help
+* Rick (http://github.com/technoweenie) - for making an ActiveSupport patch with support for this library and teasing me that it might go into Rails 3. You sure lit a fire under my ass and I got a ton of work done because of it! :)
+* The entire Github Crew - my inspiration, time spent writing this, finding Yajl, So many-MANY other things wouldn't have been possible without this awesome service. I owe you guys some whiskey at Kilowatt.

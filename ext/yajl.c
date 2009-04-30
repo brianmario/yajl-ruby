@@ -184,7 +184,7 @@ void Init_yajl() {
     mYajl = rb_define_module("Yajl");
     
     mStream = rb_define_module_under(mYajl, "Stream");
-    rb_define_module_function(mStream, "decode", t_parse, 1);
+    rb_define_module_function(mStream, "parse", t_parse, 1);
     
     mChunked = rb_define_module_under(mYajl, "Chunked");
     rb_define_module_function(mChunked, "parse_some", t_parseSome, 1);

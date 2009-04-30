@@ -1,18 +1,35 @@
+# encoding: UTF-8
 require 'socket' unless defined?(Socket)
 require 'zlib' unless defined?(Zlib)
 require 'yajl' unless defined?(Yajl)
 
 module Yajl
+  # == HttpStream
+  #
+  # This module is for making HTTP requests to which the response bodies (and possibly requests in the near future)
+  # are streamed directly into Yajl.
   class HttpStream
+    # === InvalidContentType
+    #
+    # This Exception is thrown when an HTTP response isn't application/json
+    # and therefore cannot be parsed.
     class InvalidContentType < Exception; end
-
+    
+    # The mime-type we expect the response to be. If it's anything else, we can't parse it
+    # and an InvalidContentType is raised.
     MIME_TYPE = "application/json"
     
+    # Makes a basic HTTP GET request to the URI provided
+    # 1. a raw socket is opened to the server/host provided
+    # 2. the request is made using HTTP/1.0, Accept-encoding: gzip (deflate support coming soon, too)
+    # 3. the response is read until the end of the headers
+    # 4. the _socket itself_ is passed directly to Yajl, for direct parsing off the stream;
+    #    As it's being received over the wire!
     def self.get(uri)
       socket = Socket.new(Socket::Constants::AF_INET, Socket::Constants::SOCK_STREAM, 0)
       sockaddr = Socket.pack_sockaddr_in(uri.port, uri.host)
       socket.connect(sockaddr)
-      socket.write("GET #{uri.path}?#{uri.query} HTTP/1.0\r\nAccept-encoding: gzip,deflate\r\n\r\n")
+      socket.write("GET #{uri.path}?#{uri.query} HTTP/1.0\r\nAccept-encoding: gzip\r\n\r\n")
       
       response_head = {}
       response_head[:headers] = {}
@@ -39,7 +56,7 @@ module Yajl
         when "gzip"
           socket = Zlib::GzipReader.new(socket)
         end
-        return Yajl::Native.parse(socket)
+        return Yajl::Stream.parse(socket)
       else
         raise InvalidContentType, "The response MIME type #{response_head[:headers]["Content-Type"]}"
       end

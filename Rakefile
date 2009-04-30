@@ -1,3 +1,4 @@
+# encoding: UTF-8
 begin
   require 'jeweler'
   Jeweler::Tasks.new do |gem|
@@ -16,7 +17,8 @@ begin
       "README.rdoc",
       "Rakefile",
       "VERSION.yml",
-      "ext/yajl.c"
+      "ext/yajl.c",
+      "ext/yajl.h"
     ]
     gem.extensions = ["ext/extconf.rb"]
     gem.files.include %w(lib/jeweler/templates/.document lib/jeweler/templates/.gitignore)

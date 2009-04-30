@@ -8,7 +8,7 @@ require 'activesupport'
 filename = ARGV[0] || 'subjects/twitter_search.json'
 json = File.new(filename, 'r')
 
-# warm up the fs
+# warm up the filesystem
 json.read
 json.rewind
 
@@ -19,7 +19,7 @@ Benchmark.bm { |x|
     puts "Yajl::Native.parse (C)"
     times.times {
       json.rewind
-      Yajl::Native.parse(json)
+      Yajl::Stream.parse(json)
     }
   }
   x.report {
