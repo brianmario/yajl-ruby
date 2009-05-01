@@ -17,7 +17,7 @@ module Yajl
     
     # The mime-type we expect the response to be. If it's anything else, we can't parse it
     # and an InvalidContentType is raised.
-    MIME_TYPE = "application/json"
+    ALLOWED_MIME_TYPES = ["application/json", "text/plain"]
     
     # Makes a basic HTTP GET request to the URI provided
     # 1. a raw socket is opened to the server/host provided
@@ -58,14 +58,16 @@ module Yajl
         end
       end
       
-      if response_head[:headers]["Content-Type"].include?(MIME_TYPE)
+      content_type = response_head[:headers]["Content-Type"].split('; ')
+      content_type = content_type[0] if content_type.size > 1
+      if ALLOWED_MIME_TYPES.include?(content_type)
         case response_head[:headers]["Content-Encoding"]
         when "gzip"
           socket = Yajl::GzipStreamReader.new(socket)
         end
         return Yajl::Stream.parse(socket)
       else
-        raise InvalidContentType, "The response MIME type #{response_head[:headers]["Content-Type"]}"
+        raise InvalidContentType, "The response MIME type #{content_type}"
       end
     ensure
       socket.close
