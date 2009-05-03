@@ -1,5 +1,9 @@
 = Changelog
 
+0.4.3 (May 2nd, 2009)
+ * adding text/plain as an allowed mime-type for Yajl::HttpStream for webservers that respond with it instead of application/json (ahem...Yelp...)
+ * renamed specs folder to spec for no reason at all
+
 0.4.2 (April 30th, 2009)
  * Yajl::HttpStream is now sending "proper" http request headers
  * Yajl::HttpStream will request HTTP-Basic auth if credentials are provided in the passed URI
