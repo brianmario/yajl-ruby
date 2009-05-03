@@ -1,6 +1,5 @@
 # encoding: UTF-8
 require 'socket' unless defined?(Socket)
-require 'zlib' unless defined?(Zlib)
 require 'yajl.rb' unless defined?(Yajl)
 
 module Yajl
@@ -71,18 +70,6 @@ module Yajl
       end
     ensure
       socket.close
-    end
-  end
-  
-  # === Yajl::GzipStreamReader
-  #
-  # This is a wrapper around Zlib::GzipReader to allow it's #read method to adhere
-  # to the IO spec, allowing for two parameters (length, and buffer)
-  class GzipStreamReader < ::Zlib::GzipReader
-    def read(len=nil, buffer=nil)
-      buffer.gsub!(/.*/, '') unless buffer.nil?
-      buffer << super(len) and return unless buffer.nil?
-      super(len)
     end
   end
 end

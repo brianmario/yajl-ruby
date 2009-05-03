@@ -1,4 +1,12 @@
 # encoding: UTF-8
+require 'zlib' unless defined?(Zlib)
+
+begin
+  require 'bzip2' unless defined?(Bzip2)
+rescue LoadError => e
+  # that's ok, we'll just continue without Bzip2 support
+end
+
 require 'yajl.bundle'
 require 'yajl/http_stream.rb' unless defined?(Yajl::HttpStream)
 
@@ -30,4 +38,31 @@ module Yajl
   #
   # The IO is parsed until a complete JSON object has been read and a ruby object will be returned.
   module Stream; end
+  
+  # === Yajl::GzipStreamReader
+  #
+  # This is a wrapper around Zlib::GzipReader to allow it's #read method to adhere
+  # to the IO spec, allowing for two parameters (length, and buffer)
+  class GzipStreamReader < ::Zlib::GzipReader
+    def read(len=nil, buffer=nil)
+      buffer.gsub!(/.*/, '') unless buffer.nil?
+      buffer << super(len) and return unless buffer.nil?
+      super(len)
+    end
+  end
+  
+  # only if bzip2-ruby is installed
+  if defined?(Bzip2)
+    # === Yajl::Bzip2StreamReader
+    #
+    # This is a wrapper around Bzip::Reader to allow it's #read method to adhere
+    # to the IO spec, allowing for two parameters (length, and buffer)
+    class Bzip2StreamReader < ::Bzip2::Reader
+      def read(len=nil, buffer=nil)
+        buffer.gsub!(/.*/, '') unless buffer.nil?
+        buffer << super(len) and return unless buffer.nil?
+        super(len)
+      end
+    end
+  end
 end
