@@ -32,6 +32,8 @@ Gem::Specification.new do |s|
     "ext/yajl.c",
     "ext/yajl.h",
     "lib/yajl.rb",
+    "lib/yajl/bzip2/stream_reader.rb",
+    "lib/yajl/gzip/stream_reader.rb",
     "lib/yajl/http_stream.rb",
     "spec/active_support_spec.rb",
     "spec/fixtures/fail.15.json",
