@@ -153,7 +153,7 @@ static VALUE t_parse(VALUE self, VALUE io) {
     VALUE rbufsize = INT2FIX(readBufferSize);
     
     // now parse from the IO
-    while (rb_funcall(io, intern_eof, 0) == Qfalse) {
+    while (rb_funcall(io, intern_eof, 0) != Qtrue) {
         rb_funcall(io, intern_io_read, 2, rbufsize, parsed);
         
         stat = yajl_parse(streamParser, (const unsigned char *)RSTRING_PTR(parsed), RSTRING_LEN(parsed));
