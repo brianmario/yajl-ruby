@@ -16,7 +16,7 @@ end
 #
 # Ruby bindings to the excellent Yajl (Yet Another JSON Parser) ANSI C library.
 module Yajl
-  VERSION = "0.4.3"
+  VERSION = "0.4.4"
   
   # == Yajl::Chunked
   #
