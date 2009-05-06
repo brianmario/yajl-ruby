@@ -10,6 +10,10 @@ module Yajl
         buffer << super(len) and return unless buffer.nil?
         super(len)
       end
+      
+      def self.parse(io)
+        Yajl::Stream.parse(new(io))
+      end
     end
   end
 end

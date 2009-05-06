@@ -62,9 +62,10 @@ module Yajl
       if ALLOWED_MIME_TYPES.include?(content_type)
         case response_head[:headers]["Content-Encoding"]
         when "gzip"
-          socket = Yajl::GzipStreamReader.new(socket)
+          return Yajl::Gzip::StreamReader.parse(socket)
+        else
+          return Yajl::Stream.parse(socket)
         end
-        return Yajl::Stream.parse(socket)
       else
         raise InvalidContentType, "The response MIME type #{content_type}"
       end
