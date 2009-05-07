@@ -1,3 +1,4 @@
+# encoding: UTF-8
 module Yajl
   module Bzip2
     # === Yajl::Bzip2::StreamReader

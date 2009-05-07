@@ -1,3 +1,4 @@
+# encoding: UTF-8
 module Yajl
   module Deflate
     # === Yajl::Deflate::StreamReader

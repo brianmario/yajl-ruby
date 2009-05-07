@@ -33,7 +33,7 @@ module Yajl
       request << "Authorization: Basic #{[userinfo].pack('m')}\r\n" unless uri.userinfo.nil?
       request << "User-Agent: Yajl::HttpStream #{Yajl::VERSION}\r\n"
       request << "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\r\n"
-      request << "Accept-Encoding: gzip\r\n"
+      request << "Accept-Encoding: gzip,deflate,bzip2\r\n"
       request << "Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7\r\n"
       request << "\r\n\r\n"
       socket.write(request)
@@ -63,6 +63,10 @@ module Yajl
         case response_head[:headers]["Content-Encoding"]
         when "gzip"
           return Yajl::Gzip::StreamReader.parse(socket)
+        when "deflate"
+          return Yajl::Deflate::StreamReader.parse(socket)
+        when "bzip2"
+          return Yajl::Bzip2::StreamReader.parse(socket)
         else
           return Yajl::Stream.parse(socket)
         end
