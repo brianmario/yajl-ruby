@@ -12,11 +12,11 @@ module Yajl
       
       def read(len=nil, buffer=nil)
         buffer.gsub!(/.*/, '') unless buffer.nil?
-        buffer << inflate(io.read(len)) and return unless buffer.nil?
-        inflate(io.read(len))
+        buffer << inflate(@io.read(len)) and return unless buffer.nil?
+        inflate(@io.read(len))
       end
       
-      alias :finished? :eof?
+      alias :eof? :finished?
       
       def self.parse(io)
         Yajl::Stream.parse(new(io))

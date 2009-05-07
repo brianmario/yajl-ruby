@@ -3,11 +3,12 @@ require 'yajl.bundle'
 require 'yajl/http_stream.rb' unless defined?(Yajl::HttpStream)
 
 require 'zlib' unless defined?(Zlib)
-require 'yajl/gzip/stream_reader.rb' unless defined?(Yajl::Gzip::StreamReader)
+require 'yajl/gzip.rb' unless defined?(Yajl::Gzip)
+require 'yajl/deflate.rb' unless defined?(Yajl::Deflate)
 
 begin
   require 'bzip2' unless defined?(Bzip2)
-  require 'yajl/bzip2/stream_reader.rb' unless defined?(Yajl::Bzip2::StreamReader)
+  require 'yajl/bzip2.rb' unless defined?(Yajl::Bzip2)
 rescue LoadError => e
   # that's ok, we'll just continue without Bzip2 support
 end

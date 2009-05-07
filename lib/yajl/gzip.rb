@@ -1,0 +1,1 @@
+require 'gzip/stream_reader.rb'

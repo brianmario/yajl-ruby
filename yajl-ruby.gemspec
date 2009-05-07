@@ -6,7 +6,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Brian Lopez"]
-  s.date = %q{2009-05-05}
+  s.date = %q{2009-05-06}
   s.email = %q{seniorlopez@gmail.com}
   s.extensions = ["ext/extconf.rb"]
   s.extra_rdoc_files = [
@@ -33,6 +33,7 @@ Gem::Specification.new do |s|
     "ext/yajl.h",
     "lib/yajl.rb",
     "lib/yajl/bzip2/stream_reader.rb",
+    "lib/yajl/deflate/stream_reader.rb",
     "lib/yajl/gzip/stream_reader.rb",
     "lib/yajl/http_stream.rb",
     "spec/active_support_spec.rb",

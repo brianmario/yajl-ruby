@@ -1,0 +1,1 @@
+require 'deflate/stream_reader.rb'
