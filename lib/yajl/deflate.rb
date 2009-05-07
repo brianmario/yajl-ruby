@@ -1,1 +1,1 @@
-require 'deflate/stream_reader.rb'
+require 'yajl/deflate/stream_reader.rb'

@@ -1,1 +1,1 @@
-require 'gzip/stream_reader.rb'
+require 'yajl/gzip/stream_reader.rb'

@@ -1,1 +1,1 @@
-require 'bzip2/stream_reader.rb'
+require 'yajl/bzip2/stream_reader.rb'
