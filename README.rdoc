@@ -15,16 +15,16 @@ Then maybe parse some JSON from:
 a File IO
 
  json_contents = File.new('test.json', 'r')
- hash = Yajl::Native.parse(json)
+ hash = Yajl::Stream.parse(json)
  
 or maybe a StringIO
 
  json_contents = StringIO.new
- hash = Yajl::Native.parse(json)
+ hash = Yajl::Stream.parse(json)
 
 or maybe STDIN
 
- cat someJsonFile.json | ruby -ryajl -e "puts Yajl::Native.parse(STDIN).inspect"
+ cat someJsonFile.json | ruby -ryajl -e "puts Yajl::Stream.parse(STDIN).inspect"
 
 
 Or lets say you didn't have access to the IO object that contained JSON data, but instead
