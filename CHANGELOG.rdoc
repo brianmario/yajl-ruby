@@ -5,8 +5,12 @@
  ** renamed Yajl::GzipStreamReader to Yajl::Gzip::StreamReader
  * added Yajl::Bzip2::StreamReader
  ** depends on the bzip2-ruby gem if you want to use it, if not Yajl::Bzip2 won't be loaded
+ * added Yajl::Deflate::StreamReader
+ ** actually uses Zlib::Inflate for stream decompression
  * added parse(io) class methods to Yajl::Gzip::StreamReader and Yajl::Bzip2::StreamReader as
    a helper for parsing compressed streams.
+ * updated Yajl::HttpStream to request responses compressed as deflate and bzip2 in addition
+   to gzip
 
 0.4.3 (May 2nd, 2009)
  * adding text/plain as an allowed mime-type for Yajl::HttpStream for webservers that respond
