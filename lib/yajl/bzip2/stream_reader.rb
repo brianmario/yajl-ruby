@@ -7,8 +7,11 @@ module Yajl
     # to the IO spec, allowing for two parameters (length, and buffer)
     class StreamReader < ::Bzip2::Reader
       def read(len=nil, buffer=nil)
-        buffer.gsub!(/.*/, '') unless buffer.nil?
-        buffer << super(len) and return unless buffer.nil?
+        unless buffer.nil?
+          buffer.gsub!(/.*/, '')
+          buffer << super(len)
+          return buffer
+        end
         super(len)
       end
 
