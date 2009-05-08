@@ -25,16 +25,18 @@ module Yajl
     # 4. the _socket itself_ is passed directly to Yajl, for direct parsing off the stream;
     #    As it's being received over the wire!
     def self.get(uri)
-      socket = TCPSocket.new(uri.host, uri.port)
+      socket = Socket.new(Socket::Constants::AF_INET, Socket::Constants::SOCK_STREAM, 0)
+      sockaddr = Socket.pack_sockaddr_in(uri.port, uri.host)
+      socket.connect(sockaddr)
       request = "GET #{uri.path}#{uri.query ? "?"+uri.query : nil} HTTP/1.0\r\n"
       request << "Host: #{uri.host}\r\n"
       request << "Authorization: Basic #{[userinfo].pack('m')}\r\n" unless uri.userinfo.nil?
       request << "User-Agent: Yajl::HttpStream #{Yajl::VERSION}\r\n"
       request << "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\r\n"
       encodings = []
-      encodings << "bzip2" if defined?(Yajl::Bzip2)
       encodings << "gzip" if defined?(Yajl::Gzip)
       encodings << "deflate" if defined?(Yajl::Deflate)
+      encodings << "bzip2" if defined?(Yajl::Bzip2)
       request << "Accept-Encoding: #{encodings.join(',')}\r\n" if encodings.any?
       request << "Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7\r\n"
       request << "\r\n\r\n"
@@ -60,13 +62,13 @@ module Yajl
       end
       
       content_type = response_head[:headers]["Content-Type"].split('; ')
-      content_type = content_type.first
+      content_type = content_type[0] if content_type.size > 1
       if ALLOWED_MIME_TYPES.include?(content_type)
         case response_head[:headers]["Content-Encoding"]
         when "gzip"
           return Yajl::Gzip::StreamReader.parse(socket)
         when "deflate"
-          return Yajl::Deflate::StreamReader.parse(socket, -Zlib::MAX_WBITS)
+          return Yajl::Deflate::StreamReader.parse(socket)
         when "bzip2"
           return Yajl::Bzip2::StreamReader.parse(socket)
         else
