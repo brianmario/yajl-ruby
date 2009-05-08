@@ -6,9 +6,9 @@ module Yajl
     # This is a wrapper around Zlib::Inflate, creating a #read method that adheres
     # to the IO spec, allowing for two parameters (length, and buffer)
     class StreamReader < ::Zlib::Inflate
-      def initialize(io)
+      def initialize(io, options)
         @io = io
-        super(nil)
+        super(options)
       end
       
       def read(len=nil, buffer=nil)
@@ -19,8 +19,8 @@ module Yajl
       
       alias :eof? :finished?
       
-      def self.parse(io)
-        Yajl::Stream.parse(new(io))
+      def self.parse(io, options=nil)
+        Yajl::Stream.parse(new(io, options))
       end
     end
   end
