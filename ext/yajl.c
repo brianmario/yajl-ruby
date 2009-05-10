@@ -67,13 +67,13 @@ static int found_number(void * ctx, const char * numberVal, unsigned int numberL
 }
 
 static int found_string(void * ctx, const unsigned char * stringVal, unsigned int stringLen) {
-    set_static_value(ctx, rb_str_new((char *)stringVal, stringLen));
+    set_static_value(ctx, rb_str_new((const char *)stringVal, stringLen));
     check_and_fire_callback(ctx);
     return 1;
 }
 
 static int found_hash_key(void * ctx, const unsigned char * stringVal, unsigned int stringLen) {
-    set_static_value(ctx, rb_str_new((char *)stringVal, stringLen));
+    set_static_value(ctx, rb_str_new((const char *)stringVal, stringLen));
     return 1;
 }
 

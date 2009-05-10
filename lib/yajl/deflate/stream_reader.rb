@@ -12,8 +12,7 @@ module Yajl
       end
       
       def read(len=nil, buffer=nil)
-        buffer.gsub!(/.*/, '') unless buffer.nil?
-        buffer << inflate(@io.read(len)) and return unless buffer.nil?
+        buffer.replace inflate(@io.read(len)) and return unless buffer.nil?
         inflate(@io.read(len))
       end
       

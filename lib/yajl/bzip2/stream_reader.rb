@@ -8,8 +8,7 @@ module Yajl
     class StreamReader < ::Bzip2::Reader
       def read(len=nil, buffer=nil)
         unless buffer.nil?
-          buffer.gsub!(/.*/, '')
-          buffer << super(len)
+          buffer.replace super(len)
           return buffer
         end
         super(len)
