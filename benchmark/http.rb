@@ -10,8 +10,8 @@ require 'activesupport'
 require 'uri'
 require 'net/http'
 
-# uri = URI.parse('http://search.twitter.com/search.json?q=github')
-uri = URI.parse('http://localhost/yajl-ruby.git/benchmark/subjects/contacts.json')
+uri = URI.parse('http://search.twitter.com/search.json?q=github')
+# uri = URI.parse('http://localhost/yajl-ruby.git/benchmark/subjects/contacts.json')
 
 times = ARGV[0] ? ARGV[0].to_i : 1
 puts "Starting benchmark parsing #{uri.to_s} #{times} times\n\n"
