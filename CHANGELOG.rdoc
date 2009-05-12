@@ -1,6 +1,6 @@
 = Changelog
 
-0.4.4 (?)
+0.4.4 (May 12th, 2009)
  * NOTE: Breaking API change:
  ** renamed Yajl::GzipStreamReader to Yajl::Gzip::StreamReader
  * added Yajl::Bzip2::StreamReader
@@ -14,6 +14,7 @@
  * fixed a bug regarding parsing Integers as Floats (so 123456 would have be parsed and returned as 123456.0)
  * fixed a bug which caused a segfault in ruby's GC during string replacement in Yajl::Gzip and Yajl::Bzip2's
    StreamReader#read methods
+ * added support for user-specified User-Agent strings in Yajl::HttpStream
 
 0.4.3 (May 2nd, 2009)
  * adding text/plain as an allowed mime-type for Yajl::HttpStream for webservers that respond
