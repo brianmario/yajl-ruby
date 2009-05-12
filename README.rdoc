@@ -51,6 +51,32 @@ only had access to chunks of it at a time. No problem!
    # Yajl::Chunked << data
  end
 
+
+Or how about a JSON API HTTP request?
+
+ require 'uri'
+ require 'yajl/http_stream'
+ 
+ url = URI.parse("http://search.twitter.com/search.json?q=engineyard")
+ results = Yajl::HttpStream.get(url)
+
+Or do the same request, with Gzip and Deflate output compression support (also supports Bzip2, if loaded):
+ 
+ require 'uri'
+ require 'yajl/gzip'
+ require 'yajl/deflate'
+ require 'yajl/http_stream'
+
+ url = URI.parse("http://search.twitter.com/search.json?q=engineyard")
+ results = Yajl::HttpStream.get(url)
+
+Or how about parsing directly from a compressed file?
+
+ require 'yajl/bzip2'
+ 
+ file = File.new('some.json.bz2', 'r')
+ result = Yajl::Bzip2::StreamReader.parse(file)
+
 There are a lot more possibilities, some of which I'm going to write other gems/plugins for.
 
 Some ideas are:
