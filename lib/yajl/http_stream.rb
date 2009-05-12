@@ -24,12 +24,14 @@ module Yajl
     # 3. the response is read until the end of the headers
     # 4. the _socket itself_ is passed directly to Yajl, for direct parsing off the stream;
     #    As it's being received over the wire!
-    def self.get(uri)
+    def self.get(uri, opts = {})
+      user_agent = opts.has_key?(['User-Agent']) ? opts['User-Agent'] : "Yajl::HttpStream #{Yajl::VERSION}"
+      
       socket = TCPSocket.new(uri.host, uri.port)
       request = "GET #{uri.path}#{uri.query ? "?"+uri.query : nil} HTTP/1.0\r\n"
       request << "Host: #{uri.host}\r\n"
       request << "Authorization: Basic #{[userinfo].pack('m')}\r\n" unless uri.userinfo.nil?
-      request << "User-Agent: Yajl::HttpStream #{Yajl::VERSION}\r\n"
+      request << "User-Agent: #{user_agent}\r\n"
       request << "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\r\n"
       encodings = []
       encodings << "bzip2" if defined?(Yajl::Bzip2)
