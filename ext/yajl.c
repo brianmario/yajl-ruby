@@ -57,10 +57,11 @@ static int found_boolean(void * ctx, int boolean) {
 }
 
 static int found_number(void * ctx, const char * numberVal, unsigned int numberLen) {
-    if (strstr(numberVal, ".") != NULL || strstr(numberVal, "e") != NULL || strstr(numberVal, "E") != NULL) {
-        set_static_value(ctx, rb_Float(rb_str_new(numberVal, numberLen)));
+    VALUE subString = rb_str_new(numberVal, numberLen);
+    if (strstr(RSTRING_PTR(subString), ".") != NULL || strstr(RSTRING_PTR(subString), "e") != NULL || strstr(RSTRING_PTR(subString), "E") != NULL) {
+        set_static_value(ctx, rb_Float(subString));
     } else {
-        set_static_value(ctx, rb_Integer(rb_str_new(numberVal, numberLen)));
+        set_static_value(ctx, rb_Integer(subString));
     }
     check_and_fire_callback(ctx);
     return 1;
