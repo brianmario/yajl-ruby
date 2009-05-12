@@ -1,0 +1,94 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+	<title>brianmario/yajl-ruby @ GitHub</title>
+	
+	<style type="text/css">
+		body {
+  		margin-top: 1.0em;
+  		background-color: #8badd0;
+		  font-family: "helvetica"; 
+  		color: #000000;
+    }
+    #container {
+      margin: 0 auto;
+      width: 700px;
+    }
+		h1 { font-size: 3.8em; color: #74522f; margin-bottom: 3px; }
+		h1 .small { font-size: 0.4em; }
+		h1 a { text-decoration: none }
+		h2 { font-size: 1.5em; color: #74522f; }
+    h3 { text-align: center; color: #74522f; }
+    a { color: #74522f; }
+    .description { font-size: 1.2em; margin-bottom: 30px; margin-top: 30px; font-style: italic;}
+    .download { float: right; }
+		pre { background: #000; color: #fff; padding: 15px;}
+    hr { border: 0; width: 80%; border-bottom: 1px solid #aaa}
+    .footer { text-align:center; padding-top:30px; font-style: italic; }
+	</style>
+	
+</head>
+
+<body>
+  <a href="http://github.com/brianmario/yajl-ruby"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" /></a>
+  
+  <div id="container">
+
+    <div class="download">
+      <a href="http://github.com/brianmario/yajl-ruby/zipball/master">
+        <img border="0" width="90" src="http://github.com/images/modules/download/zip.png"></a>
+      <a href="http://github.com/brianmario/yajl-ruby/tarball/master">
+        <img border="0" width="90" src="http://github.com/images/modules/download/tar.png"></a>
+    </div>
+      
+    <h1><a href="http://github.com/brianmario/yajl-ruby">yajl-ruby</a> 
+      <span class="small">by <a href="http://github.com/brianmario">brianmario</a></span></h1>
+
+    <div class="description">
+      Ruby C bindings to Yajl. An extremely efficient streaming JSON parsing library
+    </div>
+
+    <p>yajl-ruby is C bindings to libyajl for Ruby.
+
+It's designed to parse JSON as a stream (off any IO object that responds to read(len, buffer) and eof?).
+
+It ships with support for parsing raw, gzip, deflate and bzip2 compressed streams.
+
+It also has basic HTTP GET support, which makes a request then parses the JSON body directly off the socket itself; as it's being received over the wire. If gzip, deflate and/or bzip2 support is loaded in Yajl, the HTTP layer will request compressed response bodies supporting all loaded compression types.
+
+My plans for the HTTP layer are to make it work extremely similar to rest-client (http://github.com/adamwiggins/rest-client) but with a focus on streaming JSON back and forth.</p><h2>Dependencies</h2>
+<p>Yajl - http://github.com/lloyd/yajl</p>
+<h2>Install</h2>
+<p>sudo gem install brianmario-yajl-ruby -s http://gems.github.com/</p>
+<h2>License</h2>
+<p>MIT</p>
+<h2>Authors</h2>
+<p>Brian Lopez (seniorlopez@gmail.com)<br/><br/>      </p>
+<h2>Contact</h2>
+<p>Brian Lopez (seniorlopez@gmail.com)<br/>      </p>
+
+
+    <h2>Download</h2>
+    <p>
+      You can download this project in either
+      <a href="http://github.com/brianmario/yajl-ruby/zipball/master">zip</a> or
+      <a href="http://github.com/brianmario/yajl-ruby/tarball/master">tar</a> formats.
+    </p>
+    <p>You can also clone the project with <a href="http://git-scm.com">Git</a>
+      by running:
+      <pre>$ git clone git://github.com/brianmario/yajl-ruby</pre>
+    </p>
+      
+    <div class="footer">
+      get the source code on GitHub : <a href="http://github.com/brianmario/yajl-ruby">brianmario/yajl-ruby</a>
+    </div>
+    
+  </div>
+
+  
+</body>
+</html>
