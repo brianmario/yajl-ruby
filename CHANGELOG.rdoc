@@ -11,6 +11,9 @@
    a helper for parsing compressed streams.
  * updated Yajl::HttpStream to request responses compressed as deflate and bzip2 in addition
    to gzip
+ * fixed a bug regarding parsing Integers as Floats (so 123456 would have be parsed and returned as 123456.0)
+ * fixed a bug which caused a segfault in ruby's GC during string replacement in Yajl::Gzip and Yajl::Bzip2's
+   StreamReader#read methods
 
 0.4.3 (May 2nd, 2009)
  * adding text/plain as an allowed mime-type for Yajl::HttpStream for webservers that respond
