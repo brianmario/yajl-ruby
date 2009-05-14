@@ -3,9 +3,10 @@ require 'rubygems'
 require 'benchmark'
 require 'yajl'
 require 'json'
-require 'activesupport'
+require 'yaml'
 
-filename = ARGV[0] || 'benchmark/subjects/twitter_search.json'
+# JSON section
+filename = ARGV[0] || 'benchmark/subjects/contacts.json'
 json = File.new(filename, 'r')
 
 # warm up the filesystem
@@ -29,12 +30,26 @@ Benchmark.bm { |x|
       JSON.parse(json.read, :max_nesting => false)
     }
   }
+}
+json.close
+
+# YAML section
+filename = ARGV[0] || 'benchmark/subjects/contacts.yml'
+yaml = File.new(filename, 'r')
+
+# warm up the filesystem
+yaml.read
+yaml.rewind
+
+times = ARGV[1] ? ARGV[1].to_i : 1
+puts "Starting benchmark parsing #{File.size(filename)} bytes of YAML data #{times} times\n\n"
+Benchmark.bm { |x|
   x.report {
-    puts "ActiveSupport::JSON.decode"
+    puts "YAML.load_stream"
     times.times {
-      json.rewind
-      ActiveSupport::JSON.decode(json.read)
+      yaml.rewind
+      YAML.load_stream(yaml)
     }
   }
 }
-json.close
+yaml.close

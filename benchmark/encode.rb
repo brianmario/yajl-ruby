@@ -15,7 +15,7 @@ times = ARGV[1] ? ARGV[1].to_i : 1
 puts "Starting benchmark encoding #{filename} #{times} times\n\n"
 Benchmark.bm { |x|
   x.report {
-    puts "Yajl::Stream.encode (C)"
+    puts "Yajl::Stream.encode"
     times.times {
       Yajl::Stream.encode(hash, StringIO.new)
     }
