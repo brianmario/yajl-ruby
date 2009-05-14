@@ -172,7 +172,7 @@ NOTE: I converted the 2.4MB JSON file to YAML for this test.
 
 * Yajl::Stream.parse: 3.47s
 * JSON.parse: 6.6s
-* YAML.load_stream: 19.47s
+* YAML.load_stream: 1309.93s
 
 == Special Thanks
 
