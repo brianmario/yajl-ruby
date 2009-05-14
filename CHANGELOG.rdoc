@@ -1,5 +1,9 @@
 = Changelog
 
+0.4.5 (?)
+ * added Yajl::Stream.encode(hash, io)
+ ** generates a JSON string stream, and writes to IO
+
 0.4.4 (May 12th, 2009)
  * NOTE: Breaking API change:
  ** renamed Yajl::GzipStreamReader to Yajl::Gzip::StreamReader
