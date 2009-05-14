@@ -35,9 +35,3 @@ Benchmark.bm { |x|
   #   }
   # }
 }
-# io = StringIO.new
-# Yajl::Stream.encode(hash, io)
-# io.rewind
-# puts io.read
-# puts ""
-# puts hash.to_json
