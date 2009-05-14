@@ -5,7 +5,7 @@
 #define READ_BUFSIZE 4096
 
 static VALUE cParseError, mYajl, mStream, mChunked;
-static ID intern_io_read, intern_eof, intern_respond_to, intern_call;
+static ID intern_io_read, intern_eof, intern_respond_to, intern_call, intern_keys, intern_to_s;
 static int readBufferSize = READ_BUFSIZE;
 static yajl_parser_config cfg = {1, 1};
 
@@ -43,3 +43,4 @@ static yajl_callbacks callbacks = {
 static VALUE t_setParseComplete(VALUE self, VALUE callback);
 static VALUE t_parseSome(VALUE self, VALUE string);
 static VALUE t_parse(VALUE self, VALUE io);
+static VALUE t_encode(VALUE self, VALUE obj, VALUE io);

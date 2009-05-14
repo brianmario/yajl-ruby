@@ -44,6 +44,61 @@ void set_static_value(void * ctx, VALUE val) {
     }
 }
 
+void encode_part(yajl_gen hand, VALUE obj, VALUE io) {
+    VALUE str, outBuff;
+    int objLen;
+    int idx = 0;
+    const unsigned char * buffer;
+    unsigned int len;
+    yajl_gen_get_buf(hand, &buffer, &len);
+    outBuff = rb_str_new((const char *)buffer, len);
+    rb_io_write(io, outBuff);
+    yajl_gen_clear(hand);
+
+    switch (TYPE(obj)) {
+        case T_HASH:
+            yajl_gen_map_open(hand);
+            
+            // TODO: itterate through keys in the hash
+            VALUE keys = rb_funcall(obj, intern_keys, 0);
+            VALUE entry;
+            for(idx=0; idx<RARRAY_LEN(keys); idx++) {
+                str = rb_ary_entry(keys, idx);
+                objLen = RSTRING_LEN(str);
+                yajl_gen_string(hand, (const unsigned char *)RSTRING_PTR(str), (unsigned int)objLen);
+                encode_part(hand, rb_hash_aref(obj, str), io);
+            }
+            
+            yajl_gen_map_close(hand);
+            break;
+        case T_ARRAY:
+            yajl_gen_array_open(hand);
+            // TODO: itterate through items in the array
+            yajl_gen_array_close(hand);
+            break;
+        case T_NIL:
+            yajl_gen_null(hand);
+            break;
+        case T_TRUE:
+            yajl_gen_bool(hand, 1);
+            break;
+        case T_FALSE:
+            yajl_gen_bool(hand, 0);
+            break;
+        case T_FIXNUM:
+        case T_FLOAT:
+            str = rb_funcall(obj, intern_to_s, 0);
+            objLen = RSTRING_LEN(str);
+            yajl_gen_number(hand, RSTRING_PTR(str), (unsigned int)objLen);
+            break;
+        default:
+            str = rb_funcall(obj, intern_to_s, 0);
+            objLen = RSTRING_LEN(str);
+            yajl_gen_string(hand, (const unsigned char *)RSTRING_PTR(str), (unsigned int)objLen);
+            break;
+    }
+}
+
 static int found_null(void * ctx) {
     set_static_value(ctx, Qnil);
     check_and_fire_callback(ctx);
@@ -179,11 +234,33 @@ static VALUE t_parse(VALUE self, VALUE io) {
     return rb_ary_pop(context);
 }
 
+static VALUE t_encode(VALUE self, VALUE obj, VALUE io) {
+  yajl_gen_config conf = {0, " "};
+  yajl_gen hand;
+  yajl_status stat;
+  const unsigned char * buffer;
+  unsigned int len;
+  VALUE outBuff;
+  
+  hand = yajl_gen_alloc(&conf, NULL);
+  encode_part(hand, obj, io);
+  
+  // just make sure we output the remaining buffer
+  yajl_gen_get_buf(hand, &buffer, &len);
+  outBuff = rb_str_new((const char *)buffer, len);
+  rb_io_write(io, outBuff);
+  
+  yajl_gen_clear(hand);
+  yajl_gen_free(hand);
+  return Qnil;
+}
+
 void Init_yajl() {
     mYajl = rb_define_module("Yajl");
     
     mStream = rb_define_module_under(mYajl, "Stream");
     rb_define_module_function(mStream, "parse", t_parse, 1);
+    rb_define_module_function(mStream, "encode", t_encode, 2);
     
     mChunked = rb_define_module_under(mYajl, "Chunked");
     rb_define_module_function(mChunked, "parse_some", t_parseSome, 1);
@@ -197,4 +274,6 @@ void Init_yajl() {
     intern_eof = rb_intern("eof?");
     intern_respond_to = rb_intern("respond_to?");
     intern_call = rb_intern("call");
+    intern_keys = rb_intern("keys");
+    intern_to_s = rb_intern("to_s");
 }
