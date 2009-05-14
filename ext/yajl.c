@@ -45,7 +45,7 @@ void set_static_value(void * ctx, VALUE val) {
 }
 
 void encode_part(yajl_gen hand, VALUE obj, VALUE io) {
-    VALUE str, outBuff;
+    VALUE str, outBuff, otherObj;
     int objLen;
     int idx = 0;
     const unsigned char * buffer;
@@ -73,7 +73,10 @@ void encode_part(yajl_gen hand, VALUE obj, VALUE io) {
             break;
         case T_ARRAY:
             yajl_gen_array_open(hand);
-            // TODO: itterate through items in the array
+            for(idx=0; idx<RARRAY_LEN(obj); idx++) {
+                otherObj = rb_ary_entry(obj, idx);
+                encode_part(hand, otherObj, io);
+            }
             yajl_gen_array_close(hand);
             break;
         case T_NIL:
@@ -87,6 +90,7 @@ void encode_part(yajl_gen hand, VALUE obj, VALUE io) {
             break;
         case T_FIXNUM:
         case T_FLOAT:
+        case T_BIGNUM:
             str = rb_funcall(obj, intern_to_s, 0);
             objLen = RSTRING_LEN(str);
             yajl_gen_number(hand, RSTRING_PTR(str), (unsigned int)objLen);
