@@ -7,12 +7,12 @@ require 'json'
 require 'yaml'
 
 # JSON Section
-filename = ARGV[0] || 'benchmark/subjects/contacts.json'
+filename = 'benchmark/subjects/contacts.json'
 json = File.new(filename, 'r')
 hash = Yajl::Stream.parse(json)
 json.close
 
-times = ARGV[1] ? ARGV[1].to_i : 1
+times = ARGV[0] ? ARGV[0].to_i : 1
 puts "Starting benchmark encoding #{filename} into JSON #{times} times\n\n"
 Benchmark.bm { |x|
   x.report {
@@ -30,12 +30,12 @@ Benchmark.bm { |x|
 }
 
 # YAML Section
-filename = ARGV[0] || 'benchmark/subjects/contacts.yml'
+filename = 'benchmark/subjects/contacts.yml'
 yml = File.new(filename, 'r')
 data = YAML.load_stream(yml)
 yml.close
 
-times = ARGV[1] ? ARGV[1].to_i : 1
+times = ARGV[0] ? ARGV[0].to_i : 1
 puts "Starting benchmark encoding #{filename} into YAML #{times} times\n\n"
 Benchmark.bm { |x|
   x.report {

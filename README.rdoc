@@ -1,6 +1,6 @@
-= YAJL C Bindings for Ruby (work in progress)
+= YAJL C Bindings for Ruby
 
-This gem (although not in gem form just yet) is a C binding to the excellent YAJL JSON parsing library.
+This gem (although not in gem form just yet) is a C binding to the excellent YAJL JSON parsing and generation library.
 
 You can read more info at the projects website http://lloydforge.org/projects/yajl or check out it's codes at http://github.com/lloyd/yajl.
 
@@ -10,13 +10,15 @@ First, you're probably gonna want to include it:
 
  include 'yajl'
 
+=== Parsing
+
 Then maybe parse some JSON from:
 
 a File IO
 
  json_contents = File.new('test.json', 'r')
  hash = Yajl::Stream.parse(json)
- 
+
 or maybe a StringIO
 
  json_contents = StringIO.new
@@ -77,6 +79,25 @@ Or how about parsing directly from a compressed file?
  file = File.new('some.json.bz2', 'r')
  result = Yajl::Bzip2::StreamReader.parse(file)
 
+=== Encoding
+
+Since yajl-ruby does everything using streams, you simply need to pass the object to encode, and the IO to write the stream to (this happens in chunks).
+
+This allows you to encode JSON as a stream, writing directly to a socket
+
+ socket = TCPSocket.new(192.168.1.101, 9000)
+ hash = {:foo => 12425125, :bar => "some string", ... }
+ Yajl::Stream.encode(hash, socket)
+
+Or what if you wanted to compress the stream over the wire?
+
+ require 'yajl/gzip'
+ socket = TCPSocket.new(192.168.1.101, 9000)
+ hash = {:foo => 12425125, :bar => "some string", ... }
+ Yajl::Gzip::StreamWriter.encode(hash, socket)
+
+You can also use Yajl::Bzip2::StreamWriter and Yajl::Deflate::StreamWriter. So you can pick whichever fits your CPU/bandwidth sweet-spot.
+
 There are a lot more possibilities, some of which I'm going to write other gems/plugins for.
 
 Some ideas are:
@@ -85,6 +106,7 @@ Some ideas are:
 * Rack middleware (ideally the JSON body could be handed to the parser while it's still being received)
 * use with ohai
 * JSON API clients
+* Patch Marshal#load and Marshal#dump to use JSON? ;)
 * etc...
 
 == How to install
@@ -100,8 +122,6 @@ After you have that installed, you should be able to install it like any other g
  sudo gem install brianmario-yajl-ruby
 
 == Benchmarks
-
-I'll update this readme with some actual data soon.
 
 After I finished implementation - this library performs close to the same as the current JSON.parse (C gem) does on small/medium files.
 
@@ -131,6 +151,28 @@ Here's what parsing a 2.43MB JSON file off the filesystem 20 times looks like:
 * Yajl::Stream.parse: 4.54s
 * JSON.parse: 5.47s
 * ActiveSupport::JSON.decode: 64.42s
+
+=== Encode Time
+
+* Yajl::Stream.encode: 3.59s
+* JSON#to_json: 6.2s
+* ActiveSupport::JSON.encode: 45.58s
+
+=== Compared to YAML
+
+NOTE: I converted the 2.4MB JSON file to YAML for this test.
+
+==== Parse Time (from their respective formats)
+
+* Yajl::Stream.parse: 4.33s
+* JSON.parse: 5.37s
+* YAML.load_stream: 19.47s
+
+==== Encode Time (to their respective formats)
+
+* Yajl::Stream.parse: 3.47s
+* JSON.parse: 6.6s
+* YAML.load_stream: 19.47s
 
 == Special Thanks
 

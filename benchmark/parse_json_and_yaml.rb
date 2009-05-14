@@ -6,14 +6,14 @@ require 'json'
 require 'yaml'
 
 # JSON section
-filename = ARGV[0] || 'benchmark/subjects/contacts.json'
+filename = 'benchmark/subjects/contacts.json'
 json = File.new(filename, 'r')
 
 # warm up the filesystem
 json.read
 json.rewind
 
-times = ARGV[1] ? ARGV[1].to_i : 1
+times = ARGV[0] ? ARGV[0].to_i : 1
 puts "Starting benchmark parsing #{File.size(filename)} bytes of JSON data #{times} times\n\n"
 Benchmark.bm { |x|
   x.report {
@@ -34,14 +34,14 @@ Benchmark.bm { |x|
 json.close
 
 # YAML section
-filename = ARGV[0] || 'benchmark/subjects/contacts.yml'
+filename = 'benchmark/subjects/contacts.yml'
 yaml = File.new(filename, 'r')
 
 # warm up the filesystem
 yaml.read
 yaml.rewind
 
-times = ARGV[1] ? ARGV[1].to_i : 1
+times = ARGV[0] ? ARGV[0].to_i : 1
 puts "Starting benchmark parsing #{File.size(filename)} bytes of YAML data #{times} times\n\n"
 Benchmark.bm { |x|
   x.report {
