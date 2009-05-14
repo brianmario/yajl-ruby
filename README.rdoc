@@ -170,9 +170,9 @@ NOTE: I converted the 2.4MB JSON file to YAML for this test.
 
 ==== Encode Time (to their respective formats)
 
-* Yajl::Stream.parse: 3.47s
-* JSON.parse: 6.6s
-* YAML.load_stream: 1309.93s
+* Yajl::Stream.encode: 3.47s
+* JSON#to_json: 6.6s
+* YAML.dump(obj, io): 1309.93s
 
 == Special Thanks
 
