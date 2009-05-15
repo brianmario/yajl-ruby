@@ -21,7 +21,7 @@ Benchmark.bm { |x|
   x.report {
     puts "JSON's #to_json"
     times.times {
-      hash.to_json
+      JSON.generate(hash)
     }
   }
   x.report {
