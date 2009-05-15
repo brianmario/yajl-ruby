@@ -28,11 +28,12 @@ module Yajl
       user_agent = opts.has_key?(['User-Agent']) ? opts['User-Agent'] : "Yajl::HttpStream #{Yajl::VERSION}"
       
       socket = TCPSocket.new(uri.host, uri.port)
-      request = "GET #{uri.path}#{uri.query ? "?"+uri.query : nil} HTTP/1.0\r\n"
+      request = "GET #{uri.path}#{uri.query ? "?"+uri.query : nil} HTTP/1.1\r\n"
       request << "Host: #{uri.host}\r\n"
       request << "Authorization: Basic #{[userinfo].pack('m')}\r\n" unless uri.userinfo.nil?
       request << "User-Agent: #{user_agent}\r\n"
       request << "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\r\n"
+      request << "Connection: close\r\n"
       encodings = []
       encodings << "bzip2" if defined?(Yajl::Bzip2)
       encodings << "gzip" if defined?(Yajl::Gzip)
@@ -60,22 +61,26 @@ module Yajl
           end
         end
       end
-      raise Exception, "Chunked responses not supported yet (I'm working on this)" if response_head[:headers]["Transfer-Encoding"] == 'chunked'
-      content_type = response_head[:headers]["Content-Type"].split('; ')
-      content_type = content_type.first
-      if ALLOWED_MIME_TYPES.include?(content_type)
-        case response_head[:headers]["Content-Encoding"]
-        when "gzip"
-          return Yajl::Gzip::StreamReader.parse(socket)
-        when "deflate"
-          return Yajl::Deflate::StreamReader.parse(socket, -Zlib::MAX_WBITS)
-        when "bzip2"
-          return Yajl::Bzip2::StreamReader.parse(socket)
-        else
-          return Yajl::Stream.parse(socket)
-        end
+      
+      if response_head[:headers]["Transfer-Encoding"] == 'chunked'
+        raise Exception, "Chunked responses not supported yet (I'm working on this)"
       else
-        raise InvalidContentType, "The response MIME type #{content_type}"
+        content_type = response_head[:headers]["Content-Type"].split('; ')
+        content_type = content_type.first
+        if ALLOWED_MIME_TYPES.include?(content_type)
+          case response_head[:headers]["Content-Encoding"]
+          when "gzip"
+            return Yajl::Gzip::StreamReader.parse(socket)
+          when "deflate"
+            return Yajl::Deflate::StreamReader.parse(socket, -Zlib::MAX_WBITS)
+          when "bzip2"
+            return Yajl::Bzip2::StreamReader.parse(socket)
+          else
+            return Yajl::Stream.parse(socket)
+          end
+        else
+          raise InvalidContentType, "The response MIME type #{content_type}"
+        end
       end
     ensure
       socket.close
