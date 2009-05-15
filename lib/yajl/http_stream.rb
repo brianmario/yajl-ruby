@@ -60,7 +60,7 @@ module Yajl
           end
         end
       end
-      
+      raise Exception, "Chunked responses not supported yet (I'm working on this)" if response_head[:headers]["Transfer-Encoding"] == 'chunked'
       content_type = response_head[:headers]["Content-Type"].split('; ')
       content_type = content_type.first
       if ALLOWED_MIME_TYPES.include?(content_type)
