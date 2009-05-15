@@ -54,7 +54,7 @@ void encode_part(yajl_gen hand, VALUE obj, VALUE io) {
     outBuff = rb_str_new((const char *)buffer, len);
     rb_io_write(io, outBuff);
     yajl_gen_clear(hand);
-
+    
     switch (TYPE(obj)) {
         case T_HASH:
             yajl_gen_map_open(hand);
@@ -63,10 +63,11 @@ void encode_part(yajl_gen hand, VALUE obj, VALUE io) {
             VALUE keys = rb_funcall(obj, intern_keys, 0);
             VALUE entry;
             for(idx=0; idx<RARRAY_LEN(keys); idx++) {
-                str = rb_ary_entry(keys, idx);
-                objLen = RSTRING_LEN(str);
-                yajl_gen_string(hand, (const unsigned char *)RSTRING_PTR(str), (unsigned int)objLen);
-                encode_part(hand, rb_hash_aref(obj, str), io);
+                entry = rb_ary_entry(keys, idx);
+                // the key
+                encode_part(hand, entry, io);
+                // the value
+                encode_part(hand, rb_hash_aref(obj, entry), io);
             }
             
             yajl_gen_map_close(hand);
