@@ -55,6 +55,7 @@ only had access to chunks of it at a time. No problem!
 
 
 Or how about a JSON API HTTP request?
+This actually makes a request using a raw TCPSocket, then parses the JSON body right off the socket. While it's being received over the wire!
 
  require 'uri'
  require 'yajl/http_stream'
@@ -63,6 +64,7 @@ Or how about a JSON API HTTP request?
  results = Yajl::HttpStream.get(url)
 
 Or do the same request, with Gzip and Deflate output compression support (also supports Bzip2, if loaded):
+(this does the same raw socket Request, but transparently parses the compressed response body)
  
  require 'uri'
  require 'yajl/gzip'
