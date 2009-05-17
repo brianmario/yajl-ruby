@@ -30,7 +30,7 @@ module Yajl
       socket = TCPSocket.new(uri.host, uri.port)
       request = "GET #{uri.path}#{uri.query ? "?"+uri.query : nil} HTTP/1.1\r\n"
       request << "Host: #{uri.host}\r\n"
-      request << "Authorization: Basic #{[userinfo].pack('m')}\r\n" unless uri.userinfo.nil?
+      request << "Authorization: Basic #{[uri.userinfo].pack('m')}\r\n" unless uri.userinfo.nil?
       request << "User-Agent: #{user_agent}\r\n"
       request << "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\r\n"
       request << "Connection: close\r\n"
