@@ -260,7 +260,7 @@ static VALUE t_encode(VALUE self, VALUE obj, VALUE io) {
   return Qnil;
 }
 
-void Init_yajl() {
+void Init_yajl_ext() {
     mYajl = rb_define_module("Yajl");
     
     mStream = rb_define_module_under(mYajl, "Stream");
