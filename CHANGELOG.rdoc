@@ -1,8 +1,14 @@
 = Changelog
 
-0.4.5 (?)
+0.4.5 (May 17th, 2009)
  * added Yajl::Stream.encode(hash, io)
  ** generates a JSON string stream, and writes to IO
+ ** compressed StreamWriter helpers added as well
+ * fixed a pretty lame segfault in (x86_64 only?) ubuntu/linux
+ * changed the compiled extension to have a more specific name (yajl_ext) for easier loading
+ * removed forced-load of .bundle file, for the rest of the planet aside from OSX users
+ * added some more benchmarks to compare to other forms of serialization in Ruby
+ * various readme updates
 
 0.4.4 (May 12th, 2009)
  * NOTE: Breaking API change:
