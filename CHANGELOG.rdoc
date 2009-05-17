@@ -1,5 +1,9 @@
 = Changelog
 
+0.4.6 (May 17th, 2009)
+ * Applied a patch from benburkert (http://github.com/benburkert) to fix HTTP Basic Auth in
+   Yajl::HttpStream.get
+
 0.4.5 (May 17th, 2009)
  * added Yajl::Stream.encode(hash, io)
  ** generates a JSON string stream, and writes to IO
