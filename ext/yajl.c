@@ -210,7 +210,7 @@ static VALUE t_parse(VALUE self, VALUE io) {
     // allocate our parser
     streamParser = yajl_alloc(&callbacks, &cfg, NULL, (void *)context);
     
-    VALUE parsed = rb_str_new("", readBufferSize);
+    VALUE parsed = rb_str_new2("");
     VALUE rbufsize = INT2FIX(readBufferSize);
     
     // now parse from the IO
