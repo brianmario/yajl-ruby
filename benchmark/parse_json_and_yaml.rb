@@ -48,7 +48,7 @@ Benchmark.bm { |x|
     puts "YAML.load_stream"
     times.times {
       yaml.rewind
-      YAML.load_stream(yaml)
+      YAML.load(yaml)
     }
   }
 }
