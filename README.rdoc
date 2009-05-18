@@ -6,9 +6,9 @@ You can read more info at the projects website http://lloydforge.org/projects/ya
 
 == Example of use
 
-First, you're probably gonna want to include it:
+First, you're probably gonna want to require it:
 
- include 'yajl'
+ require 'yajl'
 
 === Parsing
 
@@ -16,12 +16,12 @@ Then maybe parse some JSON from:
 
 a File IO
 
- json_contents = File.new('test.json', 'r')
+ json = File.new('test.json', 'r')
  hash = Yajl::Stream.parse(json)
 
 or maybe a StringIO
 
- json_contents = StringIO.new
+ json = StringIO.new
  hash = Yajl::Stream.parse(json)
 
 or maybe STDIN
@@ -104,7 +104,8 @@ There are a lot more possibilities, some of which I'm going to write other gems/
 
 Some ideas are:
 * parsing logs in JSON format
-* an ActiveSupport patch (http://github.com/technoweenie/rails/commit/f9abcc93a3660fcf46172c4cd8a2f36ba5a5510d)
+* a Rails plugin (http://github.com/technoweenie/yajl-rails)
+* builtin Rails 3 support?
 * Rack middleware (ideally the JSON body could be handed to the parser while it's still being received)
 * use with ohai
 * JSON API clients
