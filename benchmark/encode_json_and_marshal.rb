@@ -1,7 +1,7 @@
 # encoding: UTF-8
 require 'rubygems'
 require 'benchmark'
-require 'yajl'
+require 'yajl_ext'
 require 'json'
 
 filename = ARGV[0] || 'benchmark/subjects/contacts.json'

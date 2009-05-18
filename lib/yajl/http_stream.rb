@@ -1,6 +1,6 @@
 # encoding: UTF-8
 require 'socket' unless defined?(Socket)
-require 'yajl.rb' unless defined?(Yajl::Stream)
+require 'yajl' unless defined?(Yajl::Stream)
 
 module Yajl
   # == Yajl::HttpStream
