@@ -1,5 +1,8 @@
 = Changelog
 
+0.4.8 (May 18th, 2009)
+ * fixed a totally bone-head compilation problem, I created for myself ;)
+
 0.4.7 (May 18th, 2009)
  * Bundling Yajl sources to remove the need to install them (and CMake) separately (Thank you Lloyd!!!)
    This means you can now simply install the gem and be off and running

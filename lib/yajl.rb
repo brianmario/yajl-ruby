@@ -13,7 +13,7 @@ require 'yajl_ext'
 #
 # Ruby bindings to the excellent Yajl (Yet Another JSON Parser) ANSI C library.
 module Yajl
-  VERSION = "0.4.7"
+  VERSION = "0.4.8"
   
   # == Yajl::Chunked
   #
