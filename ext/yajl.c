@@ -1,284 +1,152 @@
-#include "yajl.h"
+/*
+ * Copyright 2007-2009, Lloyd Hilaiel.
+ * 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are
+ * met:
+ * 
+ *  1. Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ * 
+ *  2. Redistributions in binary form must reproduce the above copyright
+ *     notice, this list of conditions and the following disclaimer in
+ *     the documentation and/or other materials provided with the
+ *     distribution.
+ * 
+ *  3. Neither the name of Lloyd Hilaiel nor the names of its
+ *     contributors may be used to endorse or promote products derived
+ *     from this software without specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+ * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ */ 
 
-void check_and_fire_callback(void * ctx) {
-    yajl_status stat;
-    
-    if (RARRAY_LEN((VALUE)ctx) == 1 && parse_complete_callback != Qnil) {
-        // parse any remaining buffered data
-        stat = yajl_parse_complete(chunkedParser);
-        
-        rb_funcall(parse_complete_callback, intern_call, 1, rb_ary_pop((VALUE)ctx));
+#include "api/yajl_parse.h"
+#include "yajl_lex.h"
+#include "yajl_parser.h"
+#include "yajl_alloc.h"
+
+#include <stdlib.h>
+#include <string.h>
+#include <assert.h>
+
+const char *
+yajl_status_to_string(yajl_status stat)
+{
+    const char * statStr = "unknown";
+    switch (stat) {
+        case yajl_status_ok:
+            statStr = "ok, no error";
+            break;
+        case yajl_status_client_canceled:
+            statStr = "client canceled parse";
+            break;
+        case yajl_status_insufficient_data:
+            statStr = "eof was met before the parse could complete";
+            break;
+        case yajl_status_error:
+            statStr = "parse error";
+            break;
     }
+    return statStr;
 }
 
-void set_static_value(void * ctx, VALUE val) {
-    VALUE len = RARRAY_LEN((VALUE)ctx);
+yajl_handle
+yajl_alloc(const yajl_callbacks * callbacks,
+           const yajl_parser_config * config,
+           const yajl_alloc_funcs * afs,
+           void * ctx)
+{
+    unsigned int allowComments = 0;
+    unsigned int validateUTF8 = 0;
+    yajl_handle hand = NULL;
+    yajl_alloc_funcs afsBuffer;
     
-    if (len > 0) {
-        VALUE lastEntry = rb_ary_entry((VALUE)ctx, len-1);
-        VALUE hash;
-        switch (TYPE(lastEntry)) {
-            case T_ARRAY:
-                rb_ary_push(lastEntry, val);
-                if (TYPE(val) == T_HASH || TYPE(val) == T_ARRAY) {
-                    rb_ary_push((VALUE)ctx, val);
-                }
-                break;
-            case T_HASH:
-                rb_hash_aset(lastEntry, val, Qnil);
-                rb_ary_push((VALUE)ctx, val);
-                break;
-            case T_STRING:
-                hash = rb_ary_entry((VALUE)ctx, len-2);
-                if (TYPE(hash) == T_HASH) {
-                    rb_hash_aset(hash, lastEntry, val);
-                    rb_ary_pop((VALUE)ctx);
-                    if (TYPE(val) == T_HASH || TYPE(val) == T_ARRAY) {
-                        rb_ary_push((VALUE)ctx, val);
-                    }
-                }
-                break;
+    /* first order of business is to set up memory allocation routines */
+    if (afs != NULL) {
+        if (afs->malloc == NULL || afs->realloc == NULL || afs->free == NULL)
+        {
+            return NULL;
         }
     } else {
-        rb_ary_push((VALUE)ctx, val);
-    }
-}
-
-void encode_part(yajl_gen hand, VALUE obj, VALUE io) {
-    VALUE str, outBuff, otherObj;
-    int objLen;
-    int idx = 0;
-    const unsigned char * buffer;
-    unsigned int len;
-    yajl_gen_get_buf(hand, &buffer, &len);
-    outBuff = rb_str_new((const char *)buffer, len);
-    rb_io_write(io, outBuff);
-    yajl_gen_clear(hand);
-    
-    switch (TYPE(obj)) {
-        case T_HASH:
-            yajl_gen_map_open(hand);
-            
-            // TODO: itterate through keys in the hash
-            VALUE keys = rb_funcall(obj, intern_keys, 0);
-            VALUE entry;
-            for(idx=0; idx<RARRAY_LEN(keys); idx++) {
-                entry = rb_ary_entry(keys, idx);
-                // the key
-                encode_part(hand, entry, io);
-                // the value
-                encode_part(hand, rb_hash_aref(obj, entry), io);
-            }
-            
-            yajl_gen_map_close(hand);
-            break;
-        case T_ARRAY:
-            yajl_gen_array_open(hand);
-            for(idx=0; idx<RARRAY_LEN(obj); idx++) {
-                otherObj = rb_ary_entry(obj, idx);
-                encode_part(hand, otherObj, io);
-            }
-            yajl_gen_array_close(hand);
-            break;
-        case T_NIL:
-            yajl_gen_null(hand);
-            break;
-        case T_TRUE:
-            yajl_gen_bool(hand, 1);
-            break;
-        case T_FALSE:
-            yajl_gen_bool(hand, 0);
-            break;
-        case T_FIXNUM:
-        case T_FLOAT:
-        case T_BIGNUM:
-            str = rb_funcall(obj, intern_to_s, 0);
-            objLen = RSTRING_LEN(str);
-            yajl_gen_number(hand, RSTRING_PTR(str), (unsigned int)objLen);
-            break;
-        default:
-            str = rb_funcall(obj, intern_to_s, 0);
-            objLen = RSTRING_LEN(str);
-            yajl_gen_string(hand, (const unsigned char *)RSTRING_PTR(str), (unsigned int)objLen);
-            break;
-    }
-}
-
-static int found_null(void * ctx) {
-    set_static_value(ctx, Qnil);
-    check_and_fire_callback(ctx);
-    return 1;
-}
-
-static int found_boolean(void * ctx, int boolean) {
-    set_static_value(ctx, boolean ? Qtrue : Qfalse);
-    check_and_fire_callback(ctx);
-    return 1;
-}
-
-static int found_number(void * ctx, const char * numberVal, unsigned int numberLen) {
-    VALUE subString = rb_str_new(numberVal, numberLen);
-    if (strstr(RSTRING_PTR(subString), ".") != NULL || strstr(RSTRING_PTR(subString), "e") != NULL || strstr(RSTRING_PTR(subString), "E") != NULL) {
-        set_static_value(ctx, rb_Float(subString));
-    } else {
-        set_static_value(ctx, rb_Integer(subString));
-    }
-    check_and_fire_callback(ctx);
-    return 1;
-}
-
-static int found_string(void * ctx, const unsigned char * stringVal, unsigned int stringLen) {
-    set_static_value(ctx, rb_str_new((const char *)stringVal, stringLen));
-    check_and_fire_callback(ctx);
-    return 1;
-}
-
-static int found_hash_key(void * ctx, const unsigned char * stringVal, unsigned int stringLen) {
-    set_static_value(ctx, rb_str_new((const char *)stringVal, stringLen));
-    return 1;
-}
-
-static int found_start_hash(void * ctx) {
-    set_static_value(ctx, rb_hash_new());
-    return 1;
-}
-
-static int found_end_hash(void * ctx) {
-    if (RARRAY_LEN((VALUE)ctx) > 1) {
-        rb_ary_pop((VALUE)ctx);
-    }
-    check_and_fire_callback(ctx);
-    return 1;
-}
-
-static int found_start_array(void * ctx) {
-    set_static_value(ctx, rb_ary_new());
-    return 1;
-}
-
-static int found_end_array(void * ctx) {
-    if (RARRAY_LEN((VALUE)ctx) > 1) {
-        rb_ary_pop((VALUE)ctx);
-    }
-    check_and_fire_callback(ctx);
-    return 1;
-}
-
-static VALUE t_setParseComplete(VALUE self, VALUE callback) {
-    parse_complete_callback = callback;
-    return Qnil;
-}
-
-static VALUE t_parseSome(VALUE self, VALUE string) {
-    yajl_status stat;
-    
-    if (string == Qnil) {
-        rb_raise(cParseError, "%s", "Can't parse a nil string.");
-        return Qnil;
-    }
-    
-    if (parse_complete_callback != Qnil) {
-        if (context == Qnil) {
-            context = rb_ary_new();
-        }
-        if (chunkedParser == NULL) {
-            // allocate our parser
-            chunkedParser = yajl_alloc(&callbacks, &cfg, NULL, (void *)context);
-        }
-        
-        stat = yajl_parse(chunkedParser, (const unsigned char *)RSTRING_PTR(string), RSTRING_LEN(string));
-        if (stat != yajl_status_ok && stat != yajl_status_insufficient_data) {
-            unsigned char * str = yajl_get_error(chunkedParser, 1, (const unsigned char *)RSTRING_PTR(string), RSTRING_LEN(string));
-            rb_raise(cParseError, "%s", (const char *) str);
-            yajl_free_error(chunkedParser, str);
-        }
-    } else {
-        rb_raise(cParseError, "%s", "The on_parse_complete callback isn't setup, parsing useless.");
-    }
-    
-    if (RARRAY_LEN(context) == 0) {
-        yajl_free(chunkedParser);
-    }
-    
-    return Qnil;
-}
-
-static VALUE t_parse(VALUE self, VALUE io) {
-    yajl_status stat;
-    context = rb_ary_new();
-    
-    // allocate our parser
-    streamParser = yajl_alloc(&callbacks, &cfg, NULL, (void *)context);
-    
-    VALUE parsed = rb_str_new2("");
-    VALUE rbufsize = INT2FIX(readBufferSize);
-    
-    // now parse from the IO
-    while (rb_funcall(io, intern_eof, 0) != Qtrue) {
-        rb_funcall(io, intern_io_read, 2, rbufsize, parsed);
-        
-        stat = yajl_parse(streamParser, (const unsigned char *)RSTRING_PTR(parsed), RSTRING_LEN(parsed));
-        
-        if (stat != yajl_status_ok && stat != yajl_status_insufficient_data) {
-            unsigned char * str = yajl_get_error(streamParser, 1, (const unsigned char *)RSTRING_PTR(parsed), RSTRING_LEN(parsed));
-            rb_raise(cParseError, "%s", (const char *) str);
-            yajl_free_error(streamParser, str);
-            break;
-        }
-    }
-    
-    // parse any remaining buffered data
-    stat = yajl_parse_complete(streamParser);
-    yajl_free(streamParser);
-    
-    if (parse_complete_callback != Qnil) {
-        check_and_fire_callback((void *)context);
-        return Qnil;
+        yajl_set_default_alloc_funcs(&afsBuffer);
+        afs = &afsBuffer;
     }
 
-    return rb_ary_pop(context);
+    hand = (yajl_handle) YA_MALLOC(afs, sizeof(struct yajl_handle_t));
+
+    /* copy in pointers to allocation routines */
+    memcpy((void *) &(hand->alloc), (void *) afs, sizeof(yajl_alloc_funcs));
+
+    if (config != NULL) {
+        allowComments = config->allowComments;
+        validateUTF8 = config->checkUTF8;
+    }
+
+    hand->callbacks = callbacks;
+    hand->ctx = ctx;
+    hand->lexer = yajl_lex_alloc(&(hand->alloc), allowComments, validateUTF8);
+    hand->errorOffset = 0;
+    hand->decodeBuf = yajl_buf_alloc(&(hand->alloc));
+    yajl_bs_init(hand->stateStack, &(hand->alloc));
+
+    yajl_bs_push(hand->stateStack, yajl_state_start);    
+
+    return hand;
 }
 
-static VALUE t_encode(VALUE self, VALUE obj, VALUE io) {
-  yajl_gen_config conf = {0, " "};
-  yajl_gen hand;
-  yajl_status stat;
-  const unsigned char * buffer;
-  unsigned int len;
-  VALUE outBuff;
-  
-  hand = yajl_gen_alloc(&conf, NULL);
-  encode_part(hand, obj, io);
-  
-  // just make sure we output the remaining buffer
-  yajl_gen_get_buf(hand, &buffer, &len);
-  outBuff = rb_str_new((const char *)buffer, len);
-  rb_io_write(io, outBuff);
-  
-  yajl_gen_clear(hand);
-  yajl_gen_free(hand);
-  return Qnil;
+void
+yajl_free(yajl_handle handle)
+{
+    yajl_bs_free(handle->stateStack);
+    yajl_buf_free(handle->decodeBuf);
+    yajl_lex_free(handle->lexer);
+    YA_FREE(&(handle->alloc), handle);
 }
 
-void Init_yajl_ext() {
-    mYajl = rb_define_module("Yajl");
-    
-    mStream = rb_define_module_under(mYajl, "Stream");
-    rb_define_module_function(mStream, "parse", t_parse, 1);
-    rb_define_module_function(mStream, "encode", t_encode, 2);
-    
-    mChunked = rb_define_module_under(mYajl, "Chunked");
-    rb_define_module_function(mChunked, "parse_some", t_parseSome, 1);
-    rb_define_module_function(mChunked, "<<", t_parseSome, 1);
-    rb_define_module_function(mChunked, "on_parse_complete=", t_setParseComplete, 1);
-    
-    VALUE rb_cStandardError = rb_const_get(rb_cObject, rb_intern("StandardError"));
-    cParseError = rb_define_class_under(mYajl, "ParseError", rb_cStandardError);
-    
-    intern_io_read = rb_intern("read");
-    intern_eof = rb_intern("eof?");
-    intern_respond_to = rb_intern("respond_to?");
-    intern_call = rb_intern("call");
-    intern_keys = rb_intern("keys");
-    intern_to_s = rb_intern("to_s");
+yajl_status
+yajl_parse(yajl_handle hand, const unsigned char * jsonText,
+           unsigned int jsonTextLen)
+{
+    unsigned int offset = 0;
+    yajl_status status;
+    status = yajl_do_parse(hand, &offset, jsonText, jsonTextLen);
+    return status;
 }
+
+yajl_status
+yajl_parse_complete(yajl_handle hand)
+{
+    /* The particular case we want to handle is a trailing number.
+     * Further input consisting of digits could cause our interpretation
+     * of the number to change (buffered "1" but "2" comes in).
+     * A very simple approach to this is to inject whitespace to terminate
+     * any number in the lex buffer.
+     */
+    return yajl_parse(hand, (const unsigned char *)" ", 1);
+}
+
+unsigned char *
+yajl_get_error(yajl_handle hand, int verbose,
+               const unsigned char * jsonText, unsigned int jsonTextLen)
+{
+    return yajl_render_error_string(hand, jsonText, jsonTextLen, verbose);
+}
+
+void
+yajl_free_error(yajl_handle hand, unsigned char * str)
+{
+    /* use memory allocation functions if set */
+    YA_FREE(&(hand->alloc), str);
+}
+
+/* XXX: add utility routines to parse from file */

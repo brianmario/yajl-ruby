@@ -1,5 +1,5 @@
-#include <yajl/yajl_parse.h>
-#include <yajl/yajl_gen.h>
+#include "api/yajl_parse.h"
+#include "api/yajl_gen.h"
 #include <ruby.h>
 
 #define READ_BUFSIZE 4096
