@@ -35,7 +35,7 @@
  * Interface to YAJL's JSON parsing facilities.
  */
 
-#include <yajl/yajl_common.h>
+#include "api/yajl_common.h"
 
 #ifndef __YAJL_PARSE_H__
 #define __YAJL_PARSE_H__
