@@ -64,7 +64,6 @@ Gem::Specification.new do |s|
      "lib/yajl/gzip/stream_reader.rb",
      "lib/yajl/gzip/stream_writer.rb",
      "lib/yajl/http_stream.rb",
-     "spec/active_support_spec.rb",
      "spec/fixtures/fail.15.json",
      "spec/fixtures/fail.16.json",
      "spec/fixtures/fail.17.json",
@@ -122,12 +121,10 @@ Gem::Specification.new do |s|
      "spec/fixtures/pass1.json",
      "spec/fixtures/pass2.json",
      "spec/fixtures/pass3.json",
-     "spec/fixtures_spec.rb",
      "spec/http/http.bzip2.dump",
      "spec/http/http.deflate.dump",
      "spec/http/http.gzip.dump",
      "spec/http/http.raw.dump",
-     "spec/one_off_spec.rb",
      "spec/spec_helper.rb",
      "yajl-ruby.gemspec"
   ]
@@ -137,9 +134,10 @@ Gem::Specification.new do |s|
   s.rubygems_version = %q{1.3.3}
   s.summary = %q{Ruby C bindings to the excellent Yajl JSON stream-based parser library.}
   s.test_files = [
-    "spec/active_support_spec.rb",
-     "spec/fixtures_spec.rb",
-     "spec/one_off_spec.rb",
+    "spec/parsing_active_support_spec.rb",
+     "spec/parsing_fixtures_spec.rb",
+     "spec/parsing_http_spec.rb",
+     "spec/parsing_one_off_spec.rb",
      "spec/spec_helper.rb"
   ]
 
