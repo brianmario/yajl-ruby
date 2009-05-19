@@ -181,9 +181,10 @@ This project includes code from the BSD licensed yajl project, copyright 2007-20
 
 I've had a lot of inspiration, and a lot of help. Thanks to everyone who's been a part of this and those to come!
 
-* Lloyd Hilaiel (http://github.com/lloyd) - for writing Yajl!!
-* Josh Ferguson (http://github.com/besquared) - for peer-pressuring me into getting back into C; it worked ;) Also tons of support over IM
-* Jonathan Novak (http://github.com/cypriss) - pointer-hacking help
-* Tom Smith (http://github.com/rtomsmith) - pointer-hacking help
-* Rick (http://github.com/technoweenie) - for making an ActiveSupport patch with support for this library and teasing me that it might go into Rails 3. You sure lit a fire under my ass and I got a ton of work done because of it! :)
-* The entire Github Crew - my inspiration, time spent writing this, finding Yajl, So many-MANY other things wouldn't have been possible without this awesome service. I owe you guys some whiskey at Kilowatt.
+* Lloyd Hilaiel - http://github.com/lloyd - for writing Yajl!!
+* Josh Ferguson - http://github.com/besquared - for peer-pressuring me into getting back into C; it worked ;) Also tons of support over IM
+* Jonathan Novak - http://github.com/cypriss - pointer-hacking help
+* Tom Smith - http://github.com/rtomsmith - pointer-hacking help
+* Rick http://github.com/technoweenie - for making an ActiveSupport patch with support for this library and teasing me that it might go into Rails 3. You sure lit a fire under my ass and I got a ton of work done because of it! :)
+* The entire Github Crew - http://github.com/ - my inspiration, time spent writing this, finding Yajl, So many-MANY other things wouldn't have been possible without this awesome service. I owe you guys some whiskey at Kilowatt.
+* benburkert - http://github.com/benburkert
