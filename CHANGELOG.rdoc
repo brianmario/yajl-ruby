@@ -1,5 +1,15 @@
 = Changelog
 
+0.4.7 (May 18th, 2009)
+ * Bundling Yajl sources to remove the need to install them (and CMake) separately (Thank you Lloyd!!!)
+   This means you can now simply install the gem and be off and running
+ * Added some spec tests for Yajl::HttpStream
+ * Added some spec tests for Yajl::Stream.encode
+ * added some more thank you's, where credit's due - in the readme
+ * updated the unicode.json file to reflect a "real-life" JSON response
+ * reorganized spec tests into their functional areas
+ * added an rcov rake task to generate code coverage output
+
 0.4.6 (May 17th, 2009)
  * Applied a patch from benburkert (http://github.com/benburkert) to fix HTTP Basic Auth in
    Yajl::HttpStream.get
