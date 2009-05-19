@@ -177,6 +177,10 @@ NOTE: I converted the 2.4MB JSON file to YAML for this test.
 * JSON#to_json: 6.6s
 * YAML.dump(obj, io): 1309.93s
 
+== Third Party Sources Bundled
+
+This project includes code from the BSD licensed yajl project, copyright 2007-2009 Lloyd Hilaiel
+
 == Special Thanks
 
 I've had a lot of inspiration, and a lot of help. Thanks to everyone who's been a part of this and those to come!
