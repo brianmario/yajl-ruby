@@ -4,6 +4,14 @@ This gem (although not in gem form just yet) is a C binding to the excellent YAJ
 
 You can read more info at the projects website http://lloydforge.org/projects/yajl or check out it's codes at http://github.com/lloyd/yajl.
 
+== How to install
+
+Install it like any other gem hosted at the Githubs like so:
+
+(more instructions here: http://gems.github.com)
+
+ sudo gem install brianmario-yajl-ruby
+
 == Example of use
 
 First, you're probably gonna want to require it:
@@ -111,18 +119,6 @@ Some ideas are:
 * JSON API clients
 * Patch Marshal#load and Marshal#dump to use JSON? ;)
 * etc...
-
-== How to install
-
-First, Yajl uses CMake to build itself (yes, the author realizes this isn't the norm for open source and is willing and ready to accept patches, fork away kids!) so you'll need to grab it first from http://www.cmake.org.
-
-After you've got that, grab the latest version (I suggest at least 1.0.4 as it contains fixes for Unicode parsing) of Yajl itself from the Githubs at http://github.com/lloyd/yajl.
-
-After you have that installed, you should be able to install it like any other gem hosted here like so:
-
-(more instructions here: http://gems.github.com)
-
- sudo gem install brianmario-yajl-ruby
 
 == Benchmarks
 

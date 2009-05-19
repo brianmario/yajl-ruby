@@ -6,7 +6,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Brian Lopez"]
-  s.date = %q{2009-05-17}
+  s.date = %q{2009-05-18}
   s.email = %q{seniorlopez@gmail.com}
   s.extensions = ["ext/extconf.rb"]
   s.extra_rdoc_files = [
@@ -34,9 +34,25 @@ Gem::Specification.new do |s|
      "benchmark/subjects/twitter_search.json",
      "benchmark/subjects/unicode.json",
      "benchmark/subjects/yelp.json",
+     "ext/api/yajl_common.h",
+     "ext/api/yajl_gen.h",
+     "ext/api/yajl_parse.h",
      "ext/extconf.rb",
      "ext/yajl.c",
-     "ext/yajl.h",
+     "ext/yajl_alloc.c",
+     "ext/yajl_alloc.h",
+     "ext/yajl_buf.c",
+     "ext/yajl_buf.h",
+     "ext/yajl_bytestack.h",
+     "ext/yajl_encode.c",
+     "ext/yajl_encode.h",
+     "ext/yajl_ext.c",
+     "ext/yajl_ext.h",
+     "ext/yajl_gen.c",
+     "ext/yajl_lex.c",
+     "ext/yajl_lex.h",
+     "ext/yajl_parser.c",
+     "ext/yajl_parser.h",
      "lib/yajl.rb",
      "lib/yajl/bzip2.rb",
      "lib/yajl/bzip2/stream_reader.rb",
