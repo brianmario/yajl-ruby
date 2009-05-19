@@ -242,7 +242,6 @@ static VALUE t_parse(VALUE self, VALUE io) {
 static VALUE t_encode(VALUE self, VALUE obj, VALUE io) {
   yajl_gen_config conf = {0, " "};
   yajl_gen hand;
-  yajl_status stat;
   const unsigned char * buffer;
   unsigned int len;
   VALUE outBuff;
