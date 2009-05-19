@@ -1,5 +1,5 @@
 # encoding: UTF-8
-require File.expand_path(File.dirname(__FILE__) + '/spec_helper.rb')
+require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 require 'yajl/bzip2'
 require 'yajl/gzip'
 require 'yajl/deflate'
@@ -15,10 +15,10 @@ end
 
 describe "Yajl HTTP GET request" do
   before(:all) do
-    @raw = File.new(File.expand_path(File.dirname(__FILE__) + '/http/http.raw.dump'), 'r')
-    @bzip2 = File.new(File.expand_path(File.dirname(__FILE__) + '/http/http.bzip2.dump'), 'r')
-    @deflate = File.new(File.expand_path(File.dirname(__FILE__) + '/http/http.deflate.dump'), 'r')
-    @gzip = File.new(File.expand_path(File.dirname(__FILE__) + '/http/http.gzip.dump'), 'r')
+    @raw = File.new(File.expand_path(File.dirname(__FILE__) + '/fixtures/http.raw.dump'), 'r')
+    @bzip2 = File.new(File.expand_path(File.dirname(__FILE__) + '/fixtures/http.bzip2.dump'), 'r')
+    @deflate = File.new(File.expand_path(File.dirname(__FILE__) + '/fixtures/http.deflate.dump'), 'r')
+    @gzip = File.new(File.expand_path(File.dirname(__FILE__) + '/fixtures/http.gzip.dump'), 'r')
     
     parse_off_headers(@raw)
     @raw_template_hash = Yajl::Stream.parse(@raw)

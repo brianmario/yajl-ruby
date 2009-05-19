@@ -1,5 +1,5 @@
 # encoding: UTF-8
-require File.expand_path(File.dirname(__FILE__) + '/spec_helper.rb')
+require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe "One-off JSON examples" do
   it "should parse 23456789012E666 and return Infinity" do
