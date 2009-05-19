@@ -6,7 +6,7 @@ begin
     gem.summary = "Ruby C bindings to the excellent Yajl JSON stream-based parser library."
     gem.email = "seniorlopez@gmail.com"
     gem.homepage = "http://github.com/brianmario/yajl-ruby"
-    gem.authors = ["Brian Lopez"]
+    gem.authors = ["Brian Lopez", "Lloyd Hilaiel"]
     gem.require_paths = ["lib", "ext"]
     gem.extra_rdoc_files = `git ls-files *.rdoc`.split("\n")
     gem.files = `git ls-files`.split("\n")
