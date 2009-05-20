@@ -1,6 +1,4 @@
 require 'rubygems'
-require 'yajl/gzip'
-require 'yajl/deflate'
 require 'yajl/http_stream'
 require 'uri'
 require 'socket'
