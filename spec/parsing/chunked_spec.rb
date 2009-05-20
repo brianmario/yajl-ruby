@@ -7,8 +7,7 @@ describe "Chunked parser" do
   end
   
   before(:each) do
-    @callback = lambda { |hash| 
-      puts hash.inspect
+    @callback = lambda { |hash|
       hash.should == @final
     }
     Yajl::Chunked.on_parse_complete = @callback
