@@ -24,7 +24,7 @@ module Yajl
     # 3. the response is read until the end of the headers
     # 4. the _socket itself_ is passed directly to Yajl, for direct parsing off the stream;
     #    As it's being received over the wire!
-    def self.get(uri, opts = {})
+    def self.get(uri, opts = {}, &block)
       user_agent = opts.has_key?(['User-Agent']) ? opts['User-Agent'] : "Yajl::HttpStream #{Yajl::VERSION}"
       
       socket = TCPSocket.new(uri.host, uri.port)
@@ -63,7 +63,16 @@ module Yajl
       end
       
       if response_head[:headers]["Transfer-Encoding"] == 'chunked'
-        raise Exception, "Chunked responses not supported yet (I'm working on this)"
+        if block_given?
+          Yajl::Chunked.on_parse_complete = block
+          while size = socket.gets.hex
+            json = socket.read(size)
+            Yajl::Chunked << json
+            socket.gets # read off the newline
+          end
+        else
+          raise Exception, "Chunked responses detected, but no block given to handle the chunks."
+        end
       else
         content_type = response_head[:headers]["Content-Type"].split('; ')
         content_type = content_type.first

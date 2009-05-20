@@ -3,10 +3,8 @@
 void check_and_fire_callback(void * ctx) {
     yajl_status stat;
     VALUE len = RARRAY_LEN((VALUE)ctx);
-    if (len == 1 && needArrayVal == 0 && parse_complete_callback != Qnil) {
-        // parse any remaining buffered data
-        // stat = yajl_parse_complete(chunkedParser);
-        
+    
+    if (len == 1 && insideArray == 0 && insideHash == 0 && parse_complete_callback != Qnil) {
         rb_funcall(parse_complete_callback, intern_call, 1, rb_ary_pop((VALUE)ctx));
     }
 }
@@ -139,11 +137,13 @@ static int found_hash_key(void * ctx, const unsigned char * stringVal, unsigned 
 }
 
 static int found_start_hash(void * ctx) {
+    insideHash++;
     set_static_value(ctx, rb_hash_new());
     return 1;
 }
 
 static int found_end_hash(void * ctx) {
+    insideHash--;
     if (RARRAY_LEN((VALUE)ctx) > 1) {
         rb_ary_pop((VALUE)ctx);
     }
@@ -152,13 +152,13 @@ static int found_end_hash(void * ctx) {
 }
 
 static int found_start_array(void * ctx) {
-    needArrayVal = 1;
+    insideArray++;
     set_static_value(ctx, rb_ary_new());
     return 1;
 }
 
 static int found_end_array(void * ctx) {
-    needArrayVal = 0;
+    insideArray--;
     if (RARRAY_LEN((VALUE)ctx) > 1) {
         rb_ary_pop((VALUE)ctx);
     }
