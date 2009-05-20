@@ -3,8 +3,10 @@ require 'yajl/http_stream'
 require 'uri'
 require 'socket'
 
-username = ARGV[0]
-password = ARGV[1]
+unless (username = ARGV[0]) && (password = ARGV[1])
+  puts "\nUsage: ruby examples/twitter_stream_api.rb username password\n\n"
+  exit(0)
+end
 
 uri = URI.parse("http://#{username}:#{password}@stream.twitter.com/spritzer.json")
 
