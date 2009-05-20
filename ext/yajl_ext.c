@@ -2,8 +2,8 @@
 
 void check_and_fire_callback(void * ctx) {
     yajl_status stat;
-    
-    if (RARRAY_LEN((VALUE)ctx) == 1 && parse_complete_callback != Qnil) {
+    VALUE len = RARRAY_LEN((VALUE)ctx);
+    if (len == 1 && needArrayVal == 0 && parse_complete_callback != Qnil) {
         // parse any remaining buffered data
         stat = yajl_parse_complete(chunkedParser);
         
@@ -152,11 +152,13 @@ static int found_end_hash(void * ctx) {
 }
 
 static int found_start_array(void * ctx) {
+    needArrayVal = 1;
     set_static_value(ctx, rb_ary_new());
     return 1;
 }
 
 static int found_end_array(void * ctx) {
+    needArrayVal = 0;
     if (RARRAY_LEN((VALUE)ctx) > 1) {
         rb_ary_pop((VALUE)ctx);
     }

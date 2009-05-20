@@ -12,6 +12,7 @@ static yajl_parser_config cfg = {1, 1};
 yajl_handle streamParser, chunkedParser;
 VALUE context = Qnil;
 VALUE parse_complete_callback = Qnil;
+static int needArrayVal = 0;
 
 void check_and_fire_callback(void * ctx);
 void set_static_value(void * ctx, VALUE val);
