@@ -1,6 +1,6 @@
 = Changelog
 
-0.4.9 (May 19th, 2009)
+0.4.9 (May 20th, 2009)
  * fixed some parser state bugs surfaced by edge cases
  * added support for Chunked HTTP response bodies in Yajl::HttpStream
  ** added support for passing a block to Yajl::HttpStream.get that will be used as a callback
