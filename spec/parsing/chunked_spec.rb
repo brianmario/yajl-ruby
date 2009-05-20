@@ -53,7 +53,13 @@ describe "Chunked parser" do
     Yajl::Chunked << '[{"abc": 123},{"def": 456}][{"abc": 123},{"def": 456}]'
   end
   
-  it "should parse an io" do
+  it "should parse 2 JSON strings from an IO" do
+    pending
+    @callback.should_receive(:call).exactly(2).times
+    Yajl::Stream.parse(StringIO.new('[{"abc": 123},{"def": 456}][{"abc": 123},{"def": 456}]'))
+  end
+  
+  it "should parse an IO" do
     @callback.should_receive(:call)
     Yajl::Stream.parse(StringIO.new('[{"abc": 123},{"def": 456}]'))
   end
