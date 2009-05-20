@@ -13,6 +13,10 @@ describe "Chunked parser" do
     Yajl::Chunked.on_parse_complete = @callback
   end
   
+  after(:each) do
+    Yajl::Chunked.on_parse_complete = nil
+  end
+  
   it "should parse a single chunk" do
     @callback.should_receive(:call)
     Yajl::Chunked << '[{"abc": 123},{"def": 456}]'
