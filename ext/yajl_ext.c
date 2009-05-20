@@ -5,7 +5,7 @@ void check_and_fire_callback(void * ctx) {
     VALUE len = RARRAY_LEN((VALUE)ctx);
     if (len == 1 && needArrayVal == 0 && parse_complete_callback != Qnil) {
         // parse any remaining buffered data
-        stat = yajl_parse_complete(chunkedParser);
+        // stat = yajl_parse_complete(chunkedParser);
         
         rb_funcall(parse_complete_callback, intern_call, 1, rb_ary_pop((VALUE)ctx));
     }
@@ -200,6 +200,7 @@ static VALUE t_parseSome(VALUE self, VALUE string) {
     
     if (RARRAY_LEN(context) == 0) {
         yajl_free(chunkedParser);
+        chunkedParser = NULL;
     }
     
     return Qnil;
