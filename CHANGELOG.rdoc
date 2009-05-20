@@ -1,5 +1,14 @@
 = Changelog
 
+0.4.9 (May 19th, 2009)
+ * fixed some parser state bugs surfaced by edge cases
+ * added support for Chunked HTTP response bodies in Yajl::HttpStream
+ ** added support for passing a block to Yajl::HttpStream.get that will be used as a callback
+    whenever a JSON object is parsed off the stream (even if there is more than one!)
+ * added an examples folder, and put an example using the Twitter Streaming API in there to start
+ * added some more spec tests, this time around Chunked parsing and continuously parsing
+   multiple JSON strings
+
 0.4.8 (May 18th, 2009)
  * fixed a totally bone-head compilation problem, I created for myself ;)
 

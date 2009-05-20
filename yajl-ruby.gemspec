@@ -2,11 +2,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{yajl-ruby}
-  s.version = "0.4.8"
+  s.version = "0.4.9"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Brian Lopez", "Lloyd Hilaiel"]
-  s.date = %q{2009-05-18}
+  s.date = %q{2009-05-19}
   s.email = %q{seniorlopez@gmail.com}
   s.extensions = ["ext/extconf.rb"]
   s.extra_rdoc_files = [
@@ -33,6 +33,7 @@ Gem::Specification.new do |s|
      "benchmark/subjects/ohai.json",
      "benchmark/subjects/twitter_search.json",
      "benchmark/subjects/unicode.json",
+     "examples/twitter_stream_api.rb",
      "ext/api/yajl_common.h",
      "ext/api/yajl_gen.h",
      "ext/api/yajl_parse.h",
@@ -70,6 +71,7 @@ Gem::Specification.new do |s|
      "spec/http/fixtures/http.raw.dump",
      "spec/http/http_spec.rb",
      "spec/parsing/active_support_spec.rb",
+     "spec/parsing/chunked_spec.rb",
      "spec/parsing/fixtures/fail.15.json",
      "spec/parsing/fixtures/fail.16.json",
      "spec/parsing/fixtures/fail.17.json",
@@ -141,9 +143,11 @@ Gem::Specification.new do |s|
     "spec/encoding/encoding_spec.rb",
      "spec/http/http_spec.rb",
      "spec/parsing/active_support_spec.rb",
+     "spec/parsing/chunked_spec.rb",
      "spec/parsing/fixtures_spec.rb",
      "spec/parsing/one_off_spec.rb",
-     "spec/spec_helper.rb"
+     "spec/spec_helper.rb",
+     "examples/twitter_stream_api.rb"
   ]
 
   if s.respond_to? :specification_version then
