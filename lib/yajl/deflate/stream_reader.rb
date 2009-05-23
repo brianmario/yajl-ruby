@@ -19,7 +19,7 @@ module Yajl
       alias :eof? :finished?
       
       def self.parse(io, options=nil)
-        Yajl::Stream.parse(new(io, options))
+        Yajl::Parser.new.parse(new(io, options))
       end
     end
   end

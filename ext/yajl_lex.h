@@ -67,6 +67,8 @@ yajl_lexer yajl_lex_alloc(yajl_alloc_funcs * alloc,
                           unsigned int allowComments,
                           unsigned int validateUTF8);
 
+yajl_lexer yajl_lex_realloc(yajl_lexer orig);
+
 void yajl_lex_free(yajl_lexer lexer);
 
 /**

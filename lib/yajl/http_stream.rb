@@ -1,6 +1,6 @@
 # encoding: UTF-8
 require 'socket' unless defined?(Socket)
-require 'yajl' unless defined?(Yajl::Stream)
+require 'yajl' unless defined?(Yajl::Parser)
 
 module Yajl
   # == Yajl::HttpStream
@@ -61,14 +61,21 @@ module Yajl
           end
         end
       end
-      
+      parser = Yajl::Parser.new
       if response_head[:headers]["Transfer-Encoding"] == 'chunked'
         if block_given?
-          Yajl::Chunked.on_parse_complete = block
-          while size = socket.gets.hex
+          parser.on_parse_complete = block
+          chunkLeft = 0
+          while !socket.eof? && (size = socket.gets.hex)
+            next if size == 0
             json = socket.read(size)
-            Yajl::Chunked << json
-            socket.gets # read off the newline
+            chunkLeft = size-json.size
+            if chunkLeft == 0
+              parser << json
+            else
+              # received only part of the chunk, grab the rest
+              parser << socket.read(chunkLeft)
+            end
           end
         else
           raise Exception, "Chunked responses detected, but no block given to handle the chunks."
@@ -85,7 +92,7 @@ module Yajl
           when "bzip2"
             return Yajl::Bzip2::StreamReader.parse(socket)
           else
-            return Yajl::Stream.parse(socket)
+            return Yajl::Parser.new.parse(socket)
           end
         else
           raise InvalidContentType, "The response MIME type #{content_type}"

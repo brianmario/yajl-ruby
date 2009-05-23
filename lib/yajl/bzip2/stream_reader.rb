@@ -15,7 +15,7 @@ module Yajl
       end
 
       def self.parse(io)
-        Yajl::Stream.parse(new(io))
+        Yajl::Parser.new.parse(new(io))
       end
     end
   end

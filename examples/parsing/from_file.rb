@@ -1,3 +1,5 @@
+# encoding: UTF-8
+
 require 'rubygems'
 require 'yajl'
 
@@ -8,5 +10,5 @@ end
 
 json = File.new(file, 'r')
 
-hash = Yajl::Stream.parse(json)
+hash = Yajl::Parser.new.parse(json)
 puts hash.inspect

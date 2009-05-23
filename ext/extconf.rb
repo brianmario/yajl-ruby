@@ -2,6 +2,7 @@
 require 'mkmf'
 require 'rbconfig'
 
-# $CFLAGS << ' -Wall'
+$CFLAGS << ' -Wall'
+# $CFLAGS << ' -O0 -ggdb'
 
 create_makefile("yajl_ext")

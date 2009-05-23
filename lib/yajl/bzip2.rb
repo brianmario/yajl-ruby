@@ -1,6 +1,6 @@
 # encoding: UTF-8
 
-require 'yajl' unless defined?(Yajl::Stream)
+require 'yajl' unless defined?(Yajl::Parser)
 
 begin
   require 'bzip2' unless defined?(Bzip2)

@@ -9,16 +9,17 @@ require 'yaml'
 # JSON Section
 filename = 'benchmark/subjects/contacts.json'
 json = File.new(filename, 'r')
-hash = Yajl::Stream.parse(json)
+hash = Yajl::Parser.new.parse(json)
 json.close
 
 times = ARGV[0] ? ARGV[0].to_i : 1
 puts "Starting benchmark encoding #{filename} into JSON #{times} times\n\n"
 Benchmark.bm { |x|
+  encoder = Yajl::Encoder.new
   x.report {
-    puts "Yajl::Stream.encode"
+    puts "Yajl::Encoder#encode"
     times.times {
-      Yajl::Stream.encode(hash, StringIO.new)
+      encoder.encode(hash, StringIO.new)
     }
   }
   x.report {

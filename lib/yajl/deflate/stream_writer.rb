@@ -9,7 +9,7 @@ module Yajl
       end
       
       def self.encode(obj, io)
-        Yajl::Stream.encode(obj, new(io))
+        Yajl::Encoder.new.encode(obj, new(io))
       end
     end
   end

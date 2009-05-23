@@ -6,18 +6,23 @@ describe "Yajl JSON encoder" do
   
   FILES.each do |file|
     it "should encode #{File.basename(file)}" do
-      input = File.new(File.expand_path(file), 'r')
-      hash = Yajl::Stream.parse(input)
+      # we don't care about testing the stream subject as it has multiple JSON strings in it
+      if File.basename(file) != 'twitter_stream.json'
+        input = File.new(File.expand_path(file), 'r')
+        io = StringIO.new
+        parser = Yajl::Parser.new
+        encoder = Yajl::Encoder.new
       
-      io = StringIO.new
-      output = Yajl::Stream.encode(hash, io)
-      io.rewind
-      hash2 = Yajl::Stream.parse(io)
+        hash = parser.parse(input)
+        output = encoder.encode(hash, io)
+        io.rewind
+        hash2 = parser.parse(io)
       
-      io.close
-      input.close
+        io.close
+        input.close
       
-      hash.should == hash2
+        hash.should == hash2
+      end
     end
   end
 end

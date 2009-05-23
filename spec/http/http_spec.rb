@@ -21,7 +21,7 @@ describe "Yajl HTTP GET request" do
     @gzip = File.new(File.expand_path(File.dirname(__FILE__) + '/fixtures/http.gzip.dump'), 'r')
     
     parse_off_headers(@raw)
-    @raw_template_hash = Yajl::Stream.parse(@raw)
+    @raw_template_hash = Yajl::Parser.new.parse(@raw)
     @raw.rewind
   end
   
@@ -30,10 +30,6 @@ describe "Yajl HTTP GET request" do
     @bzip2.close unless @bzip2.closed?
     @deflate.close unless @deflate.closed?
     @gzip.close unless @gzip.closed?
-  end
-  
-  after(:each) do
-    GC.start
   end
   
   it "should parse a raw response" do

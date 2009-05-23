@@ -131,6 +131,9 @@ extern "C" {
                                     const yajl_parser_config * config,
                                     const yajl_alloc_funcs * allocFuncs,
                                     void * ctx);
+    
+    /** allow resetting of the lexer without the need to realloc a new parser */
+    void yajl_reset_parser(yajl_handle hand);
 
     /** free a parser handle */    
     void YAJL_API yajl_free(yajl_handle handle);

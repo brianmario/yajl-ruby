@@ -105,6 +105,11 @@ yajl_alloc(const yajl_callbacks * callbacks,
 }
 
 void
+yajl_reset_parser(yajl_handle hand) {
+    hand->lexer = yajl_lex_realloc(hand->lexer);
+}
+
+void
 yajl_free(yajl_handle handle)
 {
     yajl_bs_free(handle->stateStack);

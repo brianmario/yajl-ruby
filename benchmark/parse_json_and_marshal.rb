@@ -17,15 +17,16 @@ hash = {}
 times = ARGV[0] ? ARGV[0].to_i : 1
 puts "Starting benchmark parsing #{File.size(filename)} bytes of JSON data #{times} times\n\n"
 Benchmark.bm { |x|
+  parser = Yajl::Parser.new
   x.report {
-    puts "Yajl::Stream.parse"
+    puts "Yajl::Parser#parse"
     times.times {
       json.rewind
-      hash = Yajl::Stream.parse(json)
+      hash = parser.parse(json)
     }
   }
   x.report {
-    puts "JSON.parser"
+    puts "JSON.parse"
     times.times {
       json.rewind
       JSON.parse(json.read, :max_nesting => false)

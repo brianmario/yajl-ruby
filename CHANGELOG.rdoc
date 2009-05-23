@@ -1,5 +1,17 @@
 = Changelog
 
+0.5.0 (?)
+ * Refactored internal API so the caller can specify initialization options for the Parser and Encoder
+   respectively. Two new classes were introduced as a result - Yajl::Parser and Yajl::Encoder.
+   The newly refactored codebase is cleaner, thread-safe and removed all of the hack-code that was trickled
+   around to make things work in the previous implementation. She's much more seaworthy now cap'n!
+ ** Yajl::Parser.new accepts two options, :allow_comments and :check_utf8 which both default to true
+ ** Yajl::Encoder.new accepts two options, :pretty and :indent which default to false and "  " respectively
+ * cleaned up a lot of state code, that to my knowledge prevented yajl-ruby from being used in a thread-safe environment.
+ * added deprecated messaging to Yajl::Stream.parse and Yajl::Stream.encode - these will likely go away before 0.6.0
+ * fixed a bug in the chunked http response parser regarding partially received chunks
+ * added a Twitter Search API example showing off the HttpStream API
+
 0.4.9 (May 20th, 2009)
  * fixed some parser state bugs surfaced by edge cases
  * added support for Chunked HTTP response bodies in Yajl::HttpStream

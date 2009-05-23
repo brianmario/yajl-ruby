@@ -4,7 +4,7 @@ module Yajl
     # === Yajl::Gzip::StreamWriter
     class StreamWriter < ::Zlib::GzipWriter
       def self.encode(obj, io)
-        Yajl::Stream.encode(obj, new(io))
+        Yajl::Encoder.new.encode(obj, new(io))
       end
     end
   end

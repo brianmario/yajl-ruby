@@ -1,3 +1,5 @@
+# encoding: UTF-8
+
 require 'rubygems'
 require 'yajl'
 require 'stringio'
@@ -9,5 +11,5 @@ end
 
 json = StringIO.new(string)
 
-hash = Yajl::Stream.parse(json)
+hash = Yajl::Parser.new.parse(json)
 puts hash.inspect

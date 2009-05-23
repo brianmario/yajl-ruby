@@ -5,7 +5,7 @@ require 'yajl_ext'
 require 'json'
 require 'activesupport'
 
-filename = ARGV[0] || 'benchmark/subjects/twitter_search.json'
+filename = ARGV[0] || 'benchmark/subjects/contacts.json'
 json = File.new(filename, 'r')
 
 # warm up the filesystem
@@ -15,15 +15,16 @@ json.rewind
 times = ARGV[1] ? ARGV[1].to_i : 1
 puts "Starting benchmark parsing #{File.size(filename)} bytes of JSON data #{times} times\n\n"
 Benchmark.bm { |x|
+  parser = Yajl::Parser.new
   x.report {
-    puts "Yajl::Stream.parse"
+    puts "Yajl::Parser#parse"
     times.times {
       json.rewind
-      Yajl::Stream.parse(json)
+      parser.parse(json)
     }
   }
   x.report {
-    puts "JSON.parser"
+    puts "JSON.parse"
     times.times {
       json.rewind
       JSON.parse(json.read, :max_nesting => false)
