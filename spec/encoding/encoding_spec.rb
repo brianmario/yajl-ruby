@@ -25,4 +25,24 @@ describe "Yajl JSON encoder" do
       end
     end
   end
+  
+  it "should encode with :pretty turned on and a single space indent" do
+    output = "{\n \"foo\": {\n  \"name\": \"bar\",\n  \"id\": 1234\n }\n}\n"
+    obj = {:foo => {:id => 1234, :name => "bar"}}
+    io = StringIO.new
+    encoder = Yajl::Encoder.new(:pretty => true, :indent => ' ')
+    encoder.encode(obj, io)
+    io.rewind
+    io.read.should == output
+  end
+  
+  it "should encode with :pretty turned on and a tab character indent" do
+    output = "{\n\t\"foo\": {\n\t\t\"name\": \"bar\",\n\t\t\"id\": 1234\n\t}\n}\n"
+    obj = {:foo => {:id => 1234, :name => "bar"}}
+    io = StringIO.new
+    encoder = Yajl::Encoder.new(:pretty => true, :indent => "\t")
+    encoder.encode(obj, io)
+    io.rewind
+    io.read.should == output
+  end
 end
