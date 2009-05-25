@@ -9,4 +9,20 @@ describe "One-off JSON examples" do
       parser.parse(StringIO.new('{"key": 23456789012E666}')).should == {"key" => infinity}
     end
   end
+  
+  it "should not parse JSON with a comment" do
+    parser = Yajl::Parser.new(:allow_comments => false)
+    json = StringIO.new('{"key": /* this is a comment */ "value"}')
+    lambda {
+      parser.parse(json)
+    }.should raise_error(Yajl::ParseError)
+  end
+  
+  it "should parse JSON with a comment" do
+    parser = Yajl::Parser.new(:allow_comments => true)
+    json = StringIO.new('{"key": /* this is a comment */ "value"}')
+    lambda {
+      parser.parse(json)
+    }.should_not raise_error(Yajl::ParseError)
+  end
 end
