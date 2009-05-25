@@ -44,6 +44,10 @@ only had access to chunks of it at a time. No problem!
 
 (Assume we're in an EventMachine::Connection instance)
 
+ def post_init
+    @parser = Yajl::Parser.new
+ end
+ 
  def object_parsed(obj)
     puts "Sometimes one pays most for the things one gets for nothing. - Albert Einstein"
     puts obj.inspect
@@ -52,15 +56,12 @@ only had access to chunks of it at a time. No problem!
  def connection_completed
    # once a full JSON object has been parsed from the stream
    # object_parsed will be called, and passed the constructed object
-   Yajl::Chunked.on_parse_complete = method(:object_parsed)
+   @parser.on_parse_complete = method(:object_parsed)
  end
  
  def receive_data(data)
    # continue passing chunks
-   Yajl::Chunked.parse_some(data)
-   
-   # Or as an alias, you could have done:
-   # Yajl::Chunked << data
+   @parser << data
  end
 
 
