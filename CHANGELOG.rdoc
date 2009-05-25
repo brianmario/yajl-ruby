@@ -1,6 +1,6 @@
 = Changelog
 
-0.5.0 (?)
+0.5.0 (May 25th, 2009)
  * Refactored internal API so the caller can specify initialization options for the Parser and Encoder
    respectively. Two new classes were introduced as a result - Yajl::Parser and Yajl::Encoder.
    The newly refactored codebase is cleaner, thread-safe and removed all of the hack-code that was trickled
