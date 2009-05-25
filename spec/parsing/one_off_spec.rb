@@ -10,7 +10,7 @@ describe "One-off JSON examples" do
     end
   end
   
-  it "should not parse JSON with a comment" do
+  it "should not parse JSON with a comment, with :allow_comments set to false" do
     parser = Yajl::Parser.new(:allow_comments => false)
     json = StringIO.new('{"key": /* this is a comment */ "value"}')
     lambda {
@@ -18,11 +18,21 @@ describe "One-off JSON examples" do
     }.should raise_error(Yajl::ParseError)
   end
   
-  it "should parse JSON with a comment" do
+  it "should parse JSON with a comment, with :allow_comments set to true" do
     parser = Yajl::Parser.new(:allow_comments => true)
     json = StringIO.new('{"key": /* this is a comment */ "value"}')
     lambda {
       parser.parse(json)
     }.should_not raise_error(Yajl::ParseError)
+  end
+  
+  it "should not parse invalid UTF8 with :check_utf8 set to true" do
+    pending
+    # not sure how to write this test yet
+  end
+  
+  it "should parse invalid UTF8 with :check_utf8 set to false" do
+    pending
+    # not sure how to write this test yet
   end
 end
