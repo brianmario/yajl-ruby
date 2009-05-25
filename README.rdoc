@@ -25,16 +25,18 @@ Then maybe parse some JSON from:
 a File IO
 
  json = File.new('test.json', 'r')
- hash = Yajl::Stream.parse(json)
+ parser = Yajl::Parser.new
+ hash = parser.parse(json)
 
 or maybe a StringIO
 
- json = StringIO.new
- hash = Yajl::Stream.parse(json)
+ json = StringIO.new("...some JSON...")
+ parser = Yajl::Parser.new
+ hash = parser.parse(json)
 
 or maybe STDIN
 
- cat someJsonFile.json | ruby -ryajl -e "puts Yajl::Stream.parse(STDIN).inspect"
+ cat someJsonFile.json | ruby -ryajl -e "puts Yajl::Parser.new.parse(STDIN).inspect"
 
 
 Or lets say you didn't have access to the IO object that contained JSON data, but instead
@@ -110,7 +112,8 @@ This allows you to encode JSON as a stream, writing directly to a socket
 
  socket = TCPSocket.new(192.168.1.101, 9000)
  hash = {:foo => 12425125, :bar => "some string", ... }
- Yajl::Stream.encode(hash, socket)
+ encoder = Yajl::Encoder.new
+ Yajl::encoder.encode(hash, socket)
 
 Or what if you wanted to compress the stream over the wire?
 
@@ -148,25 +151,25 @@ Here's what parsing a 2.43MB JSON file off the filesystem 20 times looks like:
 
 ==== Average
 
-* Yajl::Stream.parse: 32MB
+* Yajl::Parser#parse: 32MB
 * JSON.parse: 54MB
 * ActiveSupport::JSON.decode: 63MB
 
 ==== Peak
 
-* Yajl::Stream.parse: 32MB
+* Yajl::Parser#parse: 32MB
 * JSON.parse: 57MB
 * ActiveSupport::JSON.decode: 67MB
 
 === Parse Time
 
-* Yajl::Stream.parse: 4.54s
+* Yajl::Parser#parse: 4.54s
 * JSON.parse: 5.47s
 * ActiveSupport::JSON.decode: 64.42s
 
 === Encode Time
 
-* Yajl::Stream.encode: 3.59s
+* Yajl::Encoder#encode: 3.59s
 * JSON#to_json: 6.2s
 * ActiveSupport::JSON.encode: 45.58s
 
@@ -176,13 +179,13 @@ NOTE: I converted the 2.4MB JSON file to YAML for this test.
 
 ==== Parse Time (from their respective formats)
 
-* Yajl::Stream.parse: 4.33s
+* Yajl::Parser#parse: 4.33s
 * JSON.parse: 5.37s
 * YAML.load_stream: 19.47s
 
 ==== Encode Time (to their respective formats)
 
-* Yajl::Stream.encode: 3.47s
+* Yajl::Encoder#encode: 3.47s
 * JSON#to_json: 6.6s
 * YAML.dump(obj, io): 1309.93s
 
