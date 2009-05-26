@@ -1,5 +1,11 @@
 = Changelog
 
+0.5.1 (May 25th, 2009)
+ * added some more tests for the new API
+ * inlined a couple of hot functions used in parsing for a little speedup
+ * updates to readme, reflecting changes in API
+ * version bump to push another gem build
+
 0.5.0 (May 25th, 2009)
  * Refactored internal API so the caller can specify initialization options for the Parser and Encoder
    respectively. Two new classes were introduced as a result - Yajl::Parser and Yajl::Encoder.
