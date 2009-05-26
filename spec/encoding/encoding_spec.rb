@@ -45,4 +45,13 @@ describe "Yajl JSON encoder" do
     io.rewind
     io.read.should == output
   end
+  
+  it "should encode with it's class method with :pretty and a tab character indent options set" do
+    output = "{\n\t\"foo\": {\n\t\t\"name\": \"bar\",\n\t\t\"id\": 1234\n\t}\n}\n"
+    obj = {:foo => {:id => 1234, :name => "bar"}}
+    io = StringIO.new
+    Yajl::Encoder.encode(obj, io, :pretty => true, :indent => "\t")
+    io.rewind
+    io.read.should == output
+  end
 end

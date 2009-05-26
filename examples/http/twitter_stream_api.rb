@@ -19,6 +19,7 @@ trap('INT') {
 }
 
 Yajl::HttpStream.get(uri) do |hash|
-  puts hash.inspect
+  STDOUT.putc '.'
+  STDOUT.flush
   captured += 1
 end
