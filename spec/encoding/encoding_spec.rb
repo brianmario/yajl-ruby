@@ -54,4 +54,15 @@ describe "Yajl JSON encoder" do
     io.rewind
     io.read.should == output
   end
+  
+  it "should encode multiple objects into a single stream" do
+    io = StringIO.new
+    obj = {:foo => "bar", :baz => 1234}
+    encoder = Yajl::Encoder.new
+    5.times do
+      encoder.encode(obj, io)
+    end
+    io.rewind
+    io.read.should == "{\"foo\":\"bar\",\"baz\":1234}\n{\"foo\":\"bar\",\"baz\":1234}\n{\"foo\":\"bar\",\"baz\":1234}\n{\"foo\":\"bar\",\"baz\":1234}\n{\"foo\":\"bar\",\"baz\":1234}\n"
+  end
 end

@@ -138,9 +138,6 @@ yajl_gen_free(yajl_gen g)
 
 #define APPENDED_ATOM \
     switch (g->state[g->depth]) {                   \
-        case yajl_gen_start:                        \
-            g->state[g->depth] = yajl_gen_complete; \
-            break;                                  \
         case yajl_gen_map_start:                    \
         case yajl_gen_map_key:                      \
             g->state[g->depth] = yajl_gen_map_val;  \
@@ -156,7 +153,7 @@ yajl_gen_free(yajl_gen g)
     }                                               \
 
 #define FINAL_NEWLINE                                        \
-    if (g->pretty && g->state[g->depth] == yajl_gen_complete) \
+    if (g->state[g->depth] == yajl_gen_start)                \
         yajl_buf_append(g->buf, "\n", 1);        
     
 yajl_gen_status
