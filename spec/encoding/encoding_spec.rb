@@ -28,6 +28,9 @@ describe "Yajl JSON encoder" do
   
   it "should encode with :pretty turned on and a single space indent" do
     output = "{\n \"foo\": {\n  \"name\": \"bar\",\n  \"id\": 1234\n }\n}\n"
+    if RUBY_VERSION.include?('1.9') # FIXME
+      output = "{\n \"foo\": {\n  \"id\": 1234,\n  \"name\": \"bar\"\n }\n}\n"
+    end
     obj = {:foo => {:id => 1234, :name => "bar"}}
     io = StringIO.new
     encoder = Yajl::Encoder.new(:pretty => true, :indent => ' ')
@@ -38,6 +41,9 @@ describe "Yajl JSON encoder" do
   
   it "should encode with :pretty turned on and a tab character indent" do
     output = "{\n\t\"foo\": {\n\t\t\"name\": \"bar\",\n\t\t\"id\": 1234\n\t}\n}\n"
+    if RUBY_VERSION.include?('1.9') # FIXME
+      output = "{\n\t\"foo\": {\n\t\t\"id\": 1234,\n\t\t\"name\": \"bar\"\n\t}\n}\n"
+    end
     obj = {:foo => {:id => 1234, :name => "bar"}}
     io = StringIO.new
     encoder = Yajl::Encoder.new(:pretty => true, :indent => "\t")
@@ -48,6 +54,9 @@ describe "Yajl JSON encoder" do
   
   it "should encode with it's class method with :pretty and a tab character indent options set" do
     output = "{\n\t\"foo\": {\n\t\t\"name\": \"bar\",\n\t\t\"id\": 1234\n\t}\n}\n"
+    if RUBY_VERSION.include?('1.9') # FIXME
+      output = "{\n\t\"foo\": {\n\t\t\"id\": 1234,\n\t\t\"name\": \"bar\"\n\t}\n}\n"
+    end
     obj = {:foo => {:id => 1234, :name => "bar"}}
     io = StringIO.new
     Yajl::Encoder.encode(obj, io, :pretty => true, :indent => "\t")
