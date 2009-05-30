@@ -2,6 +2,7 @@
 require 'rubygems'
 require 'benchmark'
 require 'yajl_ext'
+require 'stringio'
 require 'json'
 
 filename = ARGV[0] || 'benchmark/subjects/contacts.json'

@@ -2,7 +2,6 @@
 require 'rubygems'
 require 'benchmark'
 require 'yajl_ext'
-require 'activesupport'
 require 'json'
 require 'yaml'
 
