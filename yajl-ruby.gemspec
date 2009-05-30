@@ -2,20 +2,19 @@
 
 Gem::Specification.new do |s|
   s.name = %q{yajl-ruby}
-  s.version = "0.5.1"
+  s.version = "0.5.2"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Brian Lopez", "Lloyd Hilaiel"]
-  s.date = %q{2009-05-25}
+  s.date = %q{2009-05-30}
   s.email = %q{seniorlopez@gmail.com}
   s.extensions = ["ext/extconf.rb"]
   s.extra_rdoc_files = [
-    "CHANGELOG.rdoc",
-     "README.rdoc"
+    "README.rdoc"
   ]
   s.files = [
     ".gitignore",
-     "CHANGELOG.rdoc",
+     "CHANGELOG.md",
      "MIT-LICENSE",
      "README.rdoc",
      "Rakefile",

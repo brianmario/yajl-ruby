@@ -123,6 +123,16 @@ Or what if you wanted to compress the stream over the wire?
  hash = {:foo => 12425125, :bar => "some string", ... }
  Yajl::Gzip::StreamWriter.encode(hash, socket)
 
+Or what about encoding multiple objects to JSON over the same stream?
+This example will encode and send 50 JSON objects over the same stream, continuously.
+
+ socket = TCPSocket.new(192.168.1.101, 9000)
+ encoder = Yajl::Encoder.new
+ 50.times do
+   hash = {:current_time => Time.now.to_f, :foo => 12425125}
+   encoder.encode(hash, socket)
+ end
+
 You can also use Yajl::Bzip2::StreamWriter and Yajl::Deflate::StreamWriter. So you can pick whichever fits your CPU/bandwidth sweet-spot.
 
 There are a lot more possibilities, some of which I'm going to write other gems/plugins for.
