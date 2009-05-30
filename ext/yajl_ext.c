@@ -59,9 +59,11 @@ void yajl_encode_part(yajl_gen hand, VALUE obj, VALUE io) {
     unsigned int len;
     
     yajl_gen_get_buf(hand, &buffer, &len);
-    outBuff = rb_str_new((const char *)buffer, len);
-    rb_io_write(io, outBuff);
-    yajl_gen_clear(hand);
+    if (len >= WRITE_BUFSIZE) {
+        outBuff = rb_str_new((const char *)buffer, len);
+        rb_io_write(io, outBuff);
+        yajl_gen_clear(hand);
+    }
     
     switch (TYPE(obj)) {
         case T_HASH:

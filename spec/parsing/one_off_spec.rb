@@ -38,6 +38,6 @@ describe "One-off JSON examples" do
   
   it "should parse using it's class method" do
     io = StringIO.new('{"key": 1234}')
-    Yajl::Parser.parse(io).should == {"key", 1234}
+    Yajl::Parser.parse(io).should == {"key" => 1234}
   end
 end

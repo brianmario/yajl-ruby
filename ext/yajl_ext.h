@@ -2,7 +2,8 @@
 #include "api/yajl_gen.h"
 #include <ruby.h>
 
-#define READ_BUFSIZE 65536
+#define READ_BUFSIZE 8092
+#define WRITE_BUFSIZE 8092
 
 static VALUE cParseError, mYajl, cParser, cEncoder;
 static ID intern_io_read, intern_eof, intern_call, intern_keys, intern_to_s,
