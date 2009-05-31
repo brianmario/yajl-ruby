@@ -12,7 +12,7 @@ static ID intern_io_read, intern_eof, intern_call, intern_keys, intern_to_s,
 #define GetParser(obj, sval) (sval = (struct yajl_parser_wrapper*)DATA_PTR(obj));
 #define GetEncoder(obj, sval) (sval = (yajl_gen*)DATA_PTR(obj));
 
-inline void yajl_check_and_fire_callback(void * ctx);
+inline int yajl_check_and_fire_callback(void * ctx);
 inline void yajl_set_static_value(void * ctx, VALUE val);
 void yajl_encode_part(yajl_gen hand, VALUE obj, VALUE io);
 
@@ -44,6 +44,7 @@ struct yajl_parser_wrapper {
     VALUE parse_complete_callback;
     int nestedArrayLevel;
     int nestedHashLevel;
+    int objectsFound;
     yajl_handle parser;
 };
 static void yajl_parser_wrapper_free(void * wrapper);

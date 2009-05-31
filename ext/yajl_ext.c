@@ -1,7 +1,7 @@
 #include "yajl_ext.h"
 
 // Helpers for building objects
-inline void yajl_check_and_fire_callback(void * ctx) {
+inline int yajl_check_and_fire_callback(void * ctx) {
     struct yajl_parser_wrapper * wrapper;
     GetParser((VALUE)ctx, wrapper);
     
@@ -10,6 +10,14 @@ inline void yajl_check_and_fire_callback(void * ctx) {
         int len = RARRAY_LEN(wrapper->builderStack);
         if (len == 1 && wrapper->nestedArrayLevel == 0 && wrapper->nestedHashLevel == 0) {
             rb_funcall(wrapper->parse_complete_callback, intern_call, 1, rb_ary_pop(wrapper->builderStack));
+        }
+    } else {
+        int len = RARRAY_LEN(wrapper->builderStack);
+        if (len == 1 && wrapper->nestedArrayLevel == 0 && wrapper->nestedHashLevel == 0) {
+            wrapper->objectsFound++;
+            if (wrapper->objectsFound > 1) {
+                rb_raise(cParseError, "%s", "Found multiple JSON objects in the stream, but no on_parse_complete callback was assigned to handle them.");
+            }
         }
     }
 }
@@ -231,6 +239,7 @@ static VALUE rb_yajl_parser_new(int argc, VALUE * argv, VALUE klass) {
     wrapper->parser = yajl_alloc(&callbacks, &cfg, NULL, (void *)obj);
     wrapper->nestedArrayLevel = 0;
     wrapper->nestedHashLevel = 0;
+    wrapper->objectsFound = 0;
     wrapper->builderStack = rb_ary_new();
     wrapper->parse_complete_callback = Qnil;
     rb_obj_call_init(obj, 0, 0);
