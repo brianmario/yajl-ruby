@@ -253,17 +253,20 @@ static VALUE rb_yajl_parser_init(int argc, VALUE * argv, VALUE self) {
 static VALUE rb_yajl_parser_parse(int argc, VALUE * argv, VALUE self) {
     struct yajl_parser_wrapper * wrapper;
     yajl_status stat;
-    VALUE parsed, rbufsize, io;
+    VALUE parsed, rbufsize, io, blk;
     
     GetParser(self, wrapper);
     parsed = rb_str_new2("");
     
     // setup our parameters
-    rb_scan_args(argc, argv, "11", &io, &rbufsize);
+    rb_scan_args(argc, argv, "11&", &io, &rbufsize, &blk);
     if (NIL_P(rbufsize)) {
         rbufsize = INT2FIX(READ_BUFSIZE);
     } else {
         Check_Type(rbufsize, T_FIXNUM);
+    }
+    if (!NIL_P(blk)) {
+        rb_yajl_set_complete_cb(self, blk);
     }
     
     // now parse from the IO
