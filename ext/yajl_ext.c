@@ -16,7 +16,7 @@ inline int yajl_check_and_fire_callback(void * ctx) {
         if (len == 1 && wrapper->nestedArrayLevel == 0 && wrapper->nestedHashLevel == 0) {
             wrapper->objectsFound++;
             if (wrapper->objectsFound > 1) {
-                rb_raise(cParseError, "%s", "Found multiple JSON objects in the stream, but no on_parse_complete callback was assigned to handle them.");
+                rb_raise(cParseError, "%s", "Found multiple JSON objects in the stream but no block or the on_parse_complete callback was assigned to handle them.");
             }
         }
     }
