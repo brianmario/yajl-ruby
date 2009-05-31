@@ -142,8 +142,8 @@ Some ideas are:
 * a Rails plugin (http://github.com/technoweenie/yajl-rails)
 * builtin Rails 3 support?
 * Rack middleware (ideally the JSON body could be handed to the parser while it's still being received)
-* use with ohai
-* JSON API clients
+* use with ohai (http://github.com/brianmario/ohai)
+* JSON API clients (http://github.com/brianmario/crack, http://github.com/brianmario/freckle-api)
 * Patch Marshal#load and Marshal#dump to use JSON? ;)
 * etc...
 
