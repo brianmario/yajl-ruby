@@ -1,7 +1,7 @@
 #include "yajl_ext.h"
 
 // Helpers for building objects
-inline int yajl_check_and_fire_callback(void * ctx) {
+inline void yajl_check_and_fire_callback(void * ctx) {
     struct yajl_parser_wrapper * wrapper;
     GetParser((VALUE)ctx, wrapper);
     

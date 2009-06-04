@@ -86,7 +86,7 @@ describe "Chunked parser" do
     }.should_not raise_error(Yajl::ParseError)
   end
   
-  it "should raise a Yajl::ParseError error if multiple JSON strings were found, but no on_parse_complete callback assigned" do
+  it "should raise a Yajl::ParseError error if multiple JSON strings were found when no on_parse_complete callback assigned" do
     path = File.expand_path(File.dirname(__FILE__) + '/../../benchmark/subjects/twitter_stream.json')
     json = File.new(path, 'r')
     @parser.on_parse_complete = nil
