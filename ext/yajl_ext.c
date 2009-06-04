@@ -213,9 +213,25 @@ static int yajl_found_end_array(void * ctx) {
 }
 
 
-/** Ruby Interface */
+// Ruby Interface
 
-// Yajl::Parser
+/*
+ * Document-class: Yajl::Parser
+ *
+ * This class contains methods for parsing JSON directly from an IO object.
+ * The only basic requirment currently is that the IO object respond to #read(len) and #eof?
+ * The IO is parsed until a complete JSON object has been read and a ruby object will be returned.
+ */
+ 
+/*
+ * Document-method: new
+ *
+ * call-seq: new([:allow_comments => false, :check_utf8 => false])
+ *
+ * :allow_comments will turn on/off the check for comments inside the JSON stream.
+ *
+ * :check_utf8 will validate UTF8 characters found in the JSON stream.
+ */
 static VALUE rb_yajl_parser_new(int argc, VALUE * argv, VALUE klass) {
     struct yajl_parser_wrapper * wrapper;
     yajl_parser_config cfg;
@@ -246,10 +262,40 @@ static VALUE rb_yajl_parser_new(int argc, VALUE * argv, VALUE klass) {
     return obj;
 }
 
+/*
+ * Document-method: initialize
+ *
+ * call-seq: initialize([:allow_comments => false, :check_utf8 => false])
+ *
+ * :allow_comments will turn on/off the check for comments inside the JSON stream.
+ *
+ * :check_utf8 will validate UTF8 characters found in the JSON stream.
+*/
 static VALUE rb_yajl_parser_init(int argc, VALUE * argv, VALUE self) {
     return self;
 }
 
+/*
+ * Document-method: parse
+ *
+ * call-seq:
+ *  parse(io, buffer_size=8092)
+ *  parse(io, buffer_size=8092) { |obj| ... }
+ *
+ * +io+ is the stream to parse JSON from
+ *
+ * +buffer_size+ is the size of chunk that will be parsed off the stream for each loop of the parsing process.
+ * 8092 is a good balance between the different types of streams (off disk, off a socket, etc...), but this option
+ * is here so the caller can better tune their parsing depending on the type of stream being passed.
+ * A larger read buffer will perform better for files off disk, where as a smaller size may be more efficient for
+ * reading off of a socket directly.
+ *
+ * If a block was passed, it's called when an object has been parsed off the stream. This is especially
+ * usefull when parsing a stream of multiple JSON objects.
+ *
+ * NOTE: you can optionally assign the +on_parse_complete+ callback, and it will be called the same way the optional
+ * block is for this method.
+*/
 static VALUE rb_yajl_parser_parse(int argc, VALUE * argv, VALUE self) {
     struct yajl_parser_wrapper * wrapper;
     yajl_status stat;
@@ -294,6 +340,17 @@ static VALUE rb_yajl_parser_parse(int argc, VALUE * argv, VALUE self) {
     return rb_ary_pop(wrapper->builderStack);
 }
 
+/*
+ * Document-method: parse_chunk
+ *
+ * call-seq: parse_chunk(string_chunk)
+ *
+ * +string_chunk+ can be a partial or full JSON string to push on the parser.
+ *
+ * This method will throw an exception if the +on_parse_complete+ callback hasn't been assigned yet.
+ * The +on_parse_complete+ callback assignment is required so the user can handle objects that have been
+ * parsed off the stream as they're found.
+ */
 static VALUE rb_yajl_parser_parse_chunk(VALUE self, VALUE chunk) {
     struct yajl_parser_wrapper * wrapper;
     yajl_status stat;
@@ -318,6 +375,15 @@ static VALUE rb_yajl_parser_parse_chunk(VALUE self, VALUE chunk) {
     return Qnil;
 }
 
+/*
+ * Document-method: on_parse_complete=
+ *
+ * call-seq: on_parse_complete = Proc.new { |obj| ... }
+ *
+ * This callback setter allows you to pass a Proc/lambda or any other object that response to #call.
+ *
+ * It will pass a single parameter, the ruby object built from the last parsed JSON object
+ */
 static VALUE rb_yajl_set_complete_cb(VALUE self, VALUE callback) {
     struct yajl_parser_wrapper * wrapper;
     GetParser(self, wrapper);
@@ -325,7 +391,23 @@ static VALUE rb_yajl_set_complete_cb(VALUE self, VALUE callback) {
     return Qnil;
 }
 
-// Yajl::Encoder
+/*
+ * Document-class: Yajl::Encoder
+ *
+ * This class contains methods for encoding a Ruby object into JSON, streaming it's output into an IO object.
+ * The IO object need only respond to #write(str)
+ * The JSON stream created is written to the IO in chunks, as it's being created.
+ */
+
+/*
+ * Document-method: new
+ *
+ * call-seq: new([:pretty => false, :indent => '  '])
+ *
+ * :pretty will enable/disable beautifying or "pretty priting" the output string.
+ *
+ * :indent is the character(s) used to indent the output string.
+ */
 static VALUE rb_yajl_encoder_new(int argc, VALUE * argv, VALUE klass) {
     yajl_gen_config cfg;
     yajl_gen encoder;
@@ -354,10 +436,32 @@ static VALUE rb_yajl_encoder_new(int argc, VALUE * argv, VALUE klass) {
     return obj;
 }
 
+/*
+ * Document-method: initialize
+ *
+ * call-seq: initialize([:pretty => false, :indent => '  '])
+ *
+ * :pretty will enable/disable beautifying or "pretty priting" the output string.
+ *
+ * :indent is the character(s) used to indent the output string.
+ */
 static VALUE rb_yajl_encoder_init(int argc, VALUE * argv, VALUE self) {
     return self;
 }
 
+/*
+ * Document-method: encode
+ *
+ * call-seq: encode(obj, io)
+ *
+ * +obj+ is the Ruby object to encode to JSON
+ *
+ * +io+ is the IO stream to stream the encoded JSON string to.
+ *
+ * It should be noted that you can reuse an instance of this class to continue encoding multiple JSON
+ * to the same stream. Just continue calling this method, passing it the same IO object with new/different
+ * ruby objects to encode. This is how streaming is accomplished.
+ */
 static VALUE rb_yajl_encoder_encode(VALUE self, VALUE obj, VALUE io) {
     yajl_gen encoder;
     const unsigned char * buffer;

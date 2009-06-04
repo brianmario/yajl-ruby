@@ -15,23 +15,33 @@ require 'yajl_ext'
 module Yajl
   VERSION = "0.5.2"
   
-  # == Yajl::Parser
-  #
-  # This class contains methods for parsing JSON directly from an IO object.
-  # The only basic requirment currently is that the IO object respond to #read(len) and #eof?
-  # The IO is parsed until a complete JSON object has been read and a ruby object will be returned.
   class Parser
-    def self.parse(io, options={})
-      new(options).parse(io)
+    # A helper method for parse-and-forget use-cases
+    #
+    # +io+ is the stream to parse JSON from
+    #
+    # The +options+ hash allows you to set two parsing options - :allow_comments and :check_utf8
+    #
+    # :allow_comments accepts a boolean will enable/disable checks for in-line comments in the JSON stream
+    #
+    # :check_utf8 accepts a boolean will enable/disable UTF8 validation for the JSON stream
+    def self.parse(io, options={}, read_bufsize=nil, &block)
+      new(options).parse(io, read_bufsize, &block)
     end
   end
   
-  # == Yajl::Encoder
-  #
-  # This class contains methods for encoding a Ruby object into JSON, streaming it's output into an IO object.
-  # The IO object need only respond to #write(str)
-  # The JSON stream created is written to the IO in chunks, as it's being created.
   class Encoder
+    # A helper method for encode-and-forget use-cases
+    #
+    # +obj+ is a ruby object to encode to JSON format
+    #
+    # +io+ is the IO stream to encode the ruby object to.
+    #
+    # The +options+ hash allows you to set two encoding options - :pretty and :indent
+    #
+    # :pretty accepts a boolean and will enable/disable "pretty printing" the resulting output
+    #
+    # :indent accepts a string and will be used as the indent character(s) during the pretty print process
     def self.encode(obj, io, options={})
       new(options).encode(obj, io)
     end
