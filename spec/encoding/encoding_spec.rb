@@ -10,13 +10,12 @@ describe "Yajl JSON encoder" do
       if File.basename(file) != 'twitter_stream.json'
         input = File.new(File.expand_path(file), 'r')
         io = StringIO.new
-        parser = Yajl::Parser.new
         encoder = Yajl::Encoder.new
       
-        hash = parser.parse(input)
+        hash = Yajl::Parser.parse(input)
         output = encoder.encode(hash, io)
         io.rewind
-        hash2 = parser.parse(io)
+        hash2 = Yajl::Parser.parse(io)
       
         io.close
         input.close
