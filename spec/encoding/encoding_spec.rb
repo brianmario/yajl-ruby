@@ -72,6 +72,10 @@ describe "Yajl JSON encoder" do
       encoder.encode(obj, io)
     end
     io.rewind
-    io.read.should == "{\"foo\":\"bar\",\"baz\":1234}\n{\"foo\":\"bar\",\"baz\":1234}\n{\"foo\":\"bar\",\"baz\":1234}\n{\"foo\":\"bar\",\"baz\":1234}\n{\"foo\":\"bar\",\"baz\":1234}\n"
+    output = "{\"baz\":1234,\"foo\":\"bar\"}\n{\"baz\":1234,\"foo\":\"bar\"}\n{\"baz\":1234,\"foo\":\"bar\"}\n{\"baz\":1234,\"foo\":\"bar\"}\n{\"baz\":1234,\"foo\":\"bar\"}\n"
+    if RUBY_VERSION.include?('1.9') # FIXME
+      output = "{\"foo\":\"bar\",\"baz\":1234}\n{\"foo\":\"bar\",\"baz\":1234}\n{\"foo\":\"bar\",\"baz\":1234}\n{\"foo\":\"bar\",\"baz\":1234}\n{\"foo\":\"bar\",\"baz\":1234}\n"
+    end
+    io.read.should == output
   end
 end

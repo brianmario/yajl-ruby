@@ -47,15 +47,15 @@ module Yajl
     end
   end
   
-  # Deprecated - See Yajl::Parser and Yajl::Encoder
+  # DEPRECATED - See Yajl::Parser and Yajl::Encoder
   module Stream
-    # Deprecated - See Yajl::Parser
+    # DEPRECATED - See Yajl::Parser
     def self.parse(io)
       STDERR.puts "WARNING: Yajl::Stream has be deprecated and will most likely be gone in the next release. Use the Yajl::Parser class instead."
       Parser.new.parse(io)
     end
     
-    # Deprecated - See Yajl::Encoder
+    # DEPRECATED - See Yajl::Encoder
     def self.encode(obj, io)
       STDERR.puts "WARNING: Yajl::Stream has be deprecated and will most likely be gone in the next release. Use the Yajl::Encoder class instead."
       Encoder.new.encode(obj, io)

@@ -3,13 +3,10 @@ require 'socket' unless defined?(Socket)
 require 'yajl' unless defined?(Yajl::Parser)
 
 module Yajl
-  # == Yajl::HttpStream
-  #
   # This module is for making HTTP requests to which the response bodies (and possibly requests in the near future)
   # are streamed directly into Yajl.
   class HttpStream
-    # === Yajl::HttpStream::InvalidContentType
-    #
+    
     # This Exception is thrown when an HTTP response isn't application/json
     # and therefore cannot be parsed.
     class InvalidContentType < Exception; end
@@ -22,8 +19,7 @@ module Yajl
     # 1. a raw socket is opened to the server/host provided
     # 2. the request is made using HTTP/1.0, Accept-encoding: gzip (deflate support coming soon, too)
     # 3. the response is read until the end of the headers
-    # 4. the _socket itself_ is passed directly to Yajl, for direct parsing off the stream;
-    #    As it's being received over the wire!
+    # 4. the _socket itself_ is passed directly to Yajl, for direct parsing off the stream; As it's being received over the wire!
     def self.get(uri, opts = {}, &block)
       user_agent = opts.has_key?(['User-Agent']) ? opts['User-Agent'] : "Yajl::HttpStream #{Yajl::VERSION}"
       
