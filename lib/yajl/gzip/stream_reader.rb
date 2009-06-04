@@ -18,7 +18,7 @@ module Yajl
       #
       # See Yajl::Parser#parse for parameter documentation
       def self.parse(io, options={}, buffer_size=nil, &block)
-        Yajl::Parser.new(options).parse(new(io, buffer_size, &block))
+        Yajl::Parser.new(options).parse(new(io), buffer_size, &block)
       end
     end
   end
