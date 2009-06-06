@@ -134,6 +134,18 @@ void yajl_parser_wrapper_mark(void * wrapper) {
     rb_gc_mark(w->parse_complete_callback);
 }
 
+void yajl_parse_chunk(const unsigned char * chunk, unsigned int len, yajl_handle parser) {
+    yajl_status stat;
+    
+    stat = yajl_parse(parser, chunk, len);
+    
+    if (stat != yajl_status_ok && stat != yajl_status_insufficient_data) {
+        unsigned char * str = yajl_get_error(parser, 1, chunk, len);
+        rb_raise(cParseError, "%s", (const char *) str);
+        yajl_free_error(parser, str);
+    }
+}
+
 // YAJL Callbacks
 static int yajl_found_null(void * ctx) {
     yajl_set_static_value(ctx, Qnil);
@@ -279,12 +291,12 @@ static VALUE rb_yajl_parser_init(int argc, VALUE * argv, VALUE self) {
  * Document-method: parse
  *
  * call-seq:
- *  parse(io, buffer_size=8092)
- *  parse(io, buffer_size=8092) { |obj| ... }
+ *  parse(input, buffer_size=8092)
+ *  parse(input, buffer_size=8092) { |obj| ... }
  *
- * +io+ is the stream to parse JSON from
+ * +input+ can either be a string or an IO to parse JSON from
  *
- * +buffer_size+ is the size of chunk that will be parsed off the stream for each loop of the parsing process.
+ * +buffer_size+ is the size of chunk that will be parsed off the input (if it's an IO) for each loop of the parsing process.
  * 8092 is a good balance between the different types of streams (off disk, off a socket, etc...), but this option
  * is here so the caller can better tune their parsing depending on the type of stream being passed.
  * A larger read buffer will perform better for files off disk, where as a smaller size may be more efficient for
@@ -297,15 +309,15 @@ static VALUE rb_yajl_parser_init(int argc, VALUE * argv, VALUE self) {
  * block is for this method.
 */
 static VALUE rb_yajl_parser_parse(int argc, VALUE * argv, VALUE self) {
-    struct yajl_parser_wrapper * wrapper;
     yajl_status stat;
-    VALUE parsed, rbufsize, io, blk;
+    struct yajl_parser_wrapper * wrapper;
+    VALUE parsed, rbufsize, input, blk;
     
     GetParser(self, wrapper);
     parsed = rb_str_new2("");
     
     // setup our parameters
-    rb_scan_args(argc, argv, "11&", &io, &rbufsize, &blk);
+    rb_scan_args(argc, argv, "11&", &input, &rbufsize, &blk);
     if (NIL_P(rbufsize)) {
         rbufsize = INT2FIX(READ_BUFSIZE);
     } else {
@@ -315,18 +327,15 @@ static VALUE rb_yajl_parser_parse(int argc, VALUE * argv, VALUE self) {
         rb_yajl_set_complete_cb(self, blk);
     }
     
-    // now parse from the IO
-    while (rb_funcall(io, intern_eof, 0) != Qtrue) {
-        rb_funcall(io, intern_io_read, 2, rbufsize, parsed);
-        
-        stat = yajl_parse(wrapper->parser, (const unsigned char *)RSTRING_PTR(parsed), RSTRING_LEN(parsed));
-        
-        if (stat != yajl_status_ok && stat != yajl_status_insufficient_data) {
-            unsigned char * str = yajl_get_error(wrapper->parser, 1, (const unsigned char *)RSTRING_PTR(parsed), RSTRING_LEN(parsed));
-            rb_raise(cParseError, "%s", (const char *) str);
-            yajl_free_error(wrapper->parser, str);
-            break;
+    if (TYPE(input) == T_STRING) {
+        yajl_parse_chunk((const unsigned char *)RSTRING_PTR(input), RSTRING_LEN(input), wrapper->parser);
+    } else if (rb_respond_to(input, intern_eof)) {
+        while (rb_funcall(input, intern_eof, 0) != Qtrue) {
+            rb_funcall(input, intern_io_read, 2, rbufsize, parsed);
+            yajl_parse_chunk((const unsigned char *)RSTRING_PTR(parsed), RSTRING_LEN(parsed), wrapper->parser);
         }
+    } else {
+        rb_raise(cParseError, "input must be a string or IO");
     }
     
     // parse any remaining buffered data
@@ -353,7 +362,6 @@ static VALUE rb_yajl_parser_parse(int argc, VALUE * argv, VALUE self) {
  */
 static VALUE rb_yajl_parser_parse_chunk(VALUE self, VALUE chunk) {
     struct yajl_parser_wrapper * wrapper;
-    yajl_status stat;
     
     GetParser(self, wrapper);
     if (NIL_P(chunk)) {
@@ -362,12 +370,7 @@ static VALUE rb_yajl_parser_parse_chunk(VALUE self, VALUE chunk) {
     }
     
     if (wrapper->parse_complete_callback != Qnil) {
-        stat = yajl_parse(wrapper->parser, (const unsigned char *)RSTRING_PTR(chunk), RSTRING_LEN(chunk));
-        if (stat != yajl_status_ok && stat != yajl_status_insufficient_data) {
-            unsigned char * str = yajl_get_error(wrapper->parser, 1, (const unsigned char *)RSTRING_PTR(chunk), RSTRING_LEN(chunk));
-            rb_raise(cParseError, "%s", (const char *) str);
-            yajl_free_error(wrapper->parser, str);
-        }
+        yajl_parse_chunk((const unsigned char *)RSTRING_PTR(chunk), RSTRING_LEN(chunk), wrapper->parser);
     } else {
         rb_raise(cParseError, "The on_parse_complete callback isn't setup, parsing useless.");
     }

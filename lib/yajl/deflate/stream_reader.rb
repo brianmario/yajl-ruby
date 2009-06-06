@@ -21,11 +21,15 @@ module Yajl
       # Helper method for one-off parsing from a deflate-compressed stream
       #
       # See Yajl::Parser#parse for parameter documentation
-      def self.parse(io, options={}, buffer_size=nil, &block)
+      def self.parse(input, options={}, buffer_size=nil, &block)
+        if input.is_a?(String)
+          input = StringIO.new(input)
+        end
+        
         if options.is_a?(Hash)
-          Yajl::Parser.new(options).parse(new(io), buffer_size, &block)
+          Yajl::Parser.new(options).parse(new(input), buffer_size, &block)
         elsif options.is_a?(Fixnum)
-          Yajl::Parser.new.parse(new(io, options), buffer_size, &block)
+          Yajl::Parser.new.parse(new(input, options), buffer_size, &block)
         end
       end
     end

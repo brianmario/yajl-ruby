@@ -17,8 +17,12 @@ module Yajl
       # Helper method for one-off parsing from a bzip2-compressed stream
       #
       # See Yajl::Parser#parse for parameter documentation
-      def self.parse(io, options={}, buffer_size=nil, &block)
-        Yajl::Parser.new(options).parse(new(io), buffer_size, &block)
+      def self.parse(input, options={}, buffer_size=nil, &block)
+        if input.is_a?(String)
+          input = StringIO.new(input)
+        end
+        
+        Yajl::Parser.new(options).parse(new(input), buffer_size, &block)
       end
     end
   end
