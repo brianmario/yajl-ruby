@@ -8,7 +8,7 @@ describe "Parsing JSON Fixtures" do
   FAILED = failed.inject([]) { |a, f| a << [ f, File.read(f) ] }.sort
   
   FAILED.each do |name, source|
-    it "should not be able to parse #{File.basename(name)}" do
+    it "should not be able to parse #{File.basename(name)} as an IO" do
         lambda {
           parser = Yajl::Parser.new
           parser.parse(StringIO.new(source))
@@ -16,11 +16,29 @@ describe "Parsing JSON Fixtures" do
     end
   end
   
+  FAILED.each do |name, source|
+    it "should not be able to parse #{File.basename(name)} as a string" do
+        lambda {
+          parser = Yajl::Parser.new
+          parser.parse(source)
+        }.should raise_error(Yajl::ParseError)
+    end
+  end
+  
   PASSED.each do |name, source|
-    it "should be able to parse #{File.basename(name)}" do
+    it "should be able to parse #{File.basename(name)} as an IO" do
         lambda {
           parser = Yajl::Parser.new
           parser.parse(StringIO.new(source))
+        }.should_not raise_error(Yajl::ParseError)
+    end
+  end
+  
+  PASSED.each do |name, source|
+    it "should be able to parse #{File.basename(name)} as a string" do
+        lambda {
+          parser = Yajl::Parser.new
+          parser.parse(source)
         }.should_not raise_error(Yajl::ParseError)
     end
   end
