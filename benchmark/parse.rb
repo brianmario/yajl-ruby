@@ -15,12 +15,20 @@ json.rewind
 times = ARGV[1] ? ARGV[1].to_i : 1
 puts "Starting benchmark parsing #{File.size(filename)} bytes of JSON data #{times} times\n\n"
 Benchmark.bm { |x|
-  parser = Yajl::Parser.new
+  io_parser = Yajl::Parser.new
   x.report {
-    puts "Yajl::Parser#parse"
+    puts "Yajl::Parser#parse (from an IO)"
     times.times {
       json.rewind
-      parser.parse(json)
+      io_parser.parse(json)
+    }
+  }
+  string_parser = Yajl::Parser.new
+  x.report {
+    puts "Yajl::Parser#parse (from a String)"
+    times.times {
+      json.rewind
+      string_parser.parse(json.read)
     }
   }
   x.report {

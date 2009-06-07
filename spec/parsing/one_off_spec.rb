@@ -27,17 +27,27 @@ describe "One-off JSON examples" do
   end
   
   it "should not parse invalid UTF8 with :check_utf8 set to true" do
-    pending
-    # not sure how to write this test yet
+    pending "not sure how to write this test yet"
   end
   
   it "should parse invalid UTF8 with :check_utf8 set to false" do
-    pending
-    # not sure how to write this test yet
+    pending "not sure how to write this test yet"
   end
   
-  it "should parse using it's class method" do
+  it "should parse using it's class method, from an IO" do
     io = StringIO.new('{"key": 1234}')
     Yajl::Parser.parse(io).should == {"key" => 1234}
+  end
+  
+  it "should parse using it's class method, from a string" do
+    Yajl::Parser.parse('{"key": 1234}').should == {"key" => 1234}
+  end
+  
+  it "should parse using it's class method, from a string with a block" do
+    output = nil
+    Yajl::Parser.parse('{"key": 1234}') do |obj|
+      output = obj
+    end
+    output.should == {"key" => 1234}
   end
 end

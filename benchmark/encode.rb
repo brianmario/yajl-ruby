@@ -15,11 +15,18 @@ json.close
 times = ARGV[1] ? ARGV[1].to_i : 1
 puts "Starting benchmark encoding #{filename} #{times} times\n\n"
 Benchmark.bm { |x|
-  encoder = Yajl::Encoder.new
+  io_encoder = Yajl::Encoder.new
   x.report {
-    puts "Yajl::Encoder#encode"
+    puts "Yajl::Encoder#encode (to an IO)"
     times.times {
-      encoder.encode(hash, StringIO.new)
+      io_encoder.encode(hash, StringIO.new)
+    }
+  }
+  string_encoder = Yajl::Encoder.new
+  x.report {
+    puts "Yajl::Encoder#encode (to a String)"
+    times.times {
+      output = string_encoder.encode(hash)
     }
   }
   x.report {

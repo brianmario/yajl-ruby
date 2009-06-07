@@ -66,11 +66,13 @@ void yajl_encode_part(yajl_gen hand, VALUE obj, VALUE io) {
     const unsigned char * buffer;
     unsigned int len;
     
-    yajl_gen_get_buf(hand, &buffer, &len);
-    if (len >= WRITE_BUFSIZE) {
-        outBuff = rb_str_new((const char *)buffer, len);
-        rb_io_write(io, outBuff);
-        yajl_gen_clear(hand);
+    if (io != Qnil) {
+        yajl_gen_get_buf(hand, &buffer, &len);
+        if (len >= WRITE_BUFSIZE) {
+            outBuff = rb_str_new((const char *)buffer, len);
+            rb_io_write(io, outBuff);
+            yajl_gen_clear(hand);
+        }
     }
     
     switch (TYPE(obj)) {
@@ -405,7 +407,7 @@ static VALUE rb_yajl_set_complete_cb(VALUE self, VALUE callback) {
 /*
  * Document-method: new
  *
- * call-seq: new([:pretty => false, :indent => '  '])
+ * call-seq: new([:pretty => false[, :indent => '  ']])
  *
  * :pretty will enable/disable beautifying or "pretty priting" the output string.
  *
@@ -442,7 +444,7 @@ static VALUE rb_yajl_encoder_new(int argc, VALUE * argv, VALUE klass) {
 /*
  * Document-method: initialize
  *
- * call-seq: initialize([:pretty => false, :indent => '  '])
+ * call-seq: initialize([:pretty => false[, :indent => '  ']])
  *
  * :pretty will enable/disable beautifying or "pretty priting" the output string.
  *
@@ -455,23 +457,28 @@ static VALUE rb_yajl_encoder_init(int argc, VALUE * argv, VALUE self) {
 /*
  * Document-method: encode
  *
- * call-seq: encode(obj, io)
+ * call-seq: encode(obj[, io[, &block]])
  *
  * +obj+ is the Ruby object to encode to JSON
  *
- * +io+ is the IO stream to stream the encoded JSON string to.
+ * +io+ is an optional IO used to stream the encoded JSON string to.
+ * If +io+ isn't specified, this method will return the resulting JSON string. If +io+ is specified, this method returns nil
+ *
+ * If an optional block is passed, it's called when encoding is complete and passed the resulting JSON string
  *
  * It should be noted that you can reuse an instance of this class to continue encoding multiple JSON
  * to the same stream. Just continue calling this method, passing it the same IO object with new/different
  * ruby objects to encode. This is how streaming is accomplished.
  */
-static VALUE rb_yajl_encoder_encode(VALUE self, VALUE obj, VALUE io) {
+static VALUE rb_yajl_encoder_encode(int argc, VALUE * argv, VALUE self) {
     yajl_gen encoder;
     const unsigned char * buffer;
     unsigned int len;
-    VALUE outBuff;
+    VALUE obj, io, blk, outBuff;
     
     GetEncoder(self, encoder);
+    
+    rb_scan_args(argc, argv, "11&", &obj, &io, &blk);
     
     // begin encode process
     yajl_encode_part(encoder, obj, io);
@@ -479,9 +486,16 @@ static VALUE rb_yajl_encoder_encode(VALUE self, VALUE obj, VALUE io) {
     // just make sure we output the remaining buffer
     yajl_gen_get_buf(encoder, &buffer, &len);
     outBuff = rb_str_new((const char *)buffer, len);
-    rb_io_write(io, outBuff);
     yajl_gen_clear(encoder);
-    
+    if (io != Qnil) {
+        rb_io_write(io, outBuff);
+        return Qnil;
+    } else if (blk != Qnil) {
+        rb_funcall(blk, intern_call, 1, outBuff);
+        return Qnil;
+    } else {
+        return outBuff;
+    }
     return Qnil;
 }
 
@@ -491,6 +505,7 @@ void Init_yajl_ext() {
     
     VALUE rb_cStandardError = rb_const_get(rb_cObject, rb_intern("StandardError"));
     cParseError = rb_define_class_under(mYajl, "ParseError", rb_cStandardError);
+    cEncodeError = rb_define_class_under(mYajl, "EncodeError", rb_cStandardError);
     
     cParser = rb_define_class_under(mYajl, "Parser", rb_cObject);
     rb_define_singleton_method(cParser, "new", rb_yajl_parser_new, -1);
@@ -503,7 +518,7 @@ void Init_yajl_ext() {
     cEncoder = rb_define_class_under(mYajl, "Encoder", rb_cObject);
     rb_define_singleton_method(cEncoder, "new", rb_yajl_encoder_new, -1);
     rb_define_method(cEncoder, "initialize", rb_yajl_encoder_init, -1);
-    rb_define_method(cEncoder, "encode", rb_yajl_encoder_encode, 2);
+    rb_define_method(cEncoder, "encode", rb_yajl_encoder_encode, -1);
     
     intern_io_read = rb_intern("read");
     intern_eof = rb_intern("eof?");
