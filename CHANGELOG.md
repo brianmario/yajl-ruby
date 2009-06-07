@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.5.3 (Jun 7th, 2009)
+* The IO parameter for Yajl::Encode#encode is now optional, and accepts a block
+** it will return the resulting JSON string if no IO is passed to stream to
+** if a block is passed, it will call and pass it the resulting JSON string
+* Yajl::Parser#parse can now parse from a String as well as an IO
+* Added and updated lot of in-code documentation.
+** all the C code exposed to Ruby should now have comments
+
 ## 0.5.2 (May 30th, 2009)
 * Added class helper methods Yajl::Encoder.encode(obj, io) and Yajl::Parser.parse(io)
  * added tests for the above
