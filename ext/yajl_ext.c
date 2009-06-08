@@ -252,11 +252,13 @@ static int yajl_found_end_array(void * ctx) {
 /*
  * Document-method: new
  *
- * call-seq: new([:allow_comments => false, :check_utf8 => false])
+ * call-seq: new([:symbolize_keys => false, [:allow_comments => false[, :check_utf8 => false]]])
  *
- * :allow_comments will turn on/off the check for comments inside the JSON stream.
+ * :symbolize_keys will turn hash keys into Ruby symbols, defaults to true.
  *
- * :check_utf8 will validate UTF8 characters found in the JSON stream.
+ * :allow_comments will turn on/off the check for comments inside the JSON stream, defaults to true.
+ *
+ * :check_utf8 will validate UTF8 characters found in the JSON stream, defaults to true.
  */
 static VALUE rb_yajl_parser_new(int argc, VALUE * argv, VALUE klass) {
     struct yajl_parser_wrapper * wrapper;
@@ -295,12 +297,14 @@ static VALUE rb_yajl_parser_new(int argc, VALUE * argv, VALUE klass) {
 /*
  * Document-method: initialize
  *
- * call-seq: initialize([:allow_comments => false, :check_utf8 => false])
+ * call-seq: new([:symbolize_keys => false, [:allow_comments => false[, :check_utf8 => false]]])
  *
- * :allow_comments will turn on/off the check for comments inside the JSON stream.
+ * :symbolize_keys will turn hash keys into Ruby symbols, defaults to true.
  *
- * :check_utf8 will validate UTF8 characters found in the JSON stream.
-*/
+ * :allow_comments will turn on/off the check for comments inside the JSON stream, defaults to true.
+ *
+ * :check_utf8 will validate UTF8 characters found in the JSON stream, defaults to true.
+ */
 static VALUE rb_yajl_parser_init(int argc, VALUE * argv, VALUE self) {
     return self;
 }
