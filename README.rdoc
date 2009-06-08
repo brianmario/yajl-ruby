@@ -215,3 +215,4 @@ I've had a lot of inspiration, and a lot of help. Thanks to everyone who's been 
 * Rick http://github.com/technoweenie - for making an ActiveSupport patch with support for this library and teasing me that it might go into Rails 3. You sure lit a fire under my ass and I got a ton of work done because of it! :)
 * The entire Github Crew - http://github.com/ - my inspiration, time spent writing this, finding Yajl, So many-MANY other things wouldn't have been possible without this awesome service. I owe you guys some whiskey at Kilowatt.
 * benburkert - http://github.com/benburkert
+* Aman Gupta - http://github.com/tmm1 - tons of suggestions and inspiration for the most recent features, and hopefully more to come ;)

@@ -7,6 +7,8 @@
 * Yajl::Parser#parse can now parse from a String as well as an IO
 * Added and updated lot of in-code documentation.
 ** all the C code exposed to Ruby should now have comments
+* Added :symbolize_keys option to the Yajl::Parser class, which defaults to true.
+** Having this option enabled has shown around an 18% speedup in parsing time according to my benchmarks
 
 ## 0.5.2 (May 30th, 2009)
 * Added class helper methods Yajl::Encoder.encode(obj, io) and Yajl::Parser.parse(io)
