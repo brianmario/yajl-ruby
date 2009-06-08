@@ -517,6 +517,146 @@ static VALUE rb_yajl_encoder_encode(int argc, VALUE * argv, VALUE self) {
     return Qnil;
 }
 
+
+static VALUE rb_yajl_encoder_encode_hash_start(int argc, VALUE * argv, VALUE klass) {
+    yajl_gen encoder;
+    const unsigned char * buffer;
+    unsigned int len;
+    VALUE rb_encoder, outBuff;
+    rb_scan_args(argc, argv, "10", &rb_encoder);
+    GetEncoder(rb_encoder, encoder);
+    yajl_gen_map_open(encoder);
+    
+    yajl_gen_get_buf(encoder, &buffer, &len);
+    outBuff = rb_str_new((const char *)buffer, len);
+    yajl_gen_clear(encoder);
+    return outBuff;
+}
+
+static VALUE rb_yajl_encoder_encode_hash_key(int argc, VALUE * argv, VALUE self) {
+    yajl_gen encoder;
+    const unsigned char * buffer;
+    unsigned int len;
+    VALUE rb_encoder, key, outBuff;
+    rb_scan_args(argc, argv, "20", &rb_encoder, &key);
+    GetEncoder(rb_encoder, encoder);
+    yajl_gen_string(encoder, (const unsigned char *)RSTRING_PTR(key), (unsigned int)RSTRING_LEN(key));
+    
+    yajl_gen_get_buf(encoder, &buffer, &len);
+    outBuff = rb_str_new((const char *)buffer, len);
+    yajl_gen_clear(encoder);
+    return outBuff;
+}
+
+static VALUE rb_yajl_encoder_encode_hash_end(int argc, VALUE * argv, VALUE self) {
+    yajl_gen encoder;
+    const unsigned char * buffer;
+    unsigned int len;
+    VALUE rb_encoder, outBuff;
+    rb_scan_args(argc, argv, "10", &rb_encoder);
+    GetEncoder(rb_encoder, encoder);
+    yajl_gen_map_close(encoder);
+    
+    yajl_gen_get_buf(encoder, &buffer, &len);
+    outBuff = rb_str_new((const char *)buffer, len);
+    yajl_gen_clear(encoder);
+    return outBuff;
+}
+
+static VALUE rb_yajl_encoder_encode_array_start(int argc, VALUE * argv, VALUE self) {
+    yajl_gen encoder;
+    const unsigned char * buffer;
+    unsigned int len;
+    VALUE rb_encoder, outBuff;
+    rb_scan_args(argc, argv, "10", &rb_encoder);
+    GetEncoder(rb_encoder, encoder);
+    yajl_gen_array_open(encoder);
+    
+    yajl_gen_get_buf(encoder, &buffer, &len);
+    outBuff = rb_str_new((const char *)buffer, len);
+    yajl_gen_clear(encoder);
+    return outBuff;
+}
+
+static VALUE rb_yajl_encoder_encode_array_end(int argc, VALUE * argv, VALUE self) {
+    yajl_gen encoder;
+    const unsigned char * buffer;
+    unsigned int len;
+    VALUE rb_encoder, outBuff;
+    rb_scan_args(argc, argv, "10", &rb_encoder);
+    GetEncoder(rb_encoder, encoder);
+    yajl_gen_array_close(encoder);
+    
+    yajl_gen_get_buf(encoder, &buffer, &len);
+    outBuff = rb_str_new((const char *)buffer, len);
+    yajl_gen_clear(encoder);
+    return outBuff;
+}
+
+static VALUE rb_yajl_encoder_encode_number(int argc, VALUE * argv, VALUE self) {
+    yajl_gen encoder;
+    const unsigned char * buffer;
+    unsigned int len;
+    VALUE rb_encoder, num, outBuff;
+    rb_scan_args(argc, argv, "20", &rb_encoder, &num);
+    GetEncoder(rb_encoder, encoder);
+    yajl_gen_number(encoder, RSTRING_PTR(num), (unsigned int)RSTRING_LEN(num));
+    
+    yajl_gen_get_buf(encoder, &buffer, &len);
+    outBuff = rb_str_new((const char *)buffer, len);
+    yajl_gen_clear(encoder);
+    return outBuff;
+}
+
+static VALUE rb_yajl_encoder_encode_string(int argc, VALUE * argv, VALUE self) {
+    yajl_gen encoder;
+    const unsigned char * buffer;
+    unsigned int len;
+    VALUE rb_encoder, str, outBuff;
+    rb_scan_args(argc, argv, "20", &rb_encoder, &str);
+    GetEncoder(rb_encoder, encoder);
+    yajl_gen_string(encoder, (const unsigned char *)RSTRING_PTR(str), (unsigned int)RSTRING_LEN(str));
+    
+    yajl_gen_get_buf(encoder, &buffer, &len);
+    outBuff = rb_str_new((const char *)buffer, len);
+    yajl_gen_clear(encoder);
+    return outBuff;
+}
+
+static VALUE rb_yajl_encoder_encode_boolean(int argc, VALUE * argv, VALUE self) {
+    yajl_gen encoder;
+    const unsigned char * buffer;
+    unsigned int len;
+    VALUE rb_encoder, boolean, outBuff;
+    rb_scan_args(argc, argv, "20", &rb_encoder, &boolean);
+    GetEncoder(rb_encoder, encoder);
+    if (TYPE(boolean) == T_TRUE) {
+        yajl_gen_bool(encoder, 1);
+    } else {
+        yajl_gen_bool(encoder, 0);
+    }
+    
+    yajl_gen_get_buf(encoder, &buffer, &len);
+    outBuff = rb_str_new((const char *)buffer, len);
+    yajl_gen_clear(encoder);
+    return outBuff;
+}
+
+static VALUE rb_yajl_encoder_encode_null(int argc, VALUE * argv, VALUE self) {
+    yajl_gen encoder;
+    const unsigned char * buffer;
+    unsigned int len;
+    VALUE rb_encoder, outBuff;
+    rb_scan_args(argc, argv, "10", &rb_encoder);
+    GetEncoder(rb_encoder, encoder);
+    yajl_gen_null(encoder);
+    
+    yajl_gen_get_buf(encoder, &buffer, &len);
+    outBuff = rb_str_new((const char *)buffer, len);
+    yajl_gen_clear(encoder);
+    return outBuff;
+}
+
 // Ruby Extension initializer
 void Init_yajl_ext() {
     mYajl = rb_define_module("Yajl");
@@ -537,6 +677,16 @@ void Init_yajl_ext() {
     rb_define_singleton_method(cEncoder, "new", rb_yajl_encoder_new, -1);
     rb_define_method(cEncoder, "initialize", rb_yajl_encoder_init, -1);
     rb_define_method(cEncoder, "encode", rb_yajl_encoder_encode, -1);
+    
+    rb_define_singleton_method(cEncoder, "encode_hash_start", rb_yajl_encoder_encode_hash_start, -1);
+    rb_define_singleton_method(cEncoder, "encode_hash_key", rb_yajl_encoder_encode_hash_key, -1);
+    rb_define_singleton_method(cEncoder, "encode_hash_end", rb_yajl_encoder_encode_hash_end, -1);
+    rb_define_singleton_method(cEncoder, "encode_array_start", rb_yajl_encoder_encode_array_start, -1);
+    rb_define_singleton_method(cEncoder, "encode_array_end", rb_yajl_encoder_encode_array_end, -1);
+    rb_define_singleton_method(cEncoder, "encode_number", rb_yajl_encoder_encode_number, -1);
+    rb_define_singleton_method(cEncoder, "encode_string", rb_yajl_encoder_encode_string, -1);
+    rb_define_singleton_method(cEncoder, "encode_boolean", rb_yajl_encoder_encode_boolean, -1);
+    rb_define_singleton_method(cEncoder, "encode_null", rb_yajl_encoder_encode_null, -1);
     
     intern_io_read = rb_intern("read");
     intern_eof = rb_intern("eof?");

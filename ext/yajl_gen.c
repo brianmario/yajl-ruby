@@ -152,9 +152,7 @@ yajl_gen_free(yajl_gen g)
             break;                                  \
     }                                               \
 
-#define FINAL_NEWLINE                                        \
-    if (g->state[g->depth] == yajl_gen_start)                \
-        yajl_buf_append(g->buf, "\n", 1);        
+#define FINAL_NEWLINE
     
 yajl_gen_status
 yajl_gen_integer(yajl_gen g, long int number)
