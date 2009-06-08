@@ -44,6 +44,7 @@ inline void yajl_set_static_value(void * ctx, VALUE val) {
                 rb_ary_push(wrapper->builderStack, val);
                 break;
             case T_STRING:
+            case T_SYMBOL:
                 hash = rb_ary_entry(wrapper->builderStack, len-2);
                 if (TYPE(hash) == T_HASH) {
                     rb_hash_aset(hash, lastEntry, val);
@@ -183,7 +184,18 @@ static int yajl_found_string(void * ctx, const unsigned char * stringVal, unsign
 }
 
 static int yajl_found_hash_key(void * ctx, const unsigned char * stringVal, unsigned int stringLen) {
-    yajl_set_static_value(ctx, rb_str_new((const char *)stringVal, stringLen));
+    struct yajl_parser_wrapper * wrapper;
+    GetParser((VALUE)ctx, wrapper);
+    
+    if (wrapper->symbolizeKeys) {
+        char keyStr[stringLen];
+        ID key;
+        sprintf(keyStr, "%.*s", stringLen, stringVal);
+        key = rb_intern(keyStr);
+        yajl_set_static_value(ctx, ID2SYM(key));
+    } else {
+        yajl_set_static_value(ctx, rb_str_new((const char *)stringVal, stringLen));
+    }
     yajl_check_and_fire_callback(ctx);
     return 1;
 }
@@ -250,7 +262,7 @@ static VALUE rb_yajl_parser_new(int argc, VALUE * argv, VALUE klass) {
     struct yajl_parser_wrapper * wrapper;
     yajl_parser_config cfg;
     VALUE opts, obj;
-    int allowComments = 1, checkUTF8 = 1;
+    int allowComments = 1, checkUTF8 = 1, symbolizeKeys = 1;
     
     // Scan off config vars
     if (rb_scan_args(argc, argv, "01", &opts) == 1) {
@@ -262,6 +274,9 @@ static VALUE rb_yajl_parser_new(int argc, VALUE * argv, VALUE klass) {
         if (rb_hash_aref(opts, ID2SYM(sym_check_utf8)) == Qfalse) {
             checkUTF8 = 0;
         }
+        if (rb_hash_aref(opts, ID2SYM(sym_symbolize_keys)) == Qfalse) {
+            symbolizeKeys = 0;
+        }
     }
     cfg = (yajl_parser_config){allowComments, checkUTF8};
     
@@ -270,6 +285,7 @@ static VALUE rb_yajl_parser_new(int argc, VALUE * argv, VALUE klass) {
     wrapper->nestedArrayLevel = 0;
     wrapper->nestedHashLevel = 0;
     wrapper->objectsFound = 0;
+    wrapper->symbolizeKeys = symbolizeKeys;
     wrapper->builderStack = rb_ary_new();
     wrapper->parse_complete_callback = Qnil;
     rb_obj_call_init(obj, 0, 0);
@@ -529,4 +545,5 @@ void Init_yajl_ext() {
     sym_check_utf8 = rb_intern("check_utf8");
     sym_pretty = rb_intern("pretty");
     sym_indent = rb_intern("indent");
+    sym_symbolize_keys = rb_intern("symbolize_keys");
 }

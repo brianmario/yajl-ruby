@@ -7,7 +7,7 @@
 
 static VALUE cParseError, cEncodeError, mYajl, cParser, cEncoder;
 static ID intern_io_read, intern_eof, intern_call, intern_keys, intern_to_s,
-          sym_allow_comments, sym_check_utf8, sym_pretty, sym_indent;
+          sym_allow_comments, sym_check_utf8, sym_pretty, sym_indent, sym_symbolize_keys;
 
 #define GetParser(obj, sval) (sval = (struct yajl_parser_wrapper*)DATA_PTR(obj));
 #define GetEncoder(obj, sval) (sval = (yajl_gen*)DATA_PTR(obj));
@@ -46,6 +46,7 @@ struct yajl_parser_wrapper {
     int nestedArrayLevel;
     int nestedHashLevel;
     int objectsFound;
+    int symbolizeKeys;
     yajl_handle parser;
 };
 static void yajl_parser_wrapper_free(void * wrapper);
