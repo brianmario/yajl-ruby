@@ -61,3 +61,14 @@ static VALUE rb_yajl_set_complete_cb(VALUE self, VALUE callback);
 static VALUE rb_yajl_encoder_new(int argc, VALUE * argv, VALUE klass);
 static VALUE rb_yajl_encoder_init(int argc, VALUE * argv, VALUE self);
 static VALUE rb_yajl_encoder_encode(int argc, VALUE * argv, VALUE self);
+
+static VALUE rb_yajl_json_ext_object_to_json(int argc, VALUE * argv, VALUE self);
+static VALUE rb_yajl_json_ext_hash_to_json(int argc, VALUE * argv, VALUE self);
+static VALUE rb_yajl_json_ext_array_to_json(int argc, VALUE * argv, VALUE self);
+static VALUE rb_yajl_json_ext_fixnum_to_json(int argc, VALUE * argv, VALUE self);
+static VALUE rb_yajl_json_ext_float_to_json(int argc, VALUE * argv, VALUE self);
+static VALUE rb_yajl_json_ext_string_to_json(int argc, VALUE * argv, VALUE self);
+static VALUE rb_yajl_json_ext_true_to_json(int argc, VALUE * argv, VALUE self);
+static VALUE rb_yajl_json_ext_false_to_json(int argc, VALUE * argv, VALUE self);
+static VALUE rb_yajl_json_ext_nil_to_json(int argc, VALUE * argv, VALUE self);
+static VALUE rb_yajl_encoder_enable_json_gem_ext(VALUE klass);

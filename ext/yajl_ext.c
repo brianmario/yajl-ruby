@@ -518,152 +518,108 @@ static VALUE rb_yajl_encoder_encode(int argc, VALUE * argv, VALUE self) {
 }
 
 
-static VALUE rb_yajl_encoder_encode_hash_start(int argc, VALUE * argv, VALUE klass) {
-    yajl_gen encoder;
-    const unsigned char * buffer;
-    unsigned int len;
-    VALUE rb_encoder, outBuff;
-    rb_scan_args(argc, argv, "10", &rb_encoder);
-    GetEncoder(rb_encoder, encoder);
-    yajl_gen_map_open(encoder);
-    
-    yajl_gen_get_buf(encoder, &buffer, &len);
-    outBuff = rb_str_new((const char *)buffer, len);
-    yajl_gen_clear(encoder);
-    return outBuff;
-}
-
-static VALUE rb_yajl_encoder_encode_hash_key(int argc, VALUE * argv, VALUE self) {
-    yajl_gen encoder;
-    const unsigned char * buffer;
-    unsigned int len;
-    VALUE rb_encoder, key, outBuff;
-    rb_scan_args(argc, argv, "20", &rb_encoder, &key);
-    GetEncoder(rb_encoder, encoder);
-    yajl_gen_string(encoder, (const unsigned char *)RSTRING_PTR(key), (unsigned int)RSTRING_LEN(key));
-    
-    yajl_gen_get_buf(encoder, &buffer, &len);
-    outBuff = rb_str_new((const char *)buffer, len);
-    yajl_gen_clear(encoder);
-    return outBuff;
-}
-
-static VALUE rb_yajl_encoder_encode_hash_end(int argc, VALUE * argv, VALUE self) {
-    yajl_gen encoder;
-    const unsigned char * buffer;
-    unsigned int len;
-    VALUE rb_encoder, outBuff;
-    rb_scan_args(argc, argv, "10", &rb_encoder);
-    GetEncoder(rb_encoder, encoder);
-    yajl_gen_map_close(encoder);
-    
-    yajl_gen_get_buf(encoder, &buffer, &len);
-    outBuff = rb_str_new((const char *)buffer, len);
-    yajl_gen_clear(encoder);
-    return outBuff;
-}
-
-static VALUE rb_yajl_encoder_encode_array_start(int argc, VALUE * argv, VALUE self) {
-    yajl_gen encoder;
-    const unsigned char * buffer;
-    unsigned int len;
-    VALUE rb_encoder, outBuff;
-    rb_scan_args(argc, argv, "10", &rb_encoder);
-    GetEncoder(rb_encoder, encoder);
-    yajl_gen_array_open(encoder);
-    
-    yajl_gen_get_buf(encoder, &buffer, &len);
-    outBuff = rb_str_new((const char *)buffer, len);
-    yajl_gen_clear(encoder);
-    return outBuff;
-}
-
-static VALUE rb_yajl_encoder_encode_array_end(int argc, VALUE * argv, VALUE self) {
-    yajl_gen encoder;
-    const unsigned char * buffer;
-    unsigned int len;
-    VALUE rb_encoder, outBuff;
-    rb_scan_args(argc, argv, "10", &rb_encoder);
-    GetEncoder(rb_encoder, encoder);
-    yajl_gen_array_close(encoder);
-    
-    yajl_gen_get_buf(encoder, &buffer, &len);
-    outBuff = rb_str_new((const char *)buffer, len);
-    yajl_gen_clear(encoder);
-    return outBuff;
-}
-
-static VALUE rb_yajl_encoder_encode_number(int argc, VALUE * argv, VALUE self) {
-    yajl_gen encoder;
-    const unsigned char * buffer;
-    unsigned int len;
-    VALUE rb_encoder, num, outBuff;
-    rb_scan_args(argc, argv, "20", &rb_encoder, &num);
-    GetEncoder(rb_encoder, encoder);
-    yajl_gen_number(encoder, RSTRING_PTR(num), (unsigned int)RSTRING_LEN(num));
-    
-    yajl_gen_get_buf(encoder, &buffer, &len);
-    outBuff = rb_str_new((const char *)buffer, len);
-    yajl_gen_clear(encoder);
-    return outBuff;
-}
-
-static VALUE rb_yajl_encoder_encode_string(int argc, VALUE * argv, VALUE self) {
-    yajl_gen encoder;
-    const unsigned char * buffer;
-    unsigned int len;
-    VALUE rb_encoder, str, outBuff;
-    rb_scan_args(argc, argv, "20", &rb_encoder, &str);
-    GetEncoder(rb_encoder, encoder);
-    yajl_gen_string(encoder, (const unsigned char *)RSTRING_PTR(str), (unsigned int)RSTRING_LEN(str));
-    
-    yajl_gen_get_buf(encoder, &buffer, &len);
-    outBuff = rb_str_new((const char *)buffer, len);
-    yajl_gen_clear(encoder);
-    return outBuff;
-}
-
-static VALUE rb_yajl_encoder_encode_boolean(int argc, VALUE * argv, VALUE self) {
-    yajl_gen encoder;
-    const unsigned char * buffer;
-    unsigned int len;
-    VALUE rb_encoder, boolean, outBuff;
-    rb_scan_args(argc, argv, "20", &rb_encoder, &boolean);
-    GetEncoder(rb_encoder, encoder);
-    if (TYPE(boolean) == T_TRUE) {
-        yajl_gen_bool(encoder, 1);
-    } else {
-        yajl_gen_bool(encoder, 0);
+// JSON Gem compatibility
+static VALUE rb_yajl_json_ext_object_to_json(int argc, VALUE * argv, VALUE self) {
+    VALUE rb_encoder;
+    rb_scan_args(argc, argv, "01", &rb_encoder);
+    if (rb_encoder == Qnil) {
+        rb_encoder = rb_yajl_encoder_new(0, NULL, cEncoder);
     }
-    
-    yajl_gen_get_buf(encoder, &buffer, &len);
-    outBuff = rb_str_new((const char *)buffer, len);
-    yajl_gen_clear(encoder);
-    return outBuff;
+    return rb_yajl_encoder_encode(1, &self, rb_encoder);
 }
 
-static VALUE rb_yajl_encoder_encode_null(int argc, VALUE * argv, VALUE self) {
-    yajl_gen encoder;
-    const unsigned char * buffer;
-    unsigned int len;
-    VALUE rb_encoder, outBuff;
-    rb_scan_args(argc, argv, "10", &rb_encoder);
-    GetEncoder(rb_encoder, encoder);
-    yajl_gen_null(encoder);
-    
-    yajl_gen_get_buf(encoder, &buffer, &len);
-    outBuff = rb_str_new((const char *)buffer, len);
-    yajl_gen_clear(encoder);
-    return outBuff;
+static VALUE rb_yajl_json_ext_hash_to_json(int argc, VALUE * argv, VALUE self) {
+    VALUE rb_encoder;
+    rb_scan_args(argc, argv, "01", &rb_encoder);
+    if (rb_encoder == Qnil) {
+        rb_encoder = rb_yajl_encoder_new(0, NULL, cEncoder);
+    }
+    return rb_yajl_encoder_encode(1, &self, rb_encoder);
 }
+
+static VALUE rb_yajl_json_ext_array_to_json(int argc, VALUE * argv, VALUE self) {
+    VALUE rb_encoder;
+    rb_scan_args(argc, argv, "01", &rb_encoder);
+    if (rb_encoder == Qnil) {
+        rb_encoder = rb_yajl_encoder_new(0, NULL, cEncoder);
+    }
+    return rb_yajl_encoder_encode(1, &self, rb_encoder);
+}
+
+static VALUE rb_yajl_json_ext_fixnum_to_json(int argc, VALUE * argv, VALUE self) {
+    VALUE rb_encoder;
+    rb_scan_args(argc, argv, "01", &rb_encoder);
+    if (rb_encoder == Qnil) {
+        rb_encoder = rb_yajl_encoder_new(0, NULL, cEncoder);
+    }
+    return rb_yajl_encoder_encode(1, &self, rb_encoder);
+}
+
+static VALUE rb_yajl_json_ext_float_to_json(int argc, VALUE * argv, VALUE self) {
+    VALUE rb_encoder;
+    rb_scan_args(argc, argv, "01", &rb_encoder);
+    if (rb_encoder == Qnil) {
+        rb_encoder = rb_yajl_encoder_new(0, NULL, cEncoder);
+    }
+    return rb_yajl_encoder_encode(1, &self, rb_encoder);
+}
+
+static VALUE rb_yajl_json_ext_string_to_json(int argc, VALUE * argv, VALUE self) {
+    VALUE rb_encoder;
+    rb_scan_args(argc, argv, "01", &rb_encoder);
+    if (rb_encoder == Qnil) {
+        rb_encoder = rb_yajl_encoder_new(0, NULL, cEncoder);
+    }
+    return rb_yajl_encoder_encode(1, &self, rb_encoder);
+}
+
+static VALUE rb_yajl_json_ext_true_to_json(int argc, VALUE * argv, VALUE self) {
+    VALUE rb_encoder;
+    rb_scan_args(argc, argv, "01", &rb_encoder);
+    if (rb_encoder == Qnil) {
+        rb_encoder = rb_yajl_encoder_new(0, NULL, cEncoder);
+    }
+    return rb_yajl_encoder_encode(1, &self, rb_encoder);
+}
+
+static VALUE rb_yajl_json_ext_false_to_json(int argc, VALUE * argv, VALUE self) {
+    VALUE rb_encoder;
+    rb_scan_args(argc, argv, "01", &rb_encoder);
+    if (rb_encoder == Qnil) {
+        rb_encoder = rb_yajl_encoder_new(0, NULL, cEncoder);
+    }
+    return rb_yajl_encoder_encode(1, &self, rb_encoder);
+}
+
+static VALUE rb_yajl_json_ext_nil_to_json(int argc, VALUE * argv, VALUE self) {
+    VALUE rb_encoder;
+    rb_scan_args(argc, argv, "01", &rb_encoder);
+    if (rb_encoder == Qnil) {
+        rb_encoder = rb_yajl_encoder_new(0, NULL, cEncoder);
+    }
+    return rb_yajl_encoder_encode(1, &self, rb_encoder);
+}
+
+static VALUE rb_yajl_encoder_enable_json_gem_ext(VALUE klass) {
+    rb_define_method(rb_cObject, "to_json", rb_yajl_json_ext_object_to_json, -1);
+    rb_define_method(rb_cHash, "to_json", rb_yajl_json_ext_hash_to_json, -1);
+    rb_define_method(rb_cArray, "to_json", rb_yajl_json_ext_array_to_json, -1);
+    rb_define_method(rb_cFixnum, "to_json", rb_yajl_json_ext_fixnum_to_json, -1);
+    rb_define_method(rb_cFloat, "to_json", rb_yajl_json_ext_float_to_json, -1);
+    rb_define_method(rb_cString, "to_json", rb_yajl_json_ext_string_to_json, -1);
+    rb_define_method(rb_cTrueClass, "to_json", rb_yajl_json_ext_true_to_json, -1);
+    rb_define_method(rb_cFalseClass, "to_json", rb_yajl_json_ext_false_to_json, -1);
+    rb_define_method(rb_cNilClass, "to_json", rb_yajl_json_ext_nil_to_json, -1);
+    return Qnil;
+}
+
 
 // Ruby Extension initializer
 void Init_yajl_ext() {
     mYajl = rb_define_module("Yajl");
     
-    VALUE rb_cStandardError = rb_const_get(rb_cObject, rb_intern("StandardError"));
-    cParseError = rb_define_class_under(mYajl, "ParseError", rb_cStandardError);
-    cEncodeError = rb_define_class_under(mYajl, "EncodeError", rb_cStandardError);
+    cParseError = rb_define_class_under(mYajl, "ParseError", rb_eStandardError);
+    cEncodeError = rb_define_class_under(mYajl, "EncodeError", rb_eStandardError);
     
     cParser = rb_define_class_under(mYajl, "Parser", rb_cObject);
     rb_define_singleton_method(cParser, "new", rb_yajl_parser_new, -1);
@@ -678,15 +634,7 @@ void Init_yajl_ext() {
     rb_define_method(cEncoder, "initialize", rb_yajl_encoder_init, -1);
     rb_define_method(cEncoder, "encode", rb_yajl_encoder_encode, -1);
     
-    rb_define_singleton_method(cEncoder, "encode_hash_start", rb_yajl_encoder_encode_hash_start, -1);
-    rb_define_singleton_method(cEncoder, "encode_hash_key", rb_yajl_encoder_encode_hash_key, -1);
-    rb_define_singleton_method(cEncoder, "encode_hash_end", rb_yajl_encoder_encode_hash_end, -1);
-    rb_define_singleton_method(cEncoder, "encode_array_start", rb_yajl_encoder_encode_array_start, -1);
-    rb_define_singleton_method(cEncoder, "encode_array_end", rb_yajl_encoder_encode_array_end, -1);
-    rb_define_singleton_method(cEncoder, "encode_number", rb_yajl_encoder_encode_number, -1);
-    rb_define_singleton_method(cEncoder, "encode_string", rb_yajl_encoder_encode_string, -1);
-    rb_define_singleton_method(cEncoder, "encode_boolean", rb_yajl_encoder_encode_boolean, -1);
-    rb_define_singleton_method(cEncoder, "encode_null", rb_yajl_encoder_encode_null, -1);
+    rb_define_singleton_method(cEncoder, "enable_json_gem_compatability", rb_yajl_encoder_enable_json_gem_ext, 0);
     
     intern_io_read = rb_intern("read");
     intern_eof = rb_intern("eof?");

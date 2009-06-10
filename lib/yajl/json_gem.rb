@@ -1,6 +1,8 @@
 # encoding: UTF-8
 require 'yajl' unless defined?(Yajl::Parser)
 
+Yajl::Encoder.enable_json_gem_compatability
+
 module JSON
   def self.parse(str, opts={})
     Yajl::Parser.parse(str, :symbolize_keys => false)
@@ -28,79 +30,5 @@ module JSON
   
   def self.dump(obj, io=nil, *args)
     Yajl::Encoder.encode(obj, io)
-  end
-end
-
-class Object
-  def to_json(encoder=nil)
-    encoder = Yajl::Encoder.new if encoder.nil?
-    Yajl::Encoder.encode_string(encoder, self.to_s)
-  end
-end
-
-class Hash
-  def to_json(encoder=nil)
-    encoder = Yajl::Encoder.new if encoder.nil?
-    out = ''
-    out << Yajl::Encoder.encode_hash_start(encoder)
-    self.keys.map do |key|
-      out << Yajl::Encoder.encode_hash_key(encoder, key.to_s)
-      out << self[key].to_json(encoder)
-    end
-    out << Yajl::Encoder.encode_hash_end(encoder)
-    out
-  end
-end
-
-class Array
-  def to_json(encoder=nil)
-    encoder = Yajl::Encoder.new if encoder.nil?
-    out = ''
-    out << Yajl::Encoder.encode_array_start(encoder)
-    self.map{ |val| out << val.to_json(encoder) }
-    out << Yajl::Encoder.encode_array_end(encoder)
-    out
-  end
-end
-
-class Integer
-  def to_json(encoder=nil)
-    encoder = Yajl::Encoder.new if encoder.nil?
-    Yajl::Encoder.encode_number(encoder, self.to_s)
-  end
-end
-
-class Float
-  def to_json(encoder=nil)
-    encoder = Yajl::Encoder.new if encoder.nil?
-    Yajl::Encoder.encode_number(encoder, self.to_s)
-  end
-end
-
-class String
-  def to_json(encoder=nil)
-    encoder = Yajl::Encoder.new if encoder.nil?
-    Yajl::Encoder.encode_string(encoder, self)
-  end
-end
-
-class TrueClass
-  def to_json(encoder=nil)
-    encoder = Yajl::Encoder.new if encoder.nil?
-    Yajl::Encoder.encode_boolean(encoder, true)
-  end
-end
-
-class FalseClass
-  def to_json(encoder=nil)
-    encoder = Yajl::Encoder.new if encoder.nil?
-    Yajl::Encoder.encode_boolean(encoder, false)
-  end
-end
-
-class NilClass
-  def to_json(encoder=nil)
-    encoder = Yajl::Encoder.new if encoder.nil?
-    Yajl::Encoder.encode_null(encoder)
   end
 end
