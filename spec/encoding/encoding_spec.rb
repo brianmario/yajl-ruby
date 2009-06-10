@@ -56,9 +56,9 @@ describe "Yajl JSON encoder" do
   end
   
   it "should encode with :pretty turned on and a single space indent, to an IO" do
-    output = "{\n \"foo\": {\n  \"name\": \"bar\",\n  \"id\": 1234\n }\n}\n"
+    output = "{\n \"foo\": {\n  \"name\": \"bar\",\n  \"id\": 1234\n }\n}"
     if RUBY_VERSION.include?('1.9') # FIXME
-      output = "{\n \"foo\": {\n  \"id\": 1234,\n  \"name\": \"bar\"\n }\n}\n"
+      output = "{\n \"foo\": {\n  \"id\": 1234,\n  \"name\": \"bar\"\n }\n}"
     end
     obj = {:foo => {:id => 1234, :name => "bar"}}
     io = StringIO.new
@@ -69,9 +69,9 @@ describe "Yajl JSON encoder" do
   end
   
   it "should encode with :pretty turned on and a single space indent, and return a String" do
-    output = "{\n \"foo\": {\n  \"name\": \"bar\",\n  \"id\": 1234\n }\n}\n"
+    output = "{\n \"foo\": {\n  \"name\": \"bar\",\n  \"id\": 1234\n }\n}"
     if RUBY_VERSION.include?('1.9') # FIXME
-      output = "{\n \"foo\": {\n  \"id\": 1234,\n  \"name\": \"bar\"\n }\n}\n"
+      output = "{\n \"foo\": {\n  \"id\": 1234,\n  \"name\": \"bar\"\n }\n}"
     end
     obj = {:foo => {:id => 1234, :name => "bar"}}
     encoder = Yajl::Encoder.new(:pretty => true, :indent => ' ')
@@ -80,9 +80,9 @@ describe "Yajl JSON encoder" do
   end
   
   it "should encode with :pretty turned on and a tab character indent, to an IO" do
-    output = "{\n\t\"foo\": {\n\t\t\"name\": \"bar\",\n\t\t\"id\": 1234\n\t}\n}\n"
+    output = "{\n\t\"foo\": {\n\t\t\"name\": \"bar\",\n\t\t\"id\": 1234\n\t}\n}"
     if RUBY_VERSION.include?('1.9') # FIXME
-      output = "{\n\t\"foo\": {\n\t\t\"id\": 1234,\n\t\t\"name\": \"bar\"\n\t}\n}\n"
+      output = "{\n\t\"foo\": {\n\t\t\"id\": 1234,\n\t\t\"name\": \"bar\"\n\t}\n}"
     end
     obj = {:foo => {:id => 1234, :name => "bar"}}
     io = StringIO.new
@@ -93,9 +93,9 @@ describe "Yajl JSON encoder" do
   end
   
   it "should encode with :pretty turned on and a tab character indent, and return a String" do
-    output = "{\n\t\"foo\": {\n\t\t\"name\": \"bar\",\n\t\t\"id\": 1234\n\t}\n}\n"
+    output = "{\n\t\"foo\": {\n\t\t\"name\": \"bar\",\n\t\t\"id\": 1234\n\t}\n}"
     if RUBY_VERSION.include?('1.9') # FIXME
-      output = "{\n\t\"foo\": {\n\t\t\"id\": 1234,\n\t\t\"name\": \"bar\"\n\t}\n}\n"
+      output = "{\n\t\"foo\": {\n\t\t\"id\": 1234,\n\t\t\"name\": \"bar\"\n\t}\n}"
     end
     obj = {:foo => {:id => 1234, :name => "bar"}}
     encoder = Yajl::Encoder.new(:pretty => true, :indent => "\t")
@@ -104,9 +104,9 @@ describe "Yajl JSON encoder" do
   end
   
   it "should encode with it's class method with :pretty and a tab character indent options set, to an IO" do
-    output = "{\n\t\"foo\": {\n\t\t\"name\": \"bar\",\n\t\t\"id\": 1234\n\t}\n}\n"
+    output = "{\n\t\"foo\": {\n\t\t\"name\": \"bar\",\n\t\t\"id\": 1234\n\t}\n}"
     if RUBY_VERSION.include?('1.9') # FIXME
-      output = "{\n\t\"foo\": {\n\t\t\"id\": 1234,\n\t\t\"name\": \"bar\"\n\t}\n}\n"
+      output = "{\n\t\"foo\": {\n\t\t\"id\": 1234,\n\t\t\"name\": \"bar\"\n\t}\n}"
     end
     obj = {:foo => {:id => 1234, :name => "bar"}}
     io = StringIO.new
@@ -116,9 +116,9 @@ describe "Yajl JSON encoder" do
   end
   
   it "should encode with it's class method with :pretty and a tab character indent options set, and return a String" do
-    output = "{\n\t\"foo\": {\n\t\t\"name\": \"bar\",\n\t\t\"id\": 1234\n\t}\n}\n"
+    output = "{\n\t\"foo\": {\n\t\t\"name\": \"bar\",\n\t\t\"id\": 1234\n\t}\n}"
     if RUBY_VERSION.include?('1.9') # FIXME
-      output = "{\n\t\"foo\": {\n\t\t\"id\": 1234,\n\t\t\"name\": \"bar\"\n\t}\n}\n"
+      output = "{\n\t\"foo\": {\n\t\t\"id\": 1234,\n\t\t\"name\": \"bar\"\n\t}\n}"
     end
     obj = {:foo => {:id => 1234, :name => "bar"}}
     output = Yajl::Encoder.encode(obj, :pretty => true, :indent => "\t")
@@ -126,9 +126,9 @@ describe "Yajl JSON encoder" do
   end
   
   it "should encode with it's class method with :pretty and a tab character indent options set, to a block" do
-    output = "{\n\t\"foo\": {\n\t\t\"name\": \"bar\",\n\t\t\"id\": 1234\n\t}\n}\n"
+    output = "{\n\t\"foo\": {\n\t\t\"name\": \"bar\",\n\t\t\"id\": 1234\n\t}\n}"
     if RUBY_VERSION.include?('1.9') # FIXME
-      output = "{\n\t\"foo\": {\n\t\t\"id\": 1234,\n\t\t\"name\": \"bar\"\n\t}\n}\n"
+      output = "{\n\t\"foo\": {\n\t\t\"id\": 1234,\n\t\t\"name\": \"bar\"\n\t}\n}"
     end
     obj = {:foo => {:id => 1234, :name => "bar"}}
     output = ''
@@ -147,9 +147,9 @@ describe "Yajl JSON encoder" do
       encoder.encode(obj, io)
     end
     io.rewind
-    output = "{\"baz\":1234,\"foo\":\"bar\"}\n{\"baz\":1234,\"foo\":\"bar\"}\n{\"baz\":1234,\"foo\":\"bar\"}\n{\"baz\":1234,\"foo\":\"bar\"}\n{\"baz\":1234,\"foo\":\"bar\"}\n"
+    output = "{\"baz\":1234,\"foo\":\"bar\"}{\"baz\":1234,\"foo\":\"bar\"}{\"baz\":1234,\"foo\":\"bar\"}{\"baz\":1234,\"foo\":\"bar\"}{\"baz\":1234,\"foo\":\"bar\"}"
     if RUBY_VERSION.include?('1.9') # FIXME
-      output = "{\"foo\":\"bar\",\"baz\":1234}\n{\"foo\":\"bar\",\"baz\":1234}\n{\"foo\":\"bar\",\"baz\":1234}\n{\"foo\":\"bar\",\"baz\":1234}\n{\"foo\":\"bar\",\"baz\":1234}\n"
+      output = "{\"foo\":\"bar\",\"baz\":1234}{\"foo\":\"bar\",\"baz\":1234}{\"foo\":\"bar\",\"baz\":1234}{\"foo\":\"bar\",\"baz\":1234}{\"foo\":\"bar\",\"baz\":1234}"
     end
     io.read.should == output
   end
