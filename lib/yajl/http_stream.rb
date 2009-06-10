@@ -7,7 +7,7 @@ module Yajl
   # are streamed directly into Yajl.
   class HttpStream
     
-    # This Exception is thrown when an HTTP response isn't application/json
+    # This Exception is thrown when an HTTP response isn't in ALLOWED_MIME_TYPES
     # and therefore cannot be parsed.
     class InvalidContentType < Exception; end
     
