@@ -4,7 +4,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 class Dummy; end
 
 describe "JSON Gem compatability API" do
-  it "shoud not mixin #to_json on base objects until Yajl::Encoder.enable_json_gem_compatability has been called" do
+  it "shoud not mixin #to_json on base objects until compatability has been enabled" do
     d = Dummy.new
     
     d.respond_to?(:to_json).should_not be_true
@@ -18,7 +18,7 @@ describe "JSON Gem compatability API" do
     nil.respond_to?(:to_json).should_not be_true
   end
   
-  it "should mixin #to_json on base objects after Yajl::Encoder.enable_json_gem_compatability has been called" do
+  it "should mixin #to_json on base objects after compatability has been enabled" do
     Yajl::Encoder.enable_json_gem_compatability
     d = Dummy.new
     
