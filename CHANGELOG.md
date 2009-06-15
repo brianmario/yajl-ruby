@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.5.4 (?)
+* Yajl::Parser's :symbolize_keys option now defaults to false
+
 ## 0.5.3 (Jun 7th, 2009)
 * The IO parameter for Yajl::Encode#encode is now optional, and accepts a block
 ** it will return the resulting JSON string if no IO is passed to stream to

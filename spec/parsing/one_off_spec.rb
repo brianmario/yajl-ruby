@@ -6,7 +6,7 @@ describe "One-off JSON examples" do
     infinity = (1.0/0)
     silence_warnings do
       parser = Yajl::Parser.new
-      parser.parse(StringIO.new('{"key": 23456789012E666}')).should == {:key => infinity}
+      parser.parse(StringIO.new('{"key": 23456789012E666}')).should == {"key" => infinity}
     end
   end
   
@@ -36,16 +36,16 @@ describe "One-off JSON examples" do
   
   it "should parse using it's class method, from an IO" do
     io = StringIO.new('{"key": 1234}')
-    Yajl::Parser.parse(io).should == {:key => 1234}
+    Yajl::Parser.parse(io).should == {"key" => 1234}
   end
   
-  it "should parse using it's class method, from an IO with string keys" do
+  it "should parse using it's class method, from an IO with symbolized keys" do
     parser = Yajl::Parser.new(:symbolize_keys => true)
     parser.parse('{"key": 1234}').should == {:key => 1234}
   end
   
   it "should parse using it's class method, from a string" do
-    Yajl::Parser.parse('{"key": 1234}').should == {:key => 1234}
+    Yajl::Parser.parse('{"key": 1234}').should == {"key" => 1234}
   end
   
   it "should parse using it's class method, from a string with a block" do
@@ -53,6 +53,6 @@ describe "One-off JSON examples" do
     Yajl::Parser.parse('{"key": 1234}') do |obj|
       output = obj
     end
-    output.should == {:key => 1234}
+    output.should == {"key" => 1234}
   end
 end

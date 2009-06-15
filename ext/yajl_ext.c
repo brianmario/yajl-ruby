@@ -252,9 +252,9 @@ static int yajl_found_end_array(void * ctx) {
 /*
  * Document-method: new
  *
- * call-seq: new([:symbolize_keys => false, [:allow_comments => false[, :check_utf8 => false]]])
+ * call-seq: new([:symbolize_keys => true, [:allow_comments => false[, :check_utf8 => false]]])
  *
- * :symbolize_keys will turn hash keys into Ruby symbols, defaults to true.
+ * :symbolize_keys will turn hash keys into Ruby symbols, defaults to false.
  *
  * :allow_comments will turn on/off the check for comments inside the JSON stream, defaults to true.
  *
@@ -264,7 +264,7 @@ static VALUE rb_yajl_parser_new(int argc, VALUE * argv, VALUE klass) {
     struct yajl_parser_wrapper * wrapper;
     yajl_parser_config cfg;
     VALUE opts, obj;
-    int allowComments = 1, checkUTF8 = 1, symbolizeKeys = 1;
+    int allowComments = 1, checkUTF8 = 1, symbolizeKeys = 0;
     
     // Scan off config vars
     if (rb_scan_args(argc, argv, "01", &opts) == 1) {
@@ -276,8 +276,8 @@ static VALUE rb_yajl_parser_new(int argc, VALUE * argv, VALUE klass) {
         if (rb_hash_aref(opts, ID2SYM(sym_check_utf8)) == Qfalse) {
             checkUTF8 = 0;
         }
-        if (rb_hash_aref(opts, ID2SYM(sym_symbolize_keys)) == Qfalse) {
-            symbolizeKeys = 0;
+        if (rb_hash_aref(opts, ID2SYM(sym_symbolize_keys)) == Qtrue) {
+            symbolizeKeys = 1;
         }
     }
     cfg = (yajl_parser_config){allowComments, checkUTF8};
@@ -297,9 +297,9 @@ static VALUE rb_yajl_parser_new(int argc, VALUE * argv, VALUE klass) {
 /*
  * Document-method: initialize
  *
- * call-seq: new([:symbolize_keys => false, [:allow_comments => false[, :check_utf8 => false]]])
+ * call-seq: new([:symbolize_keys => true, [:allow_comments => false[, :check_utf8 => false]]])
  *
- * :symbolize_keys will turn hash keys into Ruby symbols, defaults to true.
+ * :symbolize_keys will turn hash keys into Ruby symbols, defaults to false.
  *
  * :allow_comments will turn on/off the check for comments inside the JSON stream, defaults to true.
  *

@@ -4,7 +4,7 @@ require 'stringio'
 
 describe "Chunked parser" do
   before(:all) do
-    @final = [{:abc => 123}, {:def => 456}]
+    @final = [{"abc" => 123}, {"def" => 456}]
   end
   
   before(:each) do
