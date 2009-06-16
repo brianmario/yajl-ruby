@@ -166,9 +166,7 @@ static int yajl_found_number(void * ctx, const char * numberVal, unsigned int nu
     VALUE subString = rb_str_new(numberVal, numberLen);
     char * cSubString = RSTRING_PTR(subString);
     
-    if (strstr(cSubString, ".") != NULL ||
-        strstr(cSubString, "e") != NULL ||
-        strstr(cSubString, "E") != NULL) {
+    if (strstr(cSubString, ".") != NULL || strstr(cSubString, "e") != NULL || strstr(cSubString, "E") != NULL) {
             yajl_set_static_value(ctx, rb_Float(subString));
     } else {
         yajl_set_static_value(ctx, rb_Integer(subString));
@@ -186,15 +184,13 @@ static int yajl_found_string(void * ctx, const unsigned char * stringVal, unsign
 static int yajl_found_hash_key(void * ctx, const unsigned char * stringVal, unsigned int stringLen) {
     struct yajl_parser_wrapper * wrapper;
     GetParser((VALUE)ctx, wrapper);
+    VALUE keyStr = rb_str_new((const char *)stringVal, stringLen);
     
     if (wrapper->symbolizeKeys) {
-        char keyStr[stringLen];
-        ID key;
-        sprintf(keyStr, "%.*s", stringLen, stringVal);
-        key = rb_intern(keyStr);
+        ID key = rb_intern(RSTRING_PTR(keyStr));
         yajl_set_static_value(ctx, ID2SYM(key));
     } else {
-        yajl_set_static_value(ctx, rb_str_new((const char *)stringVal, stringLen));
+        yajl_set_static_value(ctx, keyStr);
     }
     yajl_check_and_fire_callback(ctx);
     return 1;
