@@ -62,13 +62,14 @@ inline void yajl_set_static_value(void * ctx, VALUE val) {
 
 void yajl_encode_part(yajl_gen hand, VALUE obj, VALUE io) {
     VALUE str, outBuff, otherObj;
+    yajl_gen_status status;
     int objLen;
     int idx = 0;
     const unsigned char * buffer;
     unsigned int len;
     
     if (io != Qnil) {
-        yajl_gen_get_buf(hand, &buffer, &len);
+        status = yajl_gen_get_buf(hand, &buffer, &len);
         if (len >= WRITE_BUFSIZE) {
             outBuff = rb_str_new((const char *)buffer, len);
             rb_io_write(io, outBuff);
@@ -78,49 +79,50 @@ void yajl_encode_part(yajl_gen hand, VALUE obj, VALUE io) {
     
     switch (TYPE(obj)) {
         case T_HASH:
-            yajl_gen_map_open(hand);
+            status = yajl_gen_map_open(hand);
             
             // TODO: itterate through keys in the hash
             VALUE keys = rb_funcall(obj, intern_keys, 0);
-            VALUE entry;
+            VALUE entry, keyStr;
             for(idx=0; idx<RARRAY_LEN(keys); idx++) {
                 entry = rb_ary_entry(keys, idx);
+                keyStr = rb_funcall(entry, intern_to_s, 0); // key must be a string
                 // the key
-                yajl_encode_part(hand, entry, io);
+                yajl_encode_part(hand, keyStr, io);
                 // the value
                 yajl_encode_part(hand, rb_hash_aref(obj, entry), io);
             }
             
-            yajl_gen_map_close(hand);
+            status = yajl_gen_map_close(hand);
             break;
         case T_ARRAY:
-            yajl_gen_array_open(hand);
+            status = yajl_gen_array_open(hand);
             for(idx=0; idx<RARRAY_LEN(obj); idx++) {
                 otherObj = rb_ary_entry(obj, idx);
                 yajl_encode_part(hand, otherObj, io);
             }
-            yajl_gen_array_close(hand);
+            status = yajl_gen_array_close(hand);
             break;
         case T_NIL:
-            yajl_gen_null(hand);
+            status = yajl_gen_null(hand);
             break;
         case T_TRUE:
-            yajl_gen_bool(hand, 1);
+            status = yajl_gen_bool(hand, 1);
             break;
         case T_FALSE:
-            yajl_gen_bool(hand, 0);
+            status = yajl_gen_bool(hand, 0);
             break;
         case T_FIXNUM:
         case T_FLOAT:
         case T_BIGNUM:
             str = rb_funcall(obj, intern_to_s, 0);
             objLen = RSTRING_LEN(str);
-            yajl_gen_number(hand, RSTRING_PTR(str), (unsigned int)objLen);
+            status = yajl_gen_number(hand, RSTRING_PTR(str), (unsigned int)objLen);
             break;
         default:
             str = rb_funcall(obj, intern_to_s, 0);
             objLen = RSTRING_LEN(str);
-            yajl_gen_string(hand, (const unsigned char *)RSTRING_PTR(str), (unsigned int)objLen);
+            status = yajl_gen_string(hand, (const unsigned char *)RSTRING_PTR(str), (unsigned int)objLen);
             break;
     }
 }
