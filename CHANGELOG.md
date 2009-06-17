@@ -1,9 +1,10 @@
 # Changelog
 
-## 0.5.4 (?)
+## 0.5.4 (June 16th, 2009)
 * Yajl::Parser's :symbolize_keys option now defaults to false
+* remove use of sprintf for a little speed improvement while parsing
 
-## 0.5.3 (Jun 7th, 2009)
+## 0.5.3 (June 7th, 2009)
 * The IO parameter for Yajl::Encode#encode is now optional, and accepts a block
 ** it will return the resulting JSON string if no IO is passed to stream to
 ** if a block is passed, it will call and pass it the resulting JSON string
