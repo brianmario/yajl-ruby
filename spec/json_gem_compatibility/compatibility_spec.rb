@@ -83,22 +83,25 @@ describe "JSON Gem compatability API" do
         'c' => 'c',
         'd' => [ 1, "b", 3.14 ],
         'e' => { 'foo' => 'bar' },
-        'g' => "\"\037",
+        'g' => "blah",
         'h' => 1000.0,
         'i' => 0.001
       }
       
-      @json2 = '{"a":2,"b":3.141,"c":"c","d":[1,"b",3.14],"e":{"foo":"bar"},"g":"\\"\\u001f","h":1000.0,"i":0.001}'
+      @json2 = '{"a":2,"b":3.141,"c":"c","d":[1,"b",3.14],"e":{"foo":"bar"},"g":"blah","h":1000.0,"i":0.001}'
       
-      @json3 = '{
+      @json3 = %{
+        {
           "a": 2,
           "b": 3.141,
           "c": "c",
           "d": [1, "b", 3.14],
           "e": {"foo": "bar"},
-          "g": "\"\u001f",
+          "g": "blah",
           "h": 1000.0,
-          "i": 0.001}'
+          "i": 0.001
+        }
+      }.chomp
     end
     
     it "should be able to unparse" do
@@ -108,6 +111,18 @@ describe "JSON Gem compatability API" do
       @hash.should == parsed_json
       json = JSON.generate({1=>2})
       '{"1":2}'.should eql(json)
+      parsed_json = JSON.parse(json)
+      {"1"=>2}.should == parsed_json
+    end
+    
+    it "should be able to unparse pretty" do
+      json = JSON.pretty_generate(@hash)
+      JSON.parse(@json3).should == JSON.parse(json)
+      parsed_json = JSON.parse(json)
+      @hash.should == parsed_json
+      json = JSON.pretty_generate({1=>2})
+      test = "{\n  \"1\": 2\n}".chomp
+      test.should == json
       parsed_json = JSON.parse(json)
       {"1"=>2}.should == parsed_json
     end
