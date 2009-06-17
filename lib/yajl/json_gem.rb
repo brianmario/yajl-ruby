@@ -11,12 +11,11 @@ module JSON
   
   def self.parse(str, opts={})
     begin
-      Yajl::Parser.parse(str, :symbolize_keys => false)
+      Yajl::Parser.parse(str, opts)
     rescue Yajl::ParseError => e
       raise JSON::ParserError, e.message
     end
   end
-  alias :parse! :parse
   
   def self.generate(obj, opts={})
     begin
@@ -30,7 +29,6 @@ module JSON
       raise JSON::ParserError, e.message
     end
   end
-  alias :unparse :generate
   
   def self.pretty_generate(obj, opts={})
     begin
@@ -42,7 +40,6 @@ module JSON
       raise JSON::ParserError, e.message
     end
   end
-  alias :pretty_unparse :pretty_generate
   
   def self.load(input, *args)
     begin
