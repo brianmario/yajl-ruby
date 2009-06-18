@@ -6,7 +6,9 @@ require 'json'
 
 # JSON section
 filename = 'benchmark/subjects/contacts.json'
+marshal_filename = 'benchmark/subjects/contacts.marshal_dump'
 json = File.new(filename, 'r')
+marshal_file = File.new(marshal_filename, 'r')
 
 # warm up the filesystem
 json.read
@@ -32,12 +34,12 @@ Benchmark.bm { |x|
       JSON.parse(json.read, :max_nesting => false)
     }
   }
-  data = Marshal.dump(hash)
   x.report {
     puts "Marshal.load"
     times.times {
-      Marshal.load(data)
+      Marshal.load(marshal_file)
     }
   }
 }
 json.close
+marshal_file.close
