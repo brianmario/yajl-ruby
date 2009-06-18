@@ -5,12 +5,12 @@ require 'yajl_ext'
 require 'stringio'
 require 'json'
 
-filename = ARGV[0] || 'benchmark/subjects/contacts.json'
+times = ARGV[0] ? ARGV[0].to_i : 1
+filename = 'benchmark/subjects/contacts.json'
 json = File.new(filename, 'r')
 hash = Yajl::Parser.new.parse(json)
 json.close
 
-times = ARGV[1] ? ARGV[1].to_i : 1
 puts "Starting benchmark encoding #{filename} #{times} times\n\n"
 Benchmark.bm { |x|
   encoder = Yajl::Encoder.new

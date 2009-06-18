@@ -4,6 +4,19 @@ This gem (although not in gem form just yet) is a C binding to the excellent YAJ
 
 You can read more info at the projects website http://lloydforge.org/projects/yajl or check out it's codes at http://github.com/lloyd/yajl.
 
+== Features
+
+* JSON parsing and encoding directly to and from an IO stream (file, socket, etc) or String. Compressed stream parsing and encoding supported for Bzip2, Gzip and Deflate.
+* Parse and encode *multiple* JSON objects to and from streams or strings continuously.
+* JSON gem compatibility API - allows yajl-ruby to be used as a drop-in replacement for the JSON gem
+* Basic HTTP client (only GET requests supported for now) which parses JSON directly off the response body *as it's being received*
+* ~3.5x faster than JSON.generate
+* ~1.9x faster than JSON.parse
+* ~4.5x faster than YAML.load
+* ~377.5x faster than YAML.dump
+* ~1.5x faster than Marshal.load
+* ~2x faster than Marshal.dump
+
 == How to install
 
 Install it like any other gem hosted at the Githubs like so:
@@ -114,7 +127,7 @@ This allows you to encode JSON as a stream, writing directly to a socket
  socket = TCPSocket.new(192.168.1.101, 9000)
  hash = {:foo => 12425125, :bar => "some string", ... }
  encoder = Yajl::Encoder.new
- Yajl::encoder.encode(hash, socket)
+ Yajl::Encoder.encode(hash, socket)
 
 Or what if you wanted to compress the stream over the wire?
 
@@ -135,7 +148,24 @@ This example will encode and send 50 JSON objects over the same stream, continuo
 
 You can also use Yajl::Bzip2::StreamWriter and Yajl::Deflate::StreamWriter. So you can pick whichever fits your CPU/bandwidth sweet-spot.
 
-There are a lot more possibilities, some of which I'm going to write other gems/plugins for.
+== JSON gem Compatibility API
+
+The JSON gem compatibility API isn't enabled by default. You have to explicitly require it like so:
+
+ require 'yajl/json_gem'
+
+That's right, you can just replace "require 'json'" with the line above and you're done!
+
+This will require yajl-ruby itself, as well as enable it's JSON gem compatibility API.
+
+This includes the following API:
+
+ JSON.parse, JSON.generate, JSON.pretty_generate, JSON.load, JSON.dump
+ and all of the #to_json instance method overrides for Ruby's primitive objects
+
+Once the compatibility API is enabled, you're existing or new project should work as if the JSON gem itself were being used. Only you'll be using Yajl ;)
+
+There are a lot more possibilities that I'd love to see other gems/plugins for someday.
 
 Some ideas are:
 * parsing logs in JSON format
@@ -192,13 +222,29 @@ NOTE: I converted the 2.4MB JSON file to YAML for this test.
 
 * Yajl::Parser#parse: 4.33s
 * JSON.parse: 5.37s
-* YAML.load_stream: 19.47s
+* YAML.load: 19.47s
 
 ==== Encode Time (to their respective formats)
 
 * Yajl::Encoder#encode: 3.47s
 * JSON#to_json: 6.6s
 * YAML.dump(obj, io): 1309.93s
+
+=== Compared to Marshal.load/Marshal.dump
+
+NOTE: I converted the 2.4MB JSON file to a Hash and a dump file from Marshal.dump for this test.
+
+==== Parse Time (from their respective formats)
+
+* Yajl::Parser#parse: 4.54s
+* JSON.parse: 7.40s
+* Marshal.load: 7s
+
+==== Encode Time (to their respective formats)
+
+* Yajl::Encoder#encode: 2.39s
+* JSON#to_json: 8.37s
+* Marshal.dump: 4.66s
 
 == Third Party Sources Bundled
 

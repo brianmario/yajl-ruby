@@ -21,12 +21,11 @@ hash = {}
 times = ARGV[0] ? ARGV[0].to_i : 1
 puts "Starting benchmark parsing #{File.size(filename)} bytes of JSON data #{times} times\n\n"
 Benchmark.bm { |x|
-  parser = Yajl::Parser.new
   x.report {
     puts "Yajl::Parser#parse"
     times.times {
       json.rewind
-      hash = parser.parse(json)
+      hash = Yajl::Parser.new.parse(json)
     }
   }
   x.report {
@@ -39,6 +38,7 @@ Benchmark.bm { |x|
   x.report {
     puts "Marshal.load"
     times.times {
+      marshal_file.rewind
       Marshal.load(marshal_file)
     }
   }

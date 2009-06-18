@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.5.5 (June 17th, 2009)
+* Introduction of the JSON gem API compatibility layer
+** NOTE: this isn't a 1:1 compatibility API, the goal was to be compatible with as many of the projects using the JSON gem as possible - not the JSON gem API itself
+** the compatibility API must be explicitly enabled by requiring 'yajl/json_gem' in your project
+** JSON.parse, JSON.generate, and the #to_json instance method extension to ruby's primitive classes are all included
+* Fix Yajl::Encoder to ensure map keys are strings
+* Encoding multiple JSON objects to a single stream doesn't separate by a newline character anymore
+* Yajl::Encoder now checks for the existence of, and will call #to_json on any non-primitive object
+
 ## 0.5.4 (June 16th, 2009)
 * Yajl::Parser's :symbolize_keys option now defaults to false
 * remove use of sprintf for a little speed improvement while parsing

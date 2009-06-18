@@ -13,7 +13,7 @@ require 'yajl_ext'
 #
 # Ruby bindings to the excellent Yajl (Yet Another JSON Parser) ANSI C library.
 module Yajl
-  VERSION = "0.5.4"
+  VERSION = "0.5.5"
   
   class Parser
     # A helper method for parse-and-forget use-cases

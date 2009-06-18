@@ -523,6 +523,19 @@ static VALUE rb_yajl_encoder_encode(int argc, VALUE * argv, VALUE self) {
 
 
 // JSON Gem compatibility
+
+/*
+ * Document-class: Object
+ */
+/*
+ * Document-method: to_json
+ *
+ * call-seq: to_json(encoder=Yajl::Encoder.new)
+ *
+ * +encoder+ is an existing Yajl::Encoder used to encode JSON
+ *
+ * Encodes an instance of Object to JSON
+ */
 static VALUE rb_yajl_json_ext_object_to_json(int argc, VALUE * argv, VALUE self) {
     VALUE rb_encoder;
     rb_scan_args(argc, argv, "01", &rb_encoder);
@@ -532,6 +545,18 @@ static VALUE rb_yajl_json_ext_object_to_json(int argc, VALUE * argv, VALUE self)
     return rb_yajl_encoder_encode(1, &self, rb_encoder);
 }
 
+/*
+ * Document-class: Hash
+ */
+/*
+ * Document-method: to_json
+ *
+ * call-seq: to_json(encoder=Yajl::Encoder.new)
+ *
+ * +encoder+ is an existing Yajl::Encoder used to encode JSON
+ *
+ * Encodes an instance of Hash to JSON
+ */
 static VALUE rb_yajl_json_ext_hash_to_json(int argc, VALUE * argv, VALUE self) {
     VALUE rb_encoder;
     rb_scan_args(argc, argv, "01", &rb_encoder);
@@ -541,6 +566,18 @@ static VALUE rb_yajl_json_ext_hash_to_json(int argc, VALUE * argv, VALUE self) {
     return rb_yajl_encoder_encode(1, &self, rb_encoder);
 }
 
+/*
+ * Document-class: Array
+ */
+/*
+ * Document-method: to_json
+ *
+ * call-seq: to_json(encoder=Yajl::Encoder.new)
+ *
+ * +encoder+ is an existing Yajl::Encoder used to encode JSON
+ *
+ * Encodes an instance of Array to JSON
+ */
 static VALUE rb_yajl_json_ext_array_to_json(int argc, VALUE * argv, VALUE self) {
     VALUE rb_encoder;
     rb_scan_args(argc, argv, "01", &rb_encoder);
@@ -550,6 +587,18 @@ static VALUE rb_yajl_json_ext_array_to_json(int argc, VALUE * argv, VALUE self) 
     return rb_yajl_encoder_encode(1, &self, rb_encoder);
 }
 
+/*
+ * Document-class: Fixnum
+ */
+/*
+ * Document-method: to_json
+ *
+ * call-seq: to_json(encoder=Yajl::Encoder.new)
+ *
+ * +encoder+ is an existing Yajl::Encoder used to encode JSON
+ *
+ * Encodes an instance of Fixnum to JSON
+ */
 static VALUE rb_yajl_json_ext_fixnum_to_json(int argc, VALUE * argv, VALUE self) {
     VALUE rb_encoder;
     rb_scan_args(argc, argv, "01", &rb_encoder);
@@ -559,6 +608,18 @@ static VALUE rb_yajl_json_ext_fixnum_to_json(int argc, VALUE * argv, VALUE self)
     return rb_yajl_encoder_encode(1, &self, rb_encoder);
 }
 
+/*
+ * Document-class: Float
+ */
+/*
+ * Document-method: to_json
+ *
+ * call-seq: to_json(encoder=Yajl::Encoder.new)
+ *
+ * +encoder+ is an existing Yajl::Encoder used to encode JSON
+ *
+ * Encodes an instance of Float to JSON
+ */
 static VALUE rb_yajl_json_ext_float_to_json(int argc, VALUE * argv, VALUE self) {
     VALUE rb_encoder;
     rb_scan_args(argc, argv, "01", &rb_encoder);
@@ -568,6 +629,18 @@ static VALUE rb_yajl_json_ext_float_to_json(int argc, VALUE * argv, VALUE self) 
     return rb_yajl_encoder_encode(1, &self, rb_encoder);
 }
 
+/*
+ * Document-class: String
+ */
+/*
+ * Document-method: to_json
+ *
+ * call-seq: to_json(encoder=Yajl::Encoder.new)
+ *
+ * +encoder+ is an existing Yajl::Encoder used to encode JSON
+ *
+ * Encodes an instance of TrueClass to JSON
+ */
 static VALUE rb_yajl_json_ext_string_to_json(int argc, VALUE * argv, VALUE self) {
     VALUE rb_encoder;
     rb_scan_args(argc, argv, "01", &rb_encoder);
@@ -577,6 +650,18 @@ static VALUE rb_yajl_json_ext_string_to_json(int argc, VALUE * argv, VALUE self)
     return rb_yajl_encoder_encode(1, &self, rb_encoder);
 }
 
+/*
+ * Document-class: TrueClass
+ */
+/*
+ * Document-method: to_json
+ *
+ * call-seq: to_json(encoder=Yajl::Encoder.new)
+ *
+ * +encoder+ is an existing Yajl::Encoder used to encode JSON
+ *
+ * Encodes an instance of TrueClass to JSON
+ */
 static VALUE rb_yajl_json_ext_true_to_json(int argc, VALUE * argv, VALUE self) {
     VALUE rb_encoder;
     rb_scan_args(argc, argv, "01", &rb_encoder);
@@ -586,6 +671,18 @@ static VALUE rb_yajl_json_ext_true_to_json(int argc, VALUE * argv, VALUE self) {
     return rb_yajl_encoder_encode(1, &self, rb_encoder);
 }
 
+/*
+ * Document-class: FalseClass
+ */
+/*
+ * Document-method: to_json
+ *
+ * call-seq: to_json(encoder=Yajl::Encoder.new)
+ *
+ * +encoder+ is an existing Yajl::Encoder used to encode JSON
+ *
+ * Encodes an instance of FalseClass to JSON
+ */
 static VALUE rb_yajl_json_ext_false_to_json(int argc, VALUE * argv, VALUE self) {
     VALUE rb_encoder;
     rb_scan_args(argc, argv, "01", &rb_encoder);
@@ -595,6 +692,18 @@ static VALUE rb_yajl_json_ext_false_to_json(int argc, VALUE * argv, VALUE self) 
     return rb_yajl_encoder_encode(1, &self, rb_encoder);
 }
 
+/*
+ * Document-class: NilClass
+ */
+/*
+ * Document-method: to_json
+ *
+ * call-seq: to_json(encoder=Yajl::Encoder.new)
+ *
+ * +encoder+ is an existing Yajl::Encoder used to encode JSON
+ *
+ * Encodes an instance of NilClass to JSON
+ */
 static VALUE rb_yajl_json_ext_nil_to_json(int argc, VALUE * argv, VALUE self) {
     VALUE rb_encoder;
     rb_scan_args(argc, argv, "01", &rb_encoder);
@@ -604,6 +713,16 @@ static VALUE rb_yajl_json_ext_nil_to_json(int argc, VALUE * argv, VALUE self) {
     return rb_yajl_encoder_encode(1, &self, rb_encoder);
 }
 
+/*
+ * Document-class: Yajl::Encoder
+ */
+/*
+ * Document-method: enable_json_gem_compatability
+ *
+ * call-seq: enable_json_gem_compatability
+ *
+ * Enables the JSON gem compatibility API
+ */
 static VALUE rb_yajl_encoder_enable_json_gem_ext(VALUE klass) {
     rb_define_method(rb_cObject, "to_json", rb_yajl_json_ext_object_to_json, -1);
     rb_define_method(rb_cHash, "to_json", rb_yajl_json_ext_hash_to_json, -1);

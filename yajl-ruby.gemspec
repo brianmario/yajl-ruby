@@ -2,11 +2,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{yajl-ruby}
-  s.version = "0.5.4"
+  s.version = "0.5.5"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Brian Lopez", "Lloyd Hilaiel"]
-  s.date = %q{2009-06-16}
+  s.date = %q{2009-06-18}
   s.email = %q{seniorlopez@gmail.com}
   s.extensions = ["ext/extconf.rb"]
   s.extra_rdoc_files = [
@@ -28,6 +28,7 @@ Gem::Specification.new do |s|
      "benchmark/parse_json_and_yaml.rb",
      "benchmark/parse_stream.rb",
      "benchmark/subjects/contacts.json",
+     "benchmark/subjects/contacts.marshal_dump",
      "benchmark/subjects/contacts.yml",
      "benchmark/subjects/item.json",
      "benchmark/subjects/ohai.json",
@@ -69,12 +70,14 @@ Gem::Specification.new do |s|
      "lib/yajl/gzip/stream_reader.rb",
      "lib/yajl/gzip/stream_writer.rb",
      "lib/yajl/http_stream.rb",
+     "lib/yajl/json_gem.rb",
      "spec/encoding/encoding_spec.rb",
      "spec/http/fixtures/http.bzip2.dump",
      "spec/http/fixtures/http.deflate.dump",
      "spec/http/fixtures/http.gzip.dump",
      "spec/http/fixtures/http.raw.dump",
      "spec/http/http_spec.rb",
+     "spec/json_gem_compatibility/compatibility_spec.rb",
      "spec/parsing/active_support_spec.rb",
      "spec/parsing/chunked_spec.rb",
      "spec/parsing/fixtures/fail.15.json",
@@ -147,6 +150,7 @@ Gem::Specification.new do |s|
   s.test_files = [
     "spec/encoding/encoding_spec.rb",
      "spec/http/http_spec.rb",
+     "spec/json_gem_compatibility/compatibility_spec.rb",
      "spec/parsing/active_support_spec.rb",
      "spec/parsing/chunked_spec.rb",
      "spec/parsing/fixtures_spec.rb",
