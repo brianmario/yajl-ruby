@@ -168,4 +168,8 @@ describe "Yajl JSON encoder" do
     end
     json_output.should == output
   end
+  
+  it "should encode all map keys as strings" do
+    Yajl::Encoder.encode({1=>1}).should eql("{\"1\":1}\n")
+  end
 end
