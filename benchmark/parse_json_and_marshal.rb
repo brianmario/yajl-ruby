@@ -13,6 +13,8 @@ marshal_file = File.new(marshal_filename, 'r')
 # warm up the filesystem
 json.read
 json.rewind
+marshal_file.read
+marshal_file.rewind
 
 hash = {}
 
