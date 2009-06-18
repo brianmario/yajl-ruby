@@ -170,6 +170,6 @@ describe "Yajl JSON encoder" do
   end
   
   it "should encode all map keys as strings" do
-    Yajl::Encoder.encode({1=>1}).should eql("{\"1\":1}\n")
+    Yajl::Encoder.encode({1=>1}).should eql("{\"1\":1}")
   end
 end
