@@ -63,7 +63,6 @@ inline void yajl_set_static_value(void * ctx, VALUE val) {
 void yajl_encode_part(yajl_gen hand, VALUE obj, VALUE io) {
     VALUE str, outBuff, otherObj;
     yajl_gen_status status;
-    int objLen;
     int idx = 0;
     const unsigned char * buffer;
     unsigned int len;
@@ -116,13 +115,18 @@ void yajl_encode_part(yajl_gen hand, VALUE obj, VALUE io) {
         case T_FLOAT:
         case T_BIGNUM:
             str = rb_funcall(obj, intern_to_s, 0);
-            objLen = RSTRING_LEN(str);
-            status = yajl_gen_number(hand, RSTRING_PTR(str), (unsigned int)objLen);
+            status = yajl_gen_number(hand, RSTRING_PTR(str), (unsigned int)RSTRING_LEN(str));
+            break;
+        case T_STRING:
+            status = yajl_gen_string(hand, (const unsigned char *)RSTRING_PTR(obj), (unsigned int)RSTRING_LEN(obj));
             break;
         default:
-            str = rb_funcall(obj, intern_to_s, 0);
-            objLen = RSTRING_LEN(str);
-            status = yajl_gen_string(hand, (const unsigned char *)RSTRING_PTR(str), (unsigned int)objLen);
+            if (rb_respond_to(obj, intern_to_json)) {
+                str = rb_funcall(obj, intern_to_json, 0);
+            } else {
+                str = rb_funcall(obj, intern_to_s, 0);
+            }
+            status = yajl_gen_string(hand, (const unsigned char *)RSTRING_PTR(str), (unsigned int)RSTRING_LEN(str));
             break;
     }
 }
@@ -641,6 +645,8 @@ void Init_yajl_ext() {
     intern_call = rb_intern("call");
     intern_keys = rb_intern("keys");
     intern_to_s = rb_intern("to_s");
+    intern_to_json = rb_intern("to_json");
+    
     sym_allow_comments = rb_intern("allow_comments");
     sym_check_utf8 = rb_intern("check_utf8");
     sym_pretty = rb_intern("pretty");
