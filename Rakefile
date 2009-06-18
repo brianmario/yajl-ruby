@@ -12,7 +12,7 @@ begin
     gem.files = `git ls-files`.split("\n")
     gem.extensions = ["ext/extconf.rb"]
     gem.files.include %w(lib/jeweler/templates/.document lib/jeweler/templates/.gitignore)
-    # gem.rubyforge_project = "yajl-ruby"
+    gem.rubyforge_project = "yajl-ruby"
   end
 rescue LoadError
   puts "Jeweler, or one of its dependencies, is not available. Install it with: sudo gem install technicalpickles-jeweler -s http://gems.github.com"

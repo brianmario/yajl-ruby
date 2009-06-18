@@ -145,6 +145,7 @@ Gem::Specification.new do |s|
   s.homepage = %q{http://github.com/brianmario/yajl-ruby}
   s.rdoc_options = ["--charset=UTF-8"]
   s.require_paths = ["lib", "ext"]
+  s.rubyforge_project = %q{yajl-ruby}
   s.rubygems_version = %q{1.3.4}
   s.summary = %q{Ruby C bindings to the excellent Yajl JSON stream-based parser library.}
   s.test_files = [
