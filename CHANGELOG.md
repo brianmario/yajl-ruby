@@ -1,7 +1,14 @@
 # Changelog
 
+## 0.5.6 (June 19th, 2009)
+* Added JSON.default_options hash to the JSON gem compatibility API
+* Split out the JSON gem compatibility API's parsing and encoding methods into individually includable files
+** the use case here is if you *only* want parsing, or *only* want encoding
+** also, if you don't include encoding it won't include the #to_json overrides which tend to cause problems in some environments.
+* Removed some large benchmark test files to reduce the size of the packaged gem by 1.5MB!
+
 ## 0.5.5 (June 17th, 2009)
-* Introduction of the JSON gem API compatibility layer
+* Introduction of the JSON gem compatibility API
 ** NOTE: this isn't a 1:1 compatibility API, the goal was to be compatible with as many of the projects using the JSON gem as possible - not the JSON gem API itself
 ** the compatibility API must be explicitly enabled by requiring 'yajl/json_gem' in your project
 ** JSON.parse, JSON.generate, and the #to_json instance method extension to ruby's primitive classes are all included
