@@ -18,7 +18,7 @@ module JSON
   
   def self.load(input, *args)
     begin
-      Yajl::Parser.parse(input)
+      Yajl::Parser.parse(input, default_options)
     rescue Yajl::ParseError => e
       raise JSON::ParserError, e.message
     end
