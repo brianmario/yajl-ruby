@@ -6,7 +6,7 @@ require 'stringio'
 require 'json'
 
 times = ARGV[0] ? ARGV[0].to_i : 1
-filename = 'benchmark/subjects/contacts.json'
+filename = 'benchmark/subjects/ohai.json'
 json = File.new(filename, 'r')
 hash = Yajl::Parser.new.parse(json)
 json.close

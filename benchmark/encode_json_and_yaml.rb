@@ -6,7 +6,7 @@ require 'json'
 require 'yaml'
 
 # JSON Section
-filename = 'benchmark/subjects/contacts.json'
+filename = 'benchmark/subjects/ohai.json'
 json = File.new(filename, 'r')
 hash = Yajl::Parser.new.parse(json)
 json.close

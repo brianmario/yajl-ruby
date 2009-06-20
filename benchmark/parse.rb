@@ -5,7 +5,7 @@ require 'yajl_ext'
 require 'json'
 require 'activesupport'
 
-filename = ARGV[0] || 'benchmark/subjects/contacts.json'
+filename = ARGV[0] || 'benchmark/subjects/ohai.json'
 json = File.new(filename, 'r')
 
 # warm up the filesystem

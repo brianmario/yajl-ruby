@@ -6,7 +6,7 @@ require 'json'
 require 'yaml'
 
 # JSON section
-filename = 'benchmark/subjects/contacts.json'
+filename = 'benchmark/subjects/ohai.json'
 json = File.new(filename, 'r')
 
 # warm up the filesystem

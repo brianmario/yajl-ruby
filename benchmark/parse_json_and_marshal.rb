@@ -5,8 +5,8 @@ require 'yajl_ext'
 require 'json'
 
 # JSON section
-filename = 'benchmark/subjects/contacts.json'
-marshal_filename = 'benchmark/subjects/contacts.marshal_dump'
+filename = 'benchmark/subjects/ohai.json'
+marshal_filename = 'benchmark/subjects/ohai.marshal_dump'
 json = File.new(filename, 'r')
 marshal_file = File.new(marshal_filename, 'r')
 

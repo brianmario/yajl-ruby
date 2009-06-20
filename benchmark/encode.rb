@@ -7,7 +7,7 @@ require 'json'
 # Can't use ActiveSuport::JSON.encode with the JSON gem loaded
 # require 'activesupport'
 
-filename = ARGV[0] || 'benchmark/subjects/contacts.json'
+filename = ARGV[0] || 'benchmark/subjects/ohai.json'
 json = File.new(filename, 'r')
 hash = Yajl::Parser.new.parse(json)
 json.close
