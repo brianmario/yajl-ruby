@@ -45,6 +45,14 @@ describe "JSON Gem compatability API" do
     JSON.respond_to?(:dump).should be_true
   end
   
+  it "should allow default parsing options be set with JSON.default_options" do
+    default = JSON.default_options[:symbolize_keys]
+    JSON.parse('{"foo": 1234}').should === {"foo" => 1234}
+    JSON.default_options[:symbolize_keys] = true
+    JSON.parse('{"foo": 1234}').should === {:foo => 1234}
+    JSON.default_options[:symbolize_keys] = default # ensure the rest of the test cases expect the default
+  end
+  
   context "ported tests for Unicode" do
     it "should be able to encode and parse unicode" do
       pending if RUBY_VERSION.include?('1.9') # FIXME: Some string encoding problem with 1.9
