@@ -1,4 +1,5 @@
 Makefile
+benchmark/subjects/contacts.*
 *.o
 *.dylib
 *.bundle
