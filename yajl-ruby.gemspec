@@ -6,7 +6,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Brian Lopez", "Lloyd Hilaiel"]
-  s.date = %q{2009-06-19}
+  s.date = %q{2009-06-22}
   s.email = %q{seniorlopez@gmail.com}
   s.extensions = ["ext/extconf.rb"]
   s.extra_rdoc_files = [
@@ -140,6 +140,8 @@ Gem::Specification.new do |s|
      "spec/parsing/fixtures/pass3.json",
      "spec/parsing/fixtures_spec.rb",
      "spec/parsing/one_off_spec.rb",
+     "spec/rcov.opts",
+     "spec/spec.opts",
      "spec/spec_helper.rb",
      "yajl-ruby.gemspec"
   ]
