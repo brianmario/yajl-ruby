@@ -22,8 +22,12 @@ require 'rake'
 require 'spec/rake/spectask'
 
 desc "Run all examples with RCov"
-Spec::Rake::SpecTask.new('spec_with_rcov') do |t|
+Spec::Rake::SpecTask.new('spec:rcov') do |t|
   t.spec_files = FileList['spec/']
   t.rcov = true
-  t.rcov_opts = ['--exclude', 'spec', '--spec-only']
+  t.rcov_opts << '--options' << 'spec/rcov.opts'
+end
+Spec::Rake::SpecTask.new('spec') do |t|
+  t.spec_files = FileList['spec/']
+  t.spec_opts << '--options' << 'spec/spec.opts'
 end
