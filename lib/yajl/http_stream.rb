@@ -21,7 +21,7 @@ module Yajl
     # 3. the response is read until the end of the headers
     # 4. the _socket itself_ is passed directly to Yajl, for direct parsing off the stream; As it's being received over the wire!
     def self.get(uri, opts = {}, &block)
-      user_agent = opts.has_key?(['User-Agent']) ? opts['User-Agent'] : "Yajl::HttpStream #{Yajl::VERSION}"
+      user_agent = opts.has_key?('User-Agent') ? opts.delete(['User-Agent']) : "Yajl::HttpStream #{Yajl::VERSION}"
       
       socket = TCPSocket.new(uri.host, uri.port)
       request = "GET #{uri.path}#{uri.query ? "?"+uri.query : nil} HTTP/1.1\r\n"
@@ -57,7 +57,7 @@ module Yajl
           end
         end
       end
-      parser = Yajl::Parser.new
+      parser = Yajl::Parser.new(opts)
       if response_head[:headers]["Transfer-Encoding"] == 'chunked'
         if block_given?
           parser.on_parse_complete = block
@@ -82,13 +82,13 @@ module Yajl
         if ALLOWED_MIME_TYPES.include?(content_type)
           case response_head[:headers]["Content-Encoding"]
           when "gzip"
-            return Yajl::Gzip::StreamReader.parse(socket)
+            return Yajl::Gzip::StreamReader.parse(socket, opts)
           when "deflate"
-            return Yajl::Deflate::StreamReader.parse(socket, -Zlib::MAX_WBITS)
+            return Yajl::Deflate::StreamReader.parse(socket, opts.merge({:deflate_options => -Zlib::MAX_WBITS}))
           when "bzip2"
-            return Yajl::Bzip2::StreamReader.parse(socket)
+            return Yajl::Bzip2::StreamReader.parse(socket, opts)
           else
-            return Yajl::Parser.new.parse(socket)
+            return Yajl::Parser.new(opts).parse(socket)
           end
         else
           raise InvalidContentType, "The response MIME type #{content_type}"

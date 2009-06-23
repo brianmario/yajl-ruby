@@ -27,7 +27,8 @@ module Yajl
         end
         
         if options.is_a?(Hash)
-          Yajl::Parser.new(options).parse(new(input), buffer_size, &block)
+          deflate_options = options.delete(:deflate_options)
+          Yajl::Parser.new(options).parse(new(input, deflate_options), buffer_size, &block)
         elsif options.is_a?(Fixnum)
           Yajl::Parser.new.parse(new(input, options), buffer_size, &block)
         end

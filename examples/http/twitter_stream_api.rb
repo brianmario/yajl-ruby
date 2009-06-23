@@ -2,6 +2,8 @@
 $LOAD_PATH.unshift File.expand_path(File.dirname(__FILE__) + '/../../lib')
 
 require 'rubygems'
+require 'yajl/gzip'
+require 'yajl/deflate'
 require 'yajl/http_stream'
 require 'uri'
 
@@ -18,7 +20,7 @@ trap('INT') {
   exit(0)
 }
 
-Yajl::HttpStream.get(uri) do |hash|
+Yajl::HttpStream.get(uri, :symbolize_keys => true) do |hash|
   STDOUT.putc '.'
   STDOUT.flush
   captured += 1
