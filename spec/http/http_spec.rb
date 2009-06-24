@@ -15,80 +15,71 @@ end
 
 describe "Yajl HTTP GET request" do
   before(:all) do
-    @raw = File.new(File.expand_path(File.dirname(__FILE__) + '/fixtures/http.raw.dump'), 'r')
-    @bzip2 = File.new(File.expand_path(File.dirname(__FILE__) + '/fixtures/http.bzip2.dump'), 'r')
+    raw = File.new(File.expand_path(File.dirname(__FILE__) + '/fixtures/http.raw.dump'), 'r')
+    parse_off_headers(raw)
+    @template_hash = Yajl::Parser.parse(raw)
+    
+    raw.rewind
+    parse_off_headers(raw)
+    @template_hash_symbolized = Yajl::Parser.parse(raw, :symbolize_keys => true)
+    
     @deflate = File.new(File.expand_path(File.dirname(__FILE__) + '/fixtures/http.deflate.dump'), 'r')
     @gzip = File.new(File.expand_path(File.dirname(__FILE__) + '/fixtures/http.gzip.dump'), 'r')
-    
-    parse_off_headers(@raw)
-    @raw_template_hash = Yajl::Parser.new.parse(@raw)
-    @raw.rewind
   end
   
-  after(:all) do
-    @raw.close unless @raw.closed?
-    @bzip2.close unless @bzip2.closed?
-    @deflate.close unless @deflate.closed?
-    @gzip.close unless @gzip.closed?
+  after(:each) do
+    @file_path = nil
+  end
+  
+  def prepare_mock_request_dump(format=:raw)
+    @request = File.new(File.expand_path(File.dirname(__FILE__) + "/fixtures/http.#{format}.dump"), 'r')
+    @uri = 'file://'+File.expand_path(File.dirname(__FILE__) + "/fixtures/http/http.#{format}.dump")
+    TCPSocket.should_receive(:new).and_return(@request)
+    @request.should_receive(:write)
+    @uri.should_receive(:host).at_least(2).times
+    @uri.should_receive(:port)
+    @uri.should_receive(:path)
+    @uri.should_receive(:query)
+    @uri.should_receive(:userinfo)
   end
   
   it "should parse a raw response" do
-    file = File.expand_path(File.dirname(__FILE__) + '/http/http.raw.dump')
-    uri = 'file://'+file
-    
-    TCPSocket.should_receive(:new).and_return(@raw)
-    @raw.should_receive(:write)
-    uri.should_receive(:host).at_least(2).times
-    uri.should_receive(:port)
-    uri.should_receive(:path)
-    uri.should_receive(:query)
-    uri.should_receive(:userinfo)
-    
-    @raw_template_hash.should == Yajl::HttpStream.get(uri)
+    prepare_mock_request_dump :raw
+    @template_hash.should == Yajl::HttpStream.get(@uri)
+  end
+  
+  it "should parse a raw response and symbolize keys" do
+    prepare_mock_request_dump :raw
+    @template_hash_symbolized.should == Yajl::HttpStream.get(@uri, :symbolize_keys => true)
   end
   
   it "should parse a bzip2 compressed response" do
-    file = File.expand_path(File.dirname(__FILE__) + '/http/http.bzip2.dump')
-    uri = 'file://'+file
-    
-    TCPSocket.should_receive(:new).and_return(@bzip2)
-    @bzip2.should_receive(:write)
-    uri.should_receive(:host).at_least(2).times
-    uri.should_receive(:port)
-    uri.should_receive(:path)
-    uri.should_receive(:query)
-    uri.should_receive(:userinfo)
-    
-    @raw_template_hash.should == Yajl::HttpStream.get(uri)
+    prepare_mock_request_dump :bzip2
+    @template_hash.should == Yajl::HttpStream.get(@uri)
+  end
+  
+  it "should parse a bzip2 compressed response and symbolize keys" do
+    prepare_mock_request_dump :bzip2
+    @template_hash_symbolized.should == Yajl::HttpStream.get(@uri, :symbolize_keys => true)
   end
   
   it "should parse a deflate compressed response" do
-    file = File.expand_path(File.dirname(__FILE__) + '/http/http.deflate.dump')
-    uri = 'file://'+file
-    
-    TCPSocket.should_receive(:new).and_return(@deflate)
-    @deflate.should_receive(:write)
-    uri.should_receive(:host).at_least(2).times
-    uri.should_receive(:port)
-    uri.should_receive(:path)
-    uri.should_receive(:query)
-    uri.should_receive(:userinfo)
-    
-    @raw_template_hash.should == Yajl::HttpStream.get(uri)
+    prepare_mock_request_dump :deflate
+    @template_hash.should == Yajl::HttpStream.get(@uri)
+  end
+  
+  it "should parse a deflate compressed response and symbolize keys" do
+    prepare_mock_request_dump :deflate
+    @template_hash_symbolized.should == Yajl::HttpStream.get(@uri, :symbolize_keys => true)
   end
   
   it "should parse a gzip compressed response" do
-    file = File.expand_path(File.dirname(__FILE__) + '/http/http.gzip.dump')
-    uri = 'file://'+file
-    
-    TCPSocket.should_receive(:new).and_return(@gzip)
-    @gzip.should_receive(:write)
-    uri.should_receive(:host).at_least(2).times
-    uri.should_receive(:port)
-    uri.should_receive(:path)
-    uri.should_receive(:query)
-    uri.should_receive(:userinfo)
-    
-    @raw_template_hash.should == Yajl::HttpStream.get(uri)
+    prepare_mock_request_dump :gzip
+    @template_hash.should == Yajl::HttpStream.get(@uri)
+  end
+  
+  it "should parse a gzip compressed response and symbolize keys" do
+    prepare_mock_request_dump :gzip
+    @template_hash_symbolized.should == Yajl::HttpStream.get(@uri, :symbolize_keys => true)
   end
 end

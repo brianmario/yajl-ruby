@@ -10,8 +10,7 @@ describe "Parsing JSON Fixtures" do
   FAILED.each do |name, source|
     it "should not be able to parse #{File.basename(name)} as an IO" do
         lambda {
-          parser = Yajl::Parser.new
-          parser.parse(StringIO.new(source))
+          Yajl::Parser.parse(StringIO.new(source))
         }.should raise_error(Yajl::ParseError)
     end
   end
@@ -19,8 +18,7 @@ describe "Parsing JSON Fixtures" do
   FAILED.each do |name, source|
     it "should not be able to parse #{File.basename(name)} as a string" do
         lambda {
-          parser = Yajl::Parser.new
-          parser.parse(source)
+          Yajl::Parser.parse(source)
         }.should raise_error(Yajl::ParseError)
     end
   end
@@ -28,8 +26,7 @@ describe "Parsing JSON Fixtures" do
   PASSED.each do |name, source|
     it "should be able to parse #{File.basename(name)} as an IO" do
         lambda {
-          parser = Yajl::Parser.new
-          parser.parse(StringIO.new(source))
+          Yajl::Parser.parse(StringIO.new(source))
         }.should_not raise_error(Yajl::ParseError)
     end
   end
@@ -37,8 +34,7 @@ describe "Parsing JSON Fixtures" do
   PASSED.each do |name, source|
     it "should be able to parse #{File.basename(name)} as a string" do
         lambda {
-          parser = Yajl::Parser.new
-          parser.parse(source)
+          Yajl::Parser.parse(source)
         }.should_not raise_error(Yajl::ParseError)
     end
   end

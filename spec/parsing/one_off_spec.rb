@@ -5,24 +5,21 @@ describe "One-off JSON examples" do
   it "should parse 23456789012E666 and return Infinity" do
     infinity = (1.0/0)
     silence_warnings do
-      parser = Yajl::Parser.new
-      parser.parse(StringIO.new('{"key": 23456789012E666}')).should == {"key" => infinity}
+      Yajl::Parser.parse(StringIO.new('{"key": 23456789012E666}')).should == {"key" => infinity}
     end
   end
   
   it "should not parse JSON with a comment, with :allow_comments set to false" do
-    parser = Yajl::Parser.new(:allow_comments => false)
     json = StringIO.new('{"key": /* this is a comment */ "value"}')
     lambda {
-      parser.parse(json)
+      Yajl::Parser.parse(json, :allow_comments => false)
     }.should raise_error(Yajl::ParseError)
   end
   
   it "should parse JSON with a comment, with :allow_comments set to true" do
-    parser = Yajl::Parser.new(:allow_comments => true)
     json = StringIO.new('{"key": /* this is a comment */ "value"}')
     lambda {
-      parser.parse(json)
+      Yajl::Parser.parse(json, :allow_comments => true)
     }.should_not raise_error(Yajl::ParseError)
   end
   
@@ -40,8 +37,7 @@ describe "One-off JSON examples" do
   end
   
   it "should parse using it's class method, from an IO with symbolized keys" do
-    parser = Yajl::Parser.new(:symbolize_keys => true)
-    parser.parse('{"key": 1234}').should == {:key => 1234}
+    Yajl::Parser.parse('{"key": 1234}', :symbolize_keys => true).should == {:key => 1234}
   end
   
   it "should parse using it's class method, from a string" do
