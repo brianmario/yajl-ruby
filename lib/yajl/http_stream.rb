@@ -77,7 +77,7 @@ module Yajl
           raise Exception, "Chunked responses detected, but no block given to handle the chunks."
         end
       else
-        content_type = response_head[:headers]["Content-Type"].split('; ')
+        content_type = response_head[:headers]["Content-Type"].split(';')
         content_type = content_type.first
         if ALLOWED_MIME_TYPES.include?(content_type)
           case response_head[:headers]["Content-Encoding"]
