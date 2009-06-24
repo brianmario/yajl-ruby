@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5.7 (June 23rd, 2009)
+* You can now pass parser options (like :symbolize_keys for example) to Yajl::HttpStream.get
+* Refactored spec tests a bit, DRYing up the Yajl::HttpStream specs quite a bit.
+* Added a spec rake task, and spec.opts file
+* Updated and renamed rcov rake task, and added rcov.opts file
+
 ## 0.5.6 (June 19th, 2009)
 * Added JSON.default_options hash to the JSON gem compatibility API
 * Split out the JSON gem compatibility API's parsing and encoding methods into individually includable files

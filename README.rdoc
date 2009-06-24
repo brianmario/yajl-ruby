@@ -102,12 +102,16 @@ Since yajl-ruby parses JSON as a stream, supporting API's like Twitter's Streami
 You can simply supply a block to Yajl::HttpStream.get, which is used as the callback for when a JSON object has been
 unserialized off the stream. For the case of this Twitter Streaming API call, the callback gets fired a few times a second (depending on your connection speed).
 The code below is all that's needed to make the request and stream unserialized Ruby hashes off the response, continuously.
+You'll note that I've enabled the :symbolize_keys parser option as well. Doing so is much more efficient for parsing JSON streams with
+lots of repetitive keys - for things like result sets or multiple API requests - than the same parse with string keys.
+This is because Ruby will reuse (and never GC) it's symbol table. Be that as it may, if you want to parse JSON strings with random key names
+it's much better to leave string keys enabled (the default), so they can get GC'd later.
 
  require 'uri'
  require 'yajl/http_stream'
  
  uri = URI.parse("http://#{username}:#{password}@stream.twitter.com/spritzer.json")
- Yajl::HttpStream.get(uri) do |hash|
+ Yajl::HttpStream.get(uri, :symbolize_keys => true) do |hash|
    puts hash.inspect
  end
 
@@ -251,6 +255,8 @@ NOTE: I converted the 2.4MB JSON file to a Hash and a dump file from Marshal.dum
 This project includes code from the BSD licensed yajl project, copyright 2007-2009 Lloyd Hilaiel
 
 == Special Thanks
+
+For those of you using yajl-ruby out in the wild, please hit me up on Twitter (brianmario) or send me a message here on the Githubs describing the site and how you're using it. I'd love to get a list going!
 
 I've had a lot of inspiration, and a lot of help. Thanks to everyone who's been a part of this and those to come!
 
