@@ -4,3 +4,4 @@ benchmark/subjects/contacts.*
 *.dylib
 *.bundle
 TODO.txt
+tmp/*
