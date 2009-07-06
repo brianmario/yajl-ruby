@@ -60,25 +60,41 @@ inline void yajl_set_static_value(void * ctx, VALUE val) {
     }
 }
 
-void yajl_encode_part(yajl_gen hand, VALUE obj, VALUE io) {
+static void yajl_encoder_wrapper_free(void * wrapper) {
+    struct yajl_encoder_wrapper * w = wrapper;
+    yajl_gen_free(w->encoder);
+    free(w);
+}
+
+static void yajl_encoder_wrapper_mark(void * wrapper) {
+    struct yajl_encoder_wrapper * w = wrapper;
+    rb_gc_mark(w->on_progress_callback);
+}
+
+void yajl_encode_part(void * wrapper, VALUE obj, VALUE io) {
     VALUE str, outBuff, otherObj;
+    struct yajl_encoder_wrapper * w = wrapper;
     yajl_gen_status status;
     int idx = 0;
     const unsigned char * buffer;
     unsigned int len;
     
-    if (io != Qnil) {
-        status = yajl_gen_get_buf(hand, &buffer, &len);
+    if (io != Qnil || w->on_progress_callback != Qnil) {
+        status = yajl_gen_get_buf(w->encoder, &buffer, &len);
         if (len >= WRITE_BUFSIZE) {
             outBuff = rb_str_new((const char *)buffer, len);
-            rb_io_write(io, outBuff);
-            yajl_gen_clear(hand);
+            if (io != Qnil) {
+                rb_io_write(io, outBuff);
+            } else if (w->on_progress_callback != Qnil) {
+                rb_funcall(w->on_progress_callback, intern_call, 1, outBuff);
+            }
+            yajl_gen_clear(w->encoder);
         }
     }
     
     switch (TYPE(obj)) {
         case T_HASH:
-            status = yajl_gen_map_open(hand);
+            status = yajl_gen_map_open(w->encoder);
             
             // TODO: itterate through keys in the hash
             VALUE keys = rb_funcall(obj, intern_keys, 0);
@@ -87,38 +103,38 @@ void yajl_encode_part(yajl_gen hand, VALUE obj, VALUE io) {
                 entry = rb_ary_entry(keys, idx);
                 keyStr = rb_funcall(entry, intern_to_s, 0); // key must be a string
                 // the key
-                yajl_encode_part(hand, keyStr, io);
+                yajl_encode_part(w, keyStr, io);
                 // the value
-                yajl_encode_part(hand, rb_hash_aref(obj, entry), io);
+                yajl_encode_part(w, rb_hash_aref(obj, entry), io);
             }
             
-            status = yajl_gen_map_close(hand);
+            status = yajl_gen_map_close(w->encoder);
             break;
         case T_ARRAY:
-            status = yajl_gen_array_open(hand);
+            status = yajl_gen_array_open(w->encoder);
             for(idx=0; idx<RARRAY_LEN(obj); idx++) {
                 otherObj = rb_ary_entry(obj, idx);
-                yajl_encode_part(hand, otherObj, io);
+                yajl_encode_part(w, otherObj, io);
             }
-            status = yajl_gen_array_close(hand);
+            status = yajl_gen_array_close(w->encoder);
             break;
         case T_NIL:
-            status = yajl_gen_null(hand);
+            status = yajl_gen_null(w->encoder);
             break;
         case T_TRUE:
-            status = yajl_gen_bool(hand, 1);
+            status = yajl_gen_bool(w->encoder, 1);
             break;
         case T_FALSE:
-            status = yajl_gen_bool(hand, 0);
+            status = yajl_gen_bool(w->encoder, 0);
             break;
         case T_FIXNUM:
         case T_FLOAT:
         case T_BIGNUM:
             str = rb_funcall(obj, intern_to_s, 0);
-            status = yajl_gen_number(hand, RSTRING_PTR(str), (unsigned int)RSTRING_LEN(str));
+            status = yajl_gen_number(w->encoder, RSTRING_PTR(str), (unsigned int)RSTRING_LEN(str));
             break;
         case T_STRING:
-            status = yajl_gen_string(hand, (const unsigned char *)RSTRING_PTR(obj), (unsigned int)RSTRING_LEN(obj));
+            status = yajl_gen_string(w->encoder, (const unsigned char *)RSTRING_PTR(obj), (unsigned int)RSTRING_LEN(obj));
             break;
         default:
             if (rb_respond_to(obj, intern_to_json)) {
@@ -126,7 +142,7 @@ void yajl_encode_part(yajl_gen hand, VALUE obj, VALUE io) {
             } else {
                 str = rb_funcall(obj, intern_to_s, 0);
             }
-            status = yajl_gen_string(hand, (const unsigned char *)RSTRING_PTR(str), (unsigned int)RSTRING_LEN(str));
+            status = yajl_gen_string(w->encoder, (const unsigned char *)RSTRING_PTR(str), (unsigned int)RSTRING_LEN(str));
             break;
     }
 }
@@ -348,7 +364,7 @@ static VALUE rb_yajl_parser_parse(int argc, VALUE * argv, VALUE self) {
         Check_Type(rbufsize, T_FIXNUM);
     }
     if (!NIL_P(blk)) {
-        rb_yajl_set_complete_cb(self, blk);
+        rb_yajl_parser_set_complete_cb(self, blk);
     }
     
     if (TYPE(input) == T_STRING) {
@@ -407,11 +423,11 @@ static VALUE rb_yajl_parser_parse_chunk(VALUE self, VALUE chunk) {
  *
  * call-seq: on_parse_complete = Proc.new { |obj| ... }
  *
- * This callback setter allows you to pass a Proc/lambda or any other object that response to #call.
+ * This callback setter allows you to pass a Proc/lambda or any other object that responds to #call.
  *
  * It will pass a single parameter, the ruby object built from the last parsed JSON object
  */
-static VALUE rb_yajl_set_complete_cb(VALUE self, VALUE callback) {
+static VALUE rb_yajl_parser_set_complete_cb(VALUE self, VALUE callback) {
     struct yajl_parser_wrapper * wrapper;
     GetParser(self, wrapper);
     wrapper->parse_complete_callback = callback;
@@ -436,8 +452,8 @@ static VALUE rb_yajl_set_complete_cb(VALUE self, VALUE callback) {
  * :indent is the character(s) used to indent the output string.
  */
 static VALUE rb_yajl_encoder_new(int argc, VALUE * argv, VALUE klass) {
+    struct yajl_encoder_wrapper * wrapper;
     yajl_gen_config cfg;
-    yajl_gen encoder;
     VALUE opts, obj, indent;
     const char * indentString = "  ";
     int beautify = 0;
@@ -457,8 +473,9 @@ static VALUE rb_yajl_encoder_new(int argc, VALUE * argv, VALUE klass) {
     }
     cfg = (yajl_gen_config){beautify, indentString};
     
-    encoder = yajl_gen_alloc(&cfg, NULL);
-    obj = Data_Wrap_Struct(klass, 0, yajl_gen_free, encoder);
+    obj = Data_Make_Struct(klass, struct yajl_encoder_wrapper, yajl_encoder_wrapper_mark, yajl_encoder_wrapper_free, wrapper);
+    wrapper->encoder = yajl_gen_alloc(&cfg, NULL);
+    wrapper->on_progress_callback = Qnil;
     rb_obj_call_init(obj, 0, 0);
     return obj;
 }
@@ -493,22 +510,26 @@ static VALUE rb_yajl_encoder_init(int argc, VALUE * argv, VALUE self) {
  * ruby objects to encode. This is how streaming is accomplished.
  */
 static VALUE rb_yajl_encoder_encode(int argc, VALUE * argv, VALUE self) {
-    yajl_gen encoder;
+    struct yajl_encoder_wrapper * wrapper;
     const unsigned char * buffer;
     unsigned int len;
     VALUE obj, io, blk, outBuff;
     
-    GetEncoder(self, encoder);
+    GetEncoder(self, wrapper);
     
     rb_scan_args(argc, argv, "11&", &obj, &io, &blk);
     
+    if (blk != Qnil) {
+        wrapper->on_progress_callback = blk;
+    }
+    
     // begin encode process
-    yajl_encode_part(encoder, obj, io);
+    yajl_encode_part(wrapper, obj, io);
 
     // just make sure we output the remaining buffer
-    yajl_gen_get_buf(encoder, &buffer, &len);
+    yajl_gen_get_buf(wrapper->encoder, &buffer, &len);
     outBuff = rb_str_new((const char *)buffer, len);
-    yajl_gen_clear(encoder);
+    yajl_gen_clear(wrapper->encoder);
     if (io != Qnil) {
         rb_io_write(io, outBuff);
         return Qnil;
@@ -518,6 +539,23 @@ static VALUE rb_yajl_encoder_encode(int argc, VALUE * argv, VALUE self) {
     } else {
         return outBuff;
     }
+    return Qnil;
+}
+
+/*
+ * Document-method: on_progress
+ *
+ * call-seq: on_progress = Proc.new {|str| ...}
+ *
+ * This callback setter allows you to pass a Proc/lambda or any other object that responds to #call.
+ *
+ * It will pass the caller a chunk of the encode buffer after it's reached it's internal max buffer size (defaults to 8kb).
+ * For example, encoding a large object that would normally result in 24288 bytes of data will result in 3 calls to this callback (assuming the 8kb default encode buffer).
+ */
+static VALUE rb_yajl_encoder_set_progress_cb(VALUE self, VALUE callback) {
+    struct yajl_encoder_wrapper * wrapper;
+    GetEncoder(self, wrapper);
+    wrapper->on_progress_callback = callback;
     return Qnil;
 }
 
@@ -750,12 +788,13 @@ void Init_yajl_ext() {
     rb_define_method(cParser, "parse", rb_yajl_parser_parse, -1);
     rb_define_method(cParser, "parse_chunk", rb_yajl_parser_parse_chunk, -1);
     rb_define_method(cParser, "<<", rb_yajl_parser_parse_chunk, 1);
-    rb_define_method(cParser, "on_parse_complete=", rb_yajl_set_complete_cb, 1);
+    rb_define_method(cParser, "on_parse_complete=", rb_yajl_parser_set_complete_cb, 1);
     
     cEncoder = rb_define_class_under(mYajl, "Encoder", rb_cObject);
     rb_define_singleton_method(cEncoder, "new", rb_yajl_encoder_new, -1);
     rb_define_method(cEncoder, "initialize", rb_yajl_encoder_init, -1);
     rb_define_method(cEncoder, "encode", rb_yajl_encoder_encode, -1);
+    rb_define_method(cEncoder, "on_progress=", rb_yajl_encoder_set_progress_cb, 1);
     
     rb_define_singleton_method(cEncoder, "enable_json_gem_compatability", rb_yajl_encoder_enable_json_gem_ext, 0);
     
