@@ -52,7 +52,7 @@ describe "Yajl JSON encoder" do
         hash = Yajl::Parser.parse(input)
         output = ''
         encoder.encode(hash) do |json_str|
-          output = json_str
+          output << json_str
         end
         hash2 = Yajl::Parser.parse(output)
         input.close
