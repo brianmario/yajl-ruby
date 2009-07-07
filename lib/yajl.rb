@@ -13,7 +13,7 @@ require 'yajl_ext'
 #
 # Ruby bindings to the excellent Yajl (Yet Another JSON Parser) ANSI C library.
 module Yajl
-  VERSION = "0.5.7"
+  VERSION = "0.5.8"
   
   class Parser
     # A helper method for parse-and-forget use-cases
@@ -34,9 +34,9 @@ module Yajl
     # A helper method for encode-and-forget use-cases
     #
     # Examples:
-    #   Yajl::Encoder.encode(obj[, io, :pretty => true, :indent => "\t"])
+    #   Yajl::Encoder.encode(obj[, io, :pretty => true, :indent => "\t", &block])
     #
-    #   output = Yajl::Encoder.encode(obj[, :pretty => true, :indent => "\t"])
+    #   output = Yajl::Encoder.encode(obj[, :pretty => true, :indent => "\t", &block])
     #
     # +obj+ is a ruby object to encode to JSON format
     #
@@ -48,6 +48,8 @@ module Yajl
     # :pretty accepts a boolean and will enable/disable "pretty printing" the resulting output
     #
     # :indent accepts a string and will be used as the indent character(s) during the pretty print process
+    #
+    # If a block is passed, it will be used as (and work the same as) the +on_progress+ callback
     def self.encode(obj, *args, &block)
       # TODO: this code smells, any ideas?
       options = {}

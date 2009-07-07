@@ -2,11 +2,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{yajl-ruby}
-  s.version = "0.5.7"
+  s.version = "0.5.8"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Brian Lopez", "Lloyd Hilaiel"]
-  s.date = %q{2009-06-23}
+  s.date = %q{2009-07-06}
   s.email = %q{seniorlopez@gmail.com}
   s.extensions = ["ext/extconf.rb"]
   s.extra_rdoc_files = [
@@ -34,6 +34,9 @@ Gem::Specification.new do |s|
      "benchmark/subjects/twitter_search.json",
      "benchmark/subjects/twitter_stream.json",
      "benchmark/subjects/unicode.json",
+     "examples/encoding/chunked_encoding.rb",
+     "examples/encoding/one_shot.rb",
+     "examples/encoding/to_an_io.rb",
      "examples/http/twitter_search_api.rb",
      "examples/http/twitter_stream_api.rb",
      "examples/parsing/from_file.rb",
@@ -160,6 +163,9 @@ Gem::Specification.new do |s|
      "spec/parsing/fixtures_spec.rb",
      "spec/parsing/one_off_spec.rb",
      "spec/spec_helper.rb",
+     "examples/encoding/chunked_encoding.rb",
+     "examples/encoding/one_shot.rb",
+     "examples/encoding/to_an_io.rb",
      "examples/http/twitter_search_api.rb",
      "examples/http/twitter_stream_api.rb",
      "examples/parsing/from_file.rb",

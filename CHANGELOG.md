@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.5.8 (July 6th, 2009)
+* Bugfix in Yajl::HttpStream for proper handling of the Content-type header (Rob Sharp)
+* Yajl::Encoder now has an on_progress callback setter, which can be used to harness the encoder's streaming ability.
+** The passed Proc/lambda will be called, and passed every chunk (currently 8kb) of the encoded JSON string as it's being encoded.
+* API CHANGE WARNING: Yajl::Encoder.encode's block will now be used as (and work the same as) the on_progress callback
+** This means the block will be passed chunks of the JSON string at a time, giving the caller the ability to start processing the encoded data while it's still being encoded.
+* fixed grammatical error in README (Neil Berkman)
+* Added some encoder examples
+
 ## 0.5.7 (June 23rd, 2009)
 * You can now pass parser options (like :symbolize_keys for example) to Yajl::HttpStream.get
 * Refactored spec tests a bit, DRYing up the Yajl::HttpStream specs quite a bit.
