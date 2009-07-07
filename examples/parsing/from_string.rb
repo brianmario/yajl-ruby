@@ -11,5 +11,5 @@ end
 
 json = StringIO.new(string)
 
-hash = Yajl::Parser.new.parse(json)
+hash = Yajl::Parser.parse(json)
 puts hash.inspect

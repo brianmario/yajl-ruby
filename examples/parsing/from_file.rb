@@ -10,5 +10,5 @@ end
 
 json = File.new(file, 'r')
 
-hash = Yajl::Parser.new.parse(json)
+hash = Yajl::Parser.parse(json)
 puts hash.inspect
