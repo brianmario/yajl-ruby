@@ -49,7 +49,7 @@ or maybe a StringIO
 
 or maybe STDIN
 
- cat someJsonFile.json | ruby -ryajl -e "puts Yajl::Parser.new.parse(STDIN).inspect"
+ cat someJsonFile.json | ruby -ryajl -e "puts Yajl::Parser.parse(STDIN).inspect"
 
 
 Or lets say you didn't have access to the IO object that contained JSON data, but instead
