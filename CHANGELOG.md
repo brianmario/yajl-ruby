@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.5.9 (July 9th, 2009)
+* Bugfix for Yajl::Encoder where encoding a hash like {:a => :b} would get stuck in an infinite loop
+
 ## 0.5.8 (July 6th, 2009)
 * Bugfix in Yajl::HttpStream for proper handling of the Content-type header (Rob Sharp)
 * Yajl::Encoder now has an on_progress callback setter, which can be used to harness the encoder's streaming ability.
