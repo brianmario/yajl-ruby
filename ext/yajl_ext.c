@@ -136,6 +136,10 @@ void yajl_encode_part(void * wrapper, VALUE obj, VALUE io) {
         case T_STRING:
             status = yajl_gen_string(w->encoder, (const unsigned char *)RSTRING_PTR(obj), (unsigned int)RSTRING_LEN(obj));
             break;
+        case T_SYMBOL:
+            str = rb_funcall(obj, intern_to_s, 0);
+            status = yajl_gen_string(w->encoder, (const unsigned char *)RSTRING_PTR(str), (unsigned int)RSTRING_LEN(str));
+            break;
         default:
             if (rb_respond_to(obj, intern_to_json)) {
                 str = rb_funcall(obj, intern_to_json, 0);

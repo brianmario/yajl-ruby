@@ -183,4 +183,8 @@ describe "Yajl JSON encoder" do
     d = Dummy2.new
     Yajl::Encoder.encode({:foo => d}).should eql('{"foo":"hawtness"}')
   end
+  
+  it "should encode a hash where the key and value can be symbols" do
+    Yajl::Encoder.encode({:foo => :bar}).should eql('{"foo":"bar"}')
+  end
 end
