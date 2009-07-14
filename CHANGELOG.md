@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.5.10 (July 13th, 2009)
+* Bugfix for the JSON gem compatibility API's default Object#to_json helper
+
 ## 0.5.9 (July 9th, 2009)
 * Bugfix for Yajl::Encoder where encoding a hash like {:a => :b} would get stuck in an infinite loop
 
