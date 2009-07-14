@@ -53,6 +53,20 @@ describe "JSON Gem compatability API" do
     JSON.default_options[:symbolize_keys] = default # ensure the rest of the test cases expect the default
   end
   
+  it "should encode arbitrary classes via their default to_json method" do
+    d = Dummy.new
+    d.to_json.should == "\"#{d.to_s}\""
+    
+    t = Time.now
+    t.to_json.should == "\"#{t.to_s}\""
+    
+    da = Date.today
+    da.to_json.should == "\"#{da.to_s}\""
+    
+    dt = DateTime.new
+    dt.to_json.should == "\"#{dt.to_s}\""
+  end
+  
   context "ported tests for Unicode" do
     it "should be able to encode and parse unicode" do
       pending if RUBY_VERSION.include?('1.9') # FIXME: Some string encoding problem with 1.9

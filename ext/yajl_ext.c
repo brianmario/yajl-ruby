@@ -580,7 +580,8 @@ static VALUE rb_yajl_json_ext_object_to_json(int argc, VALUE * argv, VALUE self)
     if (rb_encoder == Qnil) {
         rb_encoder = rb_yajl_encoder_new(0, NULL, cEncoder);
     }
-    return rb_yajl_encoder_encode(1, rb_funcall(self, intern_to_s, 0), rb_encoder);
+    VALUE str = rb_funcall(self, intern_to_s, 0);
+    return rb_yajl_encoder_encode(1, &str, rb_encoder);
 }
 
 /*
