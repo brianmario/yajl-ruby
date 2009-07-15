@@ -563,28 +563,6 @@ static VALUE rb_yajl_encoder_set_progress_cb(VALUE self, VALUE callback) {
 // JSON Gem compatibility
 
 /*
- * Document-class: Object
- */
-/*
- * Document-method: to_json
- *
- * call-seq: to_json(encoder=Yajl::Encoder.new)
- *
- * +encoder+ is an existing Yajl::Encoder used to encode JSON
- *
- * Encodes an instance of Object to JSON
- */
-static VALUE rb_yajl_json_ext_object_to_json(int argc, VALUE * argv, VALUE self) {
-    VALUE rb_encoder;
-    rb_scan_args(argc, argv, "01", &rb_encoder);
-    if (rb_encoder == Qnil) {
-        rb_encoder = rb_yajl_encoder_new(0, NULL, cEncoder);
-    }
-    VALUE str = rb_funcall(self, intern_to_s, 0);
-    return rb_yajl_encoder_encode(1, &str, rb_encoder);
-}
-
-/*
  * Document-class: Hash
  */
 /*
@@ -763,7 +741,6 @@ static VALUE rb_yajl_json_ext_nil_to_json(int argc, VALUE * argv, VALUE self) {
  * Enables the JSON gem compatibility API
  */
 static VALUE rb_yajl_encoder_enable_json_gem_ext(VALUE klass) {
-    rb_define_method(rb_cObject, "to_json", rb_yajl_json_ext_object_to_json, -1);
     rb_define_method(rb_cHash, "to_json", rb_yajl_json_ext_hash_to_json, -1);
     rb_define_method(rb_cArray, "to_json", rb_yajl_json_ext_array_to_json, -1);
     rb_define_method(rb_cFixnum, "to_json", rb_yajl_json_ext_fixnum_to_json, -1);

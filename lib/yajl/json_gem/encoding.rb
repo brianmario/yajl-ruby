@@ -5,6 +5,13 @@ require 'yajl' unless defined?(Yajl::Parser)
 # extension that can be included when this file is.
 Yajl::Encoder.enable_json_gem_compatability
 
+# Our fallback to_json definition
+class Object
+  def to_json(*args, &block)
+    to_s
+  end
+end
+
 module JSON
   def self.generate(obj, opts={})
     begin

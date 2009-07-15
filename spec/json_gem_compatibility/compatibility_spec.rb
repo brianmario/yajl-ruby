@@ -19,7 +19,7 @@ describe "JSON Gem compatability API" do
   end
   
   it "should mixin #to_json on base objects after compatability has been enabled" do
-    Yajl::Encoder.enable_json_gem_compatability
+    require 'yajl/json_gem'
     d = Dummy.new
     
     d.respond_to?(:to_json).should be_true
@@ -34,8 +34,6 @@ describe "JSON Gem compatability API" do
   end
   
   it "should require yajl/json_gem to enable the compatability API" do
-    require 'yajl/json_gem'
-    
     defined?(JSON).should be_true
     
     JSON.respond_to?(:parse).should be_true
@@ -55,16 +53,16 @@ describe "JSON Gem compatability API" do
   
   it "should encode arbitrary classes via their default to_json method" do
     d = Dummy.new
-    d.to_json.should == "\"#{d.to_s}\""
+    d.to_json.should == "#{d.to_s}"
     
     t = Time.now
-    t.to_json.should == "\"#{t.to_s}\""
+    t.to_json.should == "#{t.to_s}"
     
     da = Date.today
-    da.to_json.should == "\"#{da.to_s}\""
+    da.to_json.should == "#{da.to_s}"
     
     dt = DateTime.new
-    dt.to_json.should == "\"#{dt.to_s}\""
+    dt.to_json.should == "#{dt.to_s}"
   end
   
   context "ported tests for Unicode" do

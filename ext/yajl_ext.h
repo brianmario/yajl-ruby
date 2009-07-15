@@ -71,7 +71,6 @@ static VALUE rb_yajl_encoder_set_progress_cb(VALUE self, VALUE callback);
 static void yajl_encoder_wrapper_free(void * wrapper);
 static void yajl_encoder_wrapper_mark(void * wrapper);
 
-static VALUE rb_yajl_json_ext_object_to_json(int argc, VALUE * argv, VALUE self);
 static VALUE rb_yajl_json_ext_hash_to_json(int argc, VALUE * argv, VALUE self);
 static VALUE rb_yajl_json_ext_array_to_json(int argc, VALUE * argv, VALUE self);
 static VALUE rb_yajl_json_ext_fixnum_to_json(int argc, VALUE * argv, VALUE self);
