@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.5.11 (July 14th, 2009)
+* fixing a bug Aman found with to_json on non-primitive Ruby objects and double-quoting in the JSON compat API
+
 ## 0.5.10 (July 13th, 2009)
 * Bugfix for the JSON gem compatibility API's default Object#to_json helper
 
