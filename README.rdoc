@@ -27,6 +27,8 @@ Install it like any other gem hosted at the Githubs like so:
 
 == Example of use
 
+NOTE: I'm building up a collection of small examples in the examples (http://github.com/brianmario/yajl-ruby/tree/master/examples) folder.
+
 First, you're probably gonna want to require it:
 
  require 'yajl'
@@ -148,6 +150,31 @@ This example will encode and send 50 JSON objects over the same stream, continuo
  50.times do
    hash = {:current_time => Time.now.to_f, :foo => 12425125}
    encoder.encode(hash, socket)
+ end
+
+Using EventMachine and you want to encode and send in chunks?
+(Assume we're in an EventMachine::Connection instance)
+
+ def post_init
+    @encoder = Yajl::Encoder.new
+    motd_contents = File.read("/path/to/motd.txt")
+    status = File.read("/path/to/huge/status_file.txt")
+    @motd = {:motd => motd_contents, :system_status => status}
+ end
+  
+ def connection_completed
+   # The encoder will do it's best to hand you data in chunks that
+   # are around 8kb (but you may see some that are larger)
+   #
+   # It should be noted that you could have also assigned the _on_progress_ callback
+   # much like you can assign the _on_parse_complete_ callback with the parser class.
+   # Passing a block (like below) essentially tells the encoder to use that block
+   # as the callback normally assigned to _on_progress_.
+   #
+   # Send our MOTD and status
+   @encoder.encode(@motd) do |chunk|
+     send_data(chunk)
+   end
  end
 
 You can also use Yajl::Bzip2::StreamWriter and Yajl::Deflate::StreamWriter. So you can pick whichever fits your CPU/bandwidth sweet-spot.
