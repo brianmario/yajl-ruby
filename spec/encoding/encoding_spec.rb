@@ -187,4 +187,40 @@ describe "Yajl JSON encoder" do
   it "should encode a hash where the key and value can be symbols" do
     Yajl::Encoder.encode({:foo => :bar}).should eql('{"foo":"bar"}')
   end
+  
+  it "should encode using a newline or nil terminator" do
+    Yajl::Encoder.new(:terminator => "\n").encode({:foo => :bar}).should eql("{\"foo\":\"bar\"}\n")
+    Yajl::Encoder.new(:terminator => nil).encode({:foo => :bar}).should eql("{\"foo\":\"bar\"}")
+  end
+  
+  it "should encode using a newline or nil terminator, to an IO" do
+    s = StringIO.new
+    Yajl::Encoder.new(:terminator => "\n").encode({:foo => :bar}, s)
+    s.rewind
+    s.read.should eql("{\"foo\":\"bar\"}\n")
+    
+    s = StringIO.new
+    Yajl::Encoder.new(:terminator => nil).encode({:foo => :bar}, s)
+    s.rewind
+    s.read.should eql("{\"foo\":\"bar\"}")
+  end
+  
+  it "should encode using a newline or nil terminator, using a block" do
+    s = StringIO.new
+    Yajl::Encoder.new(:terminator => "\n").encode({:foo => :bar}) do |chunk|
+      s << chunk
+    end
+    s.rewind
+    s.read.should eql("{\"foo\":\"bar\"}\n")
+    
+    s = StringIO.new
+    nilpassed = false
+    Yajl::Encoder.new(:terminator => nil).encode({:foo => :bar}) do |chunk|
+      nilpassed = true if chunk.nil?
+      s << chunk
+    end
+    nilpassed.should be_true
+    s.rewind
+    s.read.should eql("{\"foo\":\"bar\"}")
+  end
 end

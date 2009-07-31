@@ -79,6 +79,11 @@ only had access to chunks of it at a time. No problem!
    @parser << data
  end
 
+Or if you don't need to stream it, it'll just return the built object from the parse when it's done.
+ NOTE: if there are going to be multiple JSON strings in the input, you *must* specify a block or callback as this
+ is how yajl-ruby will hand you (the caller) each object as it's parsed off the input.
+
+ obj = Yajl::Parser.parse(str_or_io)
 
 Or how about a JSON API HTTP request?
 This actually makes a request using a raw TCPSocket, then parses the JSON body right off the socket. While it's being received over the wire!
@@ -156,7 +161,9 @@ Using EventMachine and you want to encode and send in chunks?
 (Assume we're in an EventMachine::Connection instance)
 
  def post_init
-    @encoder = Yajl::Encoder.new
+    # Passing a :terminator character will let us determine when the encoder
+    # is done encoding the current object
+    @encoder = Yajl::Encoder.new(:terminator => nil)
     motd_contents = File.read("/path/to/motd.txt")
     status = File.read("/path/to/huge/status_file.txt")
     @motd = {:motd => motd_contents, :system_status => status}
@@ -173,9 +180,17 @@ Using EventMachine and you want to encode and send in chunks?
    #
    # Send our MOTD and status
    @encoder.encode(@motd) do |chunk|
-     send_data(chunk)
+     if chunk.nil?
+       close_connection_after_writing
+     else
+       send_data(chunk)
+     end
    end
  end
+
+Or a simple encode returning a string
+
+ json_str = Yajl::Encoder.encode({:foo => :bar})
 
 You can also use Yajl::Bzip2::StreamWriter and Yajl::Deflate::StreamWriter. So you can pick whichever fits your CPU/bandwidth sweet-spot.
 
