@@ -1,6 +1,6 @@
 = YAJL C Bindings for Ruby
 
-This gem (although not in gem form just yet) is a C binding to the excellent YAJL JSON parsing and generation library.
+This gem is a C binding to the excellent YAJL JSON parsing and generation library.
 
 You can read more info at the projects website http://lloydforge.org/projects/yajl or check out it's codes at http://github.com/lloyd/yajl.
 
@@ -188,9 +188,10 @@ Using EventMachine and you want to encode and send in chunks?
    end
  end
 
-Or a simple encode returning a string
+But to make things simple, you might just want to let yajl-ruby do all the hard work for you and just hand back
+a string when it's finished. In that case, just don't provide and IO or block (or assign the on_progress callback).
 
- json_str = Yajl::Encoder.encode({:foo => :bar})
+ str = Yajl::Encoder.encode(obj)
 
 You can also use Yajl::Bzip2::StreamWriter and Yajl::Deflate::StreamWriter. So you can pick whichever fits your CPU/bandwidth sweet-spot.
 
@@ -216,7 +217,7 @@ There are a lot more possibilities that I'd love to see other gems/plugins for s
 Some ideas are:
 * parsing logs in JSON format
 * a Rails plugin (http://github.com/technoweenie/yajl-rails)
-* builtin Rails 3 support?
+* builtin support in Rails 3?
 * Rack middleware (ideally the JSON body could be handed to the parser while it's still being received)
 * use with ohai (http://github.com/brianmario/ohai)
 * JSON API clients (http://github.com/brianmario/crack, http://github.com/brianmario/freckle-api)
