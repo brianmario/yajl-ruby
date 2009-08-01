@@ -180,7 +180,7 @@ Using EventMachine and you want to encode and send in chunks?
    #
    # Send our MOTD and status
    @encoder.encode(@motd) do |chunk|
-     if chunk.nil?
+     if chunk.nil? # got our terminator, encoding is done
        close_connection_after_writing
      else
        send_data(chunk)
