@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.6.1 (August 20th, 2009)
+* Fixed a bug in Yajl::HttpStream where responses contained multiple JSON strings but weren't Transfer-Encoding: chunked (thanks @dacort!)
+
 ## 0.6.0 (August 19th, 2009)
 * Added POST, PUT and DELETE support to Yajl::HttpStream
 ** POST support initially contributed by jdg (http://github.com/jdg) - Although oortle (http://github.com/oortle) coded it up in a fork with it as well.

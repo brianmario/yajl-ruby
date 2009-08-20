@@ -84,9 +84,9 @@ module Yajl
           end
         end
         parser = Yajl::Parser.new(opts)
+        parser.on_parse_complete = block if block_given?
         if response_head[:headers]["Transfer-Encoding"] == 'chunked'
           if block_given?
-            parser.on_parse_complete = block
             chunkLeft = 0
             while !socket.eof? && (size = socket.gets.hex)
               next if size == 0
@@ -108,13 +108,13 @@ module Yajl
           if ALLOWED_MIME_TYPES.include?(content_type)
             case response_head[:headers]["Content-Encoding"]
             when "gzip"
-              return Yajl::Gzip::StreamReader.parse(socket, opts)
+              return Yajl::Gzip::StreamReader.parse(socket, opts, &block)
             when "deflate"
-              return Yajl::Deflate::StreamReader.parse(socket, opts.merge({:deflate_options => -Zlib::MAX_WBITS}))
+              return Yajl::Deflate::StreamReader.parse(socket, opts.merge({:deflate_options => -Zlib::MAX_WBITS}), &block)
             when "bzip2"
-              return Yajl::Bzip2::StreamReader.parse(socket, opts)
+              return Yajl::Bzip2::StreamReader.parse(socket, opts, &block)
             else
-              return Yajl::Parser.new(opts).parse(socket)
+              return parser.parse(socket)
             end
           else
             raise InvalidContentType, "The response MIME type #{content_type}"
