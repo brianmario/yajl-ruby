@@ -46,7 +46,7 @@ module Yajl
         socket = TCPSocket.new(uri.host, uri.port)
         request = "#{method} #{uri.path}#{uri.query ? "?"+uri.query : nil} HTTP/1.1\r\n"
         request << "Host: #{uri.host}\r\n"
-        request << "Authorization: Basic #{[uri.userinfo].pack('m')}\r\n" unless uri.userinfo.nil?
+        request << "Authorization: Basic #{[uri.userinfo].pack('m').strip!}\r\n" unless uri.userinfo.nil?
         request << "User-Agent: #{user_agent}\r\n"
         request << "Accept: */*\r\n"
         if method == "POST" || method == "PUT"
