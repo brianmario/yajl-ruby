@@ -109,12 +109,12 @@ module Yajl
       socket = TCPSocket.new(uri.host, uri.port)
       request = "POST #{uri.path}#{uri.query ? "?"+uri.query : nil} HTTP/1.1\r\n"
       request << "Host: #{uri.host}\r\n"
-      request << "Authorization: Basic #{[uri.userinfo].pack('m')}\r\n" unless uri.userinfo.nil?
+      request << "Authorization: Basic #{[uri.userinfo].pack('m')}"
       request << "User-Agent: #{user_agent}\r\n"
       request << "Content-Length: #{body.length}\r\n"
       request << "Content-Type: application/x-www-form-urlencoded\r\n"
-      request << "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\r\n"
-      request << "Connection: close\r\n"
+      request << "Accept: */*\r\n"
+
       encodings = []
       encodings << "bzip2" if defined?(Yajl::Bzip2)
       encodings << "gzip" if defined?(Yajl::Gzip)
@@ -122,6 +122,7 @@ module Yajl
       request << "Accept-Encoding: #{encodings.join(',')}\r\n" if encodings.any?
       request << "Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7\r\n\r\n"
       request << body
+
       socket.write(request)
       response_head = {}
       response_head[:headers] = {}
