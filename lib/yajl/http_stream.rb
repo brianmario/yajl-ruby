@@ -103,7 +103,7 @@ module Yajl
     # 2. the request is made using HTTP/1.0, Accept-encoding: gzip (deflate support coming soon, too)
     # 3. the response is read until the end of the headers
     # 4. the _socket itself_ is passed directly to Yajl, for direct parsing off the stream; As it's being received over the wire!
-    def self.post(uri, opts = {}, &block)
+    def self.post(uri, body, opts = {}, &block)
       user_agent = opts.has_key?('User-Agent') ? opts.delete(['User-Agent']) : "Yajl::HttpStream #{Yajl::VERSION}"
       
       socket = TCPSocket.new(uri.host, uri.port)
@@ -111,8 +111,8 @@ module Yajl
       request << "Host: #{uri.host}\r\n"
       request << "Authorization: Basic #{[uri.userinfo].pack('m')}\r\n" unless uri.userinfo.nil?
       request << "User-Agent: #{user_agent}\r\n"
-      request << "Content-Length: #{opts['body'].length}"
-      request << "Content-Type: application/x-www-form-urlencoded"
+      request << "Content-Length: #{body.length}\r\n"
+      request << "Content-Type: application/x-www-form-urlencoded\r\n"
       request << "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\r\n"
       request << "Connection: close\r\n"
       encodings = []
@@ -120,10 +120,8 @@ module Yajl
       encodings << "gzip" if defined?(Yajl::Gzip)
       encodings << "deflate" if defined?(Yajl::Deflate)
       request << "Accept-Encoding: #{encodings.join(',')}\r\n" if encodings.any?
-      request << "Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7\r\n"
-
-      request << opts['body']
-      request << "\r\n\r\n"
+      request << "Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7\r\n\r\n"
+      request << body
       socket.write(request)
       response_head = {}
       response_head[:headers] = {}
