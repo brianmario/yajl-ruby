@@ -59,8 +59,7 @@ module Yajl
         encodings << "gzip" if defined?(Yajl::Gzip)
         encodings << "deflate" if defined?(Yajl::Deflate)
         request << "Accept-Encoding: #{encodings.join(',')}\r\n" if encodings.any?
-        request << "Accept-Charset: utf-8\r\n"
-        request << "\r\n\r\n"
+        request << "Accept-Charset: utf-8\r\n\r\n"
         if method == "POST" || method == "PUT"
           request << body
         end
