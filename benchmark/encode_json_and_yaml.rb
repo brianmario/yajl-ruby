@@ -30,7 +30,7 @@ Benchmark.bm { |x|
 }
 
 # YAML Section
-filename = 'benchmark/subjects/contacts.yml'
+filename = 'benchmark/subjects/ohai.yml'
 yml = File.new(filename, 'r')
 data = YAML.load_stream(yml)
 yml.close

@@ -35,7 +35,7 @@ Benchmark.bm { |x|
 json.close
 
 # YAML section
-filename = 'benchmark/subjects/contacts.yml'
+filename = 'benchmark/subjects/ohai.yml'
 yaml = File.new(filename, 'r')
 
 # warm up the filesystem
