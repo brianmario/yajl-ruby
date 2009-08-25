@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.6.2 (August 25th, 2009)
+* Fixed a bug surfaced by an existing library providing a to_json method, and Yajl would double-quote the values provided
+
 ## 0.6.1 (August 20th, 2009)
 * Fixed a bug in Yajl::HttpStream where responses contained multiple JSON strings but weren't Transfer-Encoding: chunked (thanks @dacort!)
 

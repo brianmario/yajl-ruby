@@ -190,12 +190,17 @@ yajl_gen_number(yajl_gen g, const char * s, unsigned int l)
 
 yajl_gen_status
 yajl_gen_string(yajl_gen g, const unsigned char * str,
-                unsigned int len)
+                unsigned int len, int quote)
 {
     ENSURE_VALID_STATE; INSERT_SEP; INSERT_WHITESPACE;
-    yajl_buf_append(g->buf, "\"", 1);
-    yajl_string_encode(g->buf, str, len);
-    yajl_buf_append(g->buf, "\"", 1);
+    if (quote) {
+        yajl_buf_append(g->buf, "\"", 1);
+        yajl_string_encode(g->buf, str, len);
+        yajl_buf_append(g->buf, "\"", 1);
+    } else {
+        yajl_buf_append(g->buf, str, len);
+    }
+    
     APPENDED_ATOM;
     FINAL_NEWLINE;
     return yajl_gen_status_ok;

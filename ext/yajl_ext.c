@@ -79,6 +79,7 @@ void yajl_encode_part(void * wrapper, VALUE obj, VALUE io) {
     int idx = 0;
     const unsigned char * buffer;
     unsigned int len;
+    int quote_strings = 1;
     
     if (io != Qnil || w->on_progress_callback != Qnil) {
         status = yajl_gen_get_buf(w->encoder, &buffer, &len);
@@ -135,15 +136,16 @@ void yajl_encode_part(void * wrapper, VALUE obj, VALUE io) {
             status = yajl_gen_number(w->encoder, RSTRING_PTR(str), (unsigned int)RSTRING_LEN(str));
             break;
         case T_STRING:
-            status = yajl_gen_string(w->encoder, (const unsigned char *)RSTRING_PTR(obj), (unsigned int)RSTRING_LEN(obj));
+            status = yajl_gen_string(w->encoder, (const unsigned char *)RSTRING_PTR(obj), (unsigned int)RSTRING_LEN(obj), 1);
             break;
         default:
             if (rb_respond_to(obj, intern_to_json)) {
                 str = rb_funcall(obj, intern_to_json, 0);
+                quote_strings = 0; // this lets us append on to the buffer without Yajl quoting it again
             } else {
                 str = rb_funcall(obj, intern_to_s, 0);
             }
-            status = yajl_gen_string(w->encoder, (const unsigned char *)RSTRING_PTR(str), (unsigned int)RSTRING_LEN(str));
+            status = yajl_gen_string(w->encoder, (const unsigned char *)RSTRING_PTR(str), (unsigned int)RSTRING_LEN(str), quote_strings);
             break;
     }
 }
