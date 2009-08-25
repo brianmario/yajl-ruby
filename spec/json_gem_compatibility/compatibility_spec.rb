@@ -53,16 +53,16 @@ describe "JSON Gem compatability API" do
   
   it "should encode arbitrary classes via their default to_json method" do
     d = Dummy.new
-    d.to_json.should == "#{d.to_s}"
+    d.to_json.should == "\"#{d.to_s}\""
     
     t = Time.now
-    t.to_json.should == "#{t.to_s}"
+    t.to_json.should == "\"#{t.to_s}\""
     
     da = Date.today
-    da.to_json.should == "#{da.to_s}"
+    da.to_json.should == "\"#{da.to_s}\""
     
     dt = DateTime.new
-    dt.to_json.should == "#{dt.to_s}"
+    dt.to_json.should == "\"#{dt.to_s}\""
   end
   
   context "ported tests for Unicode" do

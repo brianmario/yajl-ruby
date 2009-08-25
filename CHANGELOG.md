@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.6.3 (August 25th, 2009)
+* Fixed a bug in the JSON gem compatibility API where strings weren't being properly escaped
+
 ## 0.6.2 (August 25th, 2009)
 * Fixed a bug surfaced by an existing library providing a to_json method, and Yajl would double-quote the values provided
 
