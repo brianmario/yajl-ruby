@@ -2,7 +2,7 @@
 
 This gem is a C binding to the excellent YAJL JSON parsing and generation library.
 
-You can read more info at the projects website http://lloydforge.org/projects/yajl or check out it's codes at http://github.com/lloyd/yajl.
+You can read more info at the projects website http://lloyd.github.com/yajl or check out it's codes at http://github.com/lloyd/yajl.
 
 == Features
 
