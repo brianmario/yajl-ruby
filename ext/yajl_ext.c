@@ -133,6 +133,9 @@ void yajl_encode_part(void * wrapper, VALUE obj, VALUE io) {
         case T_FLOAT:
         case T_BIGNUM:
             str = rb_funcall(obj, intern_to_s, 0);
+            if (strcmp(RSTRING_PTR(str), "NaN") == 0 || strcmp(RSTRING_PTR(str), "Infinity") == 0 || strcmp(RSTRING_PTR(str), "-Infinity") == 0) {
+                rb_raise(cEncodeError, "'%s' is an invalid number", RSTRING_PTR(str));
+            }
             status = yajl_gen_number(w->encoder, RSTRING_PTR(str), (unsigned int)RSTRING_LEN(str));
             break;
         case T_STRING:
@@ -148,24 +151,6 @@ void yajl_encode_part(void * wrapper, VALUE obj, VALUE io) {
             status = yajl_gen_string(w->encoder, (const unsigned char *)RSTRING_PTR(str), (unsigned int)RSTRING_LEN(str), quote_strings);
             break;
     }
-    // I'll add this back in later once I refactor a few things above
-    // switch (status) {
-    //     case yajl_gen_status_ok:
-    //     case yajl_gen_generation_complete:
-    //         break;
-    //     case yajl_gen_keys_must_be_strings:
-    //         rb_raise(cEncodeError, "Keys must be strings");
-    //         break;
-    //     case yajl_max_depth_exceeded:
-    //         rb_raise(cEncodeError, "Max depth exceeded");
-    //         break;
-    //     case yajl_gen_in_error_state:
-    //         rb_raise(cEncodeError, "Encoder is in an error state");
-    //         break;
-    //     case yajl_gen_invalid_number:
-    //         rb_raise(cEncodeError, "Invalid number");
-    //         break;
-    // }
 }
 
 void yajl_parser_wrapper_free(void * wrapper) {

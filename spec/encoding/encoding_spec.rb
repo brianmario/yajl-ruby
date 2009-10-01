@@ -223,4 +223,19 @@ describe "Yajl JSON encoder" do
     s.rewind
     s.read.should eql("{\"foo\":\"bar\"}")
   end
+  
+  it "should not encode NaN" do
+    lambda {
+      Yajl::Encoder.encode(0.0/0.0)
+    }.should raise_error(Yajl::EncodeError)
+  end
+  
+  it "should not encode Infinity or -Infinity" do
+    lambda {
+      Yajl::Encoder.encode(1.0/0.0)
+    }.should raise_error(Yajl::EncodeError)
+    lambda {
+      Yajl::Encoder.encode(-1.0/0.0)
+    }.should raise_error(Yajl::EncodeError)
+  end
 end
