@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.6.4 (?)
+* Fixed a bug in Yajl::Encoder which allowed direct, unescaped encoding of NaN, Infinity and -Infinity.
+  It will now properly throw a Yajl::EncodeError exception if either of these values are found unescaped.
+
 ## 0.6.3 (August 25th, 2009)
 * Fixed a bug in the JSON gem compatibility API where strings weren't being properly escaped
 
