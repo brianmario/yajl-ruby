@@ -1,4 +1,4 @@
-require 'rubygems'
+# encoding: UTF-8
 require 'ffi'
 
 module Yajl
