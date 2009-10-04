@@ -1,5 +1,10 @@
 # encoding: UTF-8
-require 'yajl_ext'
+begin
+  require 'yajl_ext'
+rescue LoadError => e
+  # oops, maybe this is jRuby?
+  require 'yajl/ffi'
+end
 
 # = Extras
 # We're not going to load these auotmatically, because you might not need them ;)
