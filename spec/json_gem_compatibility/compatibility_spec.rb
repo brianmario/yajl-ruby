@@ -65,6 +65,20 @@ describe "JSON Gem compatability API" do
     dt.to_json.should == "\"#{dt.to_s}\""
   end
   
+  it "should have the standard parsing and encoding exceptions mapped" do
+    JSON::JSONError.new.is_a?(StandardError).should be_true
+    JSON::ParserError.new.is_a?(JSON::JSONError).should be_true
+    JSON::GeneratorError.new.is_a?(JSON::JSONError).should be_true
+    
+    lambda {
+      JSON.parse("blah")
+    }.should raise_error(JSON::ParserError)
+    
+    lambda {
+      JSON.generate(0.0/0.0)
+    }.should raise_error(JSON::GeneratorError)
+  end
+  
   context "ported tests for Unicode" do
     it "should be able to encode and parse unicode" do
       pending if RUBY_VERSION.include?('1.9') # FIXME: Some string encoding problem with 1.9
@@ -159,7 +173,7 @@ describe "JSON Gem compatability API" do
       it "should not be able to parse #{File.basename(name)} as an IO" do
           lambda {
             JSON.parse(StringIO.new(source))
-          }.should raise_error(Yajl::ParseError)
+          }.should raise_error(JSON::ParserError)
       end
     end
 
@@ -167,7 +181,7 @@ describe "JSON Gem compatability API" do
       it "should not be able to parse #{File.basename(name)} as a string" do
           lambda {
             JSON.parse(source)
-          }.should raise_error(Yajl::ParseError)
+          }.should raise_error(JSON::ParserError)
       end
     end
 
@@ -175,7 +189,7 @@ describe "JSON Gem compatability API" do
       it "should be able to parse #{File.basename(name)} as an IO" do
           lambda {
             JSON.parse(StringIO.new(source))
-          }.should_not raise_error(Yajl::ParseError)
+          }.should_not raise_error(JSON::ParserError)
       end
     end
 
@@ -183,7 +197,7 @@ describe "JSON Gem compatability API" do
       it "should be able to parse #{File.basename(name)} as a string" do
           lambda {
             JSON.parse(source)
-          }.should_not raise_error(Yajl::ParseError)
+          }.should_not raise_error(JSON::ParserError)
       end
     end
   end

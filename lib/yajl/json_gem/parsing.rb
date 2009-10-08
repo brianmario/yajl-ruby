@@ -2,7 +2,8 @@
 require 'yajl' unless defined?(Yajl::Parser)
 
 module JSON
-  class ParserError < Yajl::ParseError; end
+  class JSONError < StandardError; end unless defined?(JSON::JSONError)
+  class ParserError < JSONError; end unless defined?(JSON::ParserError)
   
   def self.default_options
     @default_options ||= {:symbolize_keys => false}

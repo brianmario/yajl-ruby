@@ -13,6 +13,9 @@ class Object
 end
 
 module JSON
+  class JSONError < StandardError; end unless defined?(JSON::JSONError)
+  class GeneratorError < JSONError; end unless defined?(JSON::GeneratorError)
+  
   def self.generate(obj, opts={})
     begin
       options_map = {}
@@ -21,8 +24,8 @@ module JSON
         options_map[:indent] = opts[:indent]
       end
       Yajl::Encoder.encode(obj, options_map)
-    rescue Yajl::ParseError => e
-      raise JSON::ParserError, e.message
+    rescue Yajl::EncodeError => e
+      raise JSON::GeneratorError, e.message
     end
   end
   
@@ -32,16 +35,16 @@ module JSON
       options_map[:pretty] = true
       options_map[:indent] = opts[:indent] if opts.has_key?(:indent)
       Yajl::Encoder.encode(obj, options_map)
-    rescue Yajl::ParseError => e
-      raise JSON::ParserError, e.message
+    rescue Yajl::EncodeError => e
+      raise JSON::GeneratorError, e.message
     end
   end
   
   def self.dump(obj, io=nil, *args)
     begin
       Yajl::Encoder.encode(obj, io)
-    rescue Yajl::ParseError => e
-      raise JSON::ParserError, e.message
+    rescue Yajl::EncodeError => e
+      raise JSON::GeneratorError, e.message
     end
   end
 end
