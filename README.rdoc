@@ -19,11 +19,13 @@ You can read more info at the projects website http://lloyd.github.com/yajl or c
 
 == How to install
 
-Install it like any other gem hosted at the Githubs like so:
+First make sure you've got Gemcutter in your sources list:
 
-(more instructions here: http://gems.github.com)
+ gem sources -a http://gemcutter.org
 
- sudo gem install brianmario-yajl-ruby
+Then go ahead and install it as usual:
+
+ sudo gem install yajl-ruby
 
 == Example of use
 
@@ -216,10 +218,10 @@ There are a lot more possibilities that I'd love to see other gems/plugins for s
 
 Some ideas are:
 * parsing logs in JSON format
-* a Rails plugin (http://github.com/technoweenie/yajl-rails)
+* a Rails plugin - DONE! (http://github.com/technoweenie/yajl-rails)
 * builtin support in Rails 3?
-* Rack middleware (ideally the JSON body could be handed to the parser while it's still being received)
-* use with ohai (http://github.com/brianmario/ohai)
+* Rack middleware (ideally the JSON body could be handed to the parser while it's still being received, this is apparently possible with Unicorn)
+* use with ohai - DONE! (http://github.com/opscode/ohai/commit/f89baccc3b9ab587d23e0b6257f6fedffe223c02)
 * JSON API clients (http://github.com/brianmario/crack, http://github.com/brianmario/freckle-api)
 * Patch Marshal#load and Marshal#dump to use JSON? ;)
 * etc...
