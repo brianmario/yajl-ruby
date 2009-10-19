@@ -190,15 +190,14 @@ static int yajl_found_boolean(void * ctx, int boolean) {
     return 1;
 }
 
-static int yajl_found_number(void * ctx, const char * numberVal, unsigned int numberLen) {
-    VALUE subString = rb_str_new(numberVal, numberLen);
-    char * cSubString = RSTRING_PTR(subString);
-    
-    if (strstr(cSubString, ".") != NULL || strstr(cSubString, "e") != NULL || strstr(cSubString, "E") != NULL) {
-            yajl_set_static_value(ctx, rb_Float(subString));
-    } else {
-        yajl_set_static_value(ctx, rb_Integer(subString));
-    }
+static int yajl_found_integer(void * ctx, long integerVal) {
+    yajl_set_static_value(ctx, LONG2FIX(integerVal));
+    yajl_check_and_fire_callback(ctx);
+    return 1;
+}
+
+static int yajl_found_double(void * ctx, double doubleVal) {
+    yajl_set_static_value(ctx, rb_float_new(doubleVal));
     yajl_check_and_fire_callback(ctx);
     return 1;
 }
