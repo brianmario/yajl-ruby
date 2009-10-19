@@ -2,10 +2,11 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe "One-off JSON examples" do
-  it "should not be able to parse 23456789012E666 due to overflow" do
-    lambda {
-      Yajl::Parser.parse(StringIO.new('{"key": 23456789012E666}'))
-    }.should raise_error(Yajl::ParseError)
+  it "should parse 23456789012E666 and return Infinity" do
+    infinity = (1.0/0)
+    silence_warnings do
+      Yajl::Parser.parse(StringIO.new('{"key": 23456789012E666}')).should == {"key" => infinity}
+    end
   end
   
   it "should not parse JSON with a comment, with :allow_comments set to false" do

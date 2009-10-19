@@ -33,8 +33,7 @@ void yajl_parse_chunk(const unsigned char * chunk, unsigned int len, yajl_handle
 
 static int yajl_found_null(void * ctx);
 static int yajl_found_boolean(void * ctx, int boolean);
-static int yajl_found_integer(void * ctx, long integerVal);
-static int yajl_found_double(void * ctx, double doubleVal);
+static int yajl_found_number(void * ctx, const char * numberVal, unsigned int numberLen);
 static int yajl_found_string(void * ctx, const unsigned char * stringVal, unsigned int stringLen);
 static int yajl_found_hash_key(void * ctx, const unsigned char * stringVal, unsigned int stringLen);
 static int yajl_found_start_hash(void * ctx);
@@ -45,9 +44,9 @@ static int yajl_found_end_array(void * ctx);
 static yajl_callbacks callbacks = {
     yajl_found_null,
     yajl_found_boolean,
-    yajl_found_integer,
-    yajl_found_double,
     NULL,
+    NULL,
+    yajl_found_number,
     yajl_found_string,
     yajl_found_start_hash,
     yajl_found_hash_key,
