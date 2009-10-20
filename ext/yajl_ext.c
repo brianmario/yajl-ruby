@@ -198,9 +198,9 @@ static int yajl_found_number(void * ctx, const char * numberVal, unsigned int nu
     cSubString[numberLen] = '\0';
     
     if (strchr(cSubString, '.') != NULL || strchr(cSubString, 'e') != NULL || strchr(cSubString, 'E') != NULL) {
-        yajl_set_static_value(ctx, rb_float_new(rb_cstr_to_dbl(cSubString, Qtrue)));
+        yajl_set_static_value(ctx, rb_float_new(atof(cSubString)));
     } else {
-        yajl_set_static_value(ctx, rb_cstr_to_inum(cSubString, 0, Qtrue));
+        yajl_set_static_value(ctx, INT2FIX(atoi(cSubString)));
     }
     yajl_check_and_fire_callback(ctx);
     free(cSubString);
