@@ -191,15 +191,16 @@ static int yajl_found_boolean(void * ctx, int boolean) {
 }
 
 static int yajl_found_number(void * ctx, const char * numberVal, unsigned int numberLen) {
-    VALUE subString = rb_str_new(numberVal, numberLen);
-    char * cSubString = RSTRING_PTR(subString);
+    char * subString = ALLOC_N(char, numberLen+1);
+    memcpy(subString, numberVal, numberLen);
     
-    if (strchr(cSubString, '.') != NULL || strchr(cSubString, 'e') != NULL || strchr(cSubString, 'E') != NULL) {
-            yajl_set_static_value(ctx, rb_Float(subString));
+    if (strchr(subString, '.') != NULL || strchr(subString, 'e') != NULL || strchr(subString, 'E') != NULL) {
+            yajl_set_static_value(ctx, rb_float_new(rb_cstr_to_dbl(subString, 0)));
     } else {
-        yajl_set_static_value(ctx, rb_Integer(subString));
+        yajl_set_static_value(ctx, rb_cstr_to_inum(subString, 10, 0));
     }
     yajl_check_and_fire_callback(ctx);
+    free(subString);
     return 1;
 }
 
