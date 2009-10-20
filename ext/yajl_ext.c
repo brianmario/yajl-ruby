@@ -194,7 +194,7 @@ static int yajl_found_number(void * ctx, const char * numberVal, unsigned int nu
     VALUE subString = rb_str_new(numberVal, numberLen);
     char * cSubString = RSTRING_PTR(subString);
     
-    if (strstr(cSubString, ".") != NULL || strstr(cSubString, "e") != NULL || strstr(cSubString, "E") != NULL) {
+    if (strchr(cSubString, '.') != NULL || strchr(cSubString, 'e') != NULL || strchr(cSubString, 'E') != NULL) {
             yajl_set_static_value(ctx, rb_Float(subString));
     } else {
         yajl_set_static_value(ctx, rb_Integer(subString));
