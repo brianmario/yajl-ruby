@@ -191,19 +191,17 @@ static int yajl_found_boolean(void * ctx, int boolean) {
 }
 
 static int yajl_found_number(void * ctx, const char * numberVal, unsigned int numberLen) {
-    char * cSubString = ALLOC_N(char, numberLen+1);
-    if (cSubString) {
-        memcpy(cSubString, numberVal, numberLen);
-    }
-    cSubString[numberLen] = '\0';
+    char *buffer = (char*)numberVal;
+    char oldChar = buffer[numberLen];
+    buffer[numberLen] = '\0';
     
-    if (strchr(cSubString, '.') != NULL || strchr(cSubString, 'e') != NULL || strchr(cSubString, 'E') != NULL) {
-        yajl_set_static_value(ctx, rb_float_new(atof(cSubString)));
+    if (strchr(buffer, '.') != NULL || strchr(buffer, 'e') != NULL || strchr(buffer, 'E') != NULL) {
+        yajl_set_static_value(ctx, rb_float_new(atof(buffer)));
     } else {
-        yajl_set_static_value(ctx, INT2FIX(atoi(cSubString)));
+        yajl_set_static_value(ctx, INT2FIX(atoi(buffer)));
     }
     yajl_check_and_fire_callback(ctx);
-    free(cSubString);
+    buffer[numberLen] = oldChar;
     return 1;
 }
 
