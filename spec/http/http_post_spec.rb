@@ -1,6 +1,10 @@
 # encoding: UTF-8
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
-require 'yajl/bzip2'
+begin
+  require 'yajl/bzip2'
+rescue
+  warn "Couldn't load yajl/bzip2, maybe you don't have bzip2-ruby installed? Continuing without running bzip2 specs."
+end
 require 'yajl/gzip'
 require 'yajl/deflate'
 require 'yajl/http_stream'
@@ -54,14 +58,16 @@ describe "Yajl HTTP POST request" do
     @template_hash_symbolized.should == Yajl::HttpStream.post(@uri, @body, :symbolize_keys => true)
   end
   
-  it "should parse a bzip2 compressed response" do
-    prepare_mock_request_dump :bzip2
-    @template_hash.should == Yajl::HttpStream.post(@uri, @body)
-  end
+  if defined?(Yajl::Bzip2::StreamReader)
+    it "should parse a bzip2 compressed response" do
+      prepare_mock_request_dump :bzip2
+      @template_hash.should == Yajl::HttpStream.post(@uri, @body)
+    end
   
-  it "should parse a bzip2 compressed response and symbolize keys" do
-    prepare_mock_request_dump :bzip2
-    @template_hash_symbolized.should == Yajl::HttpStream.post(@uri, @body, :symbolize_keys => true)
+    it "should parse a bzip2 compressed response and symbolize keys" do
+      prepare_mock_request_dump :bzip2
+      @template_hash_symbolized.should == Yajl::HttpStream.post(@uri, @body, :symbolize_keys => true)
+    end
   end
   
   it "should parse a deflate compressed response" do

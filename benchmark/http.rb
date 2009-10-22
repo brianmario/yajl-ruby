@@ -4,7 +4,7 @@ require 'benchmark'
 require 'yajl/http_stream'
 require 'yajl/gzip'
 require 'yajl/deflate'
-require 'yajl/bzip2'
+require 'yajl/bzip2' unless defined?(Bzip2)
 require 'json'
 require 'uri'
 require 'net/http'
