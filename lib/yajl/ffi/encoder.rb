@@ -1,6 +1,8 @@
 # encoding: UTF-8
 
 module Yajl
+  class EncodeError < StandardError; end
+  
   class Encoder
     extend ::FFI::Library
     ffi_lib('libyajl')
