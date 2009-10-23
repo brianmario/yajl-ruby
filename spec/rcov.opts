@@ -1,4 +1,3 @@
 --exclude spec,gem
 --text-summary
---spec-only
 --sort coverage --sort-reverse
