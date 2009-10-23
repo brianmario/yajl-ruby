@@ -95,4 +95,16 @@ describe "Yajl HTTP POST request" do
     prepare_mock_request_dump :gzip
     @template_hash_symbolized.should == Yajl::HttpStream.post(@uri, @body, :symbolize_keys => true)
   end
+
+  it "should parse a chunked raw response"
+
+  it "should throw Exception if chunked response and no block given" do
+    prepare_mock_request_dump :chunked
+    lambda {Yajl::HttpStream.post(@uri, @body)}.should raise_error(Exception)
+  end
+
+  it "should throw InvalidContentType if unable to handle the MIME type" do
+    prepare_mock_request_dump :html
+    lambda {Yajl::HttpStream.post(@uri, @body)}.should raise_error(Yajl::HttpStream::InvalidContentType)
+  end
 end
