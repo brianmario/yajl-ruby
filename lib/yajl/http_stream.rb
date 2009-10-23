@@ -53,7 +53,6 @@ module Yajl
           request << "Content-Length: #{body.length}\r\n"
           request << "Content-Type: #{content_type}\r\n"
         end
-        request << "Connection: close\r\n"
         encodings = []
         encodings << "bzip2" if defined?(Yajl::Bzip2)
         encodings << "gzip" if defined?(Yajl::Gzip)
