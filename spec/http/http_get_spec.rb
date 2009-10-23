@@ -57,6 +57,14 @@ describe "Yajl HTTP GET request" do
     @template_hash_symbolized.should == Yajl::HttpStream.get(@uri, :symbolize_keys => true)
   end
   
+  it "should parse a raw response using instance method" do
+    prepare_mock_request_dump :raw
+    stream = Yajl::HttpStream.new
+    @template_hash.should == stream.get(@uri)
+  end
+  
+  it "should parse a chunked response using instance method"
+  
   if defined?(Yajl::Bzip2::StreamReader)
     it "should parse a bzip2 compressed response" do
       prepare_mock_request_dump :bzip2

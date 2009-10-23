@@ -52,6 +52,12 @@ describe "Yajl HTTP DELETE request" do
     @template_hash.should == Yajl::HttpStream.delete(@uri)
   end
   
+  it "should parse a raw response using instance method" do
+    prepare_mock_request_dump :raw
+    stream = Yajl::HttpStream.new
+    @template_hash.should == stream.delete(@uri)
+  end
+  
   it "should parse a raw response and symbolize keys" do
     prepare_mock_request_dump :raw
     @template_hash_symbolized.should == Yajl::HttpStream.delete(@uri, :symbolize_keys => true)

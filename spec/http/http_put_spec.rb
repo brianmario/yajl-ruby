@@ -54,6 +54,12 @@ describe "Yajl HTTP PUT request" do
     @template_hash.should == Yajl::HttpStream.put(@uri, @body)
   end
 
+  it "should parse a raw response using instance method" do
+    prepare_mock_request_dump :raw
+    stream = Yajl::HttpStream.new
+    @template_hash.should == stream.put(@uri, @body)
+  end
+  
   it "should parse a raw response with hashed body" do
     prepare_mock_request_dump :raw
     @template_hash.should == Yajl::HttpStream.post(@uri, @hashed_body)
