@@ -1,6 +1,7 @@
 # encoding: UTF-8
 require 'socket' unless defined?(Socket)
 require 'yajl' unless defined?(Yajl::Parser)
+require 'uri' unless defined?(URI)
 
 module Yajl
   # This module is for making HTTP requests to which the response bodies (and possibly requests in the near future)
@@ -41,6 +42,9 @@ module Yajl
         if method == "POST" || method == "PUT"
           content_type = opts.has_key?('Content-Type') ? opts.delete(['Content-Type']) : "application/x-www-form-urlencoded"
           body = opts.delete(:body)
+          if body.is_a?(Hash)
+            body = body.keys.collect {|param| "#{URI.escape(param.to_s)}=#{URI.escape(body[param].to_s)}"}.join('&')
+          end
         end
 
         socket = TCPSocket.new(uri.host, uri.port)

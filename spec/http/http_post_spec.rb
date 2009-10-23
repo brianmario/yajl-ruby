@@ -30,6 +30,7 @@ describe "Yajl HTTP POST request" do
     @deflate = File.new(File.expand_path(File.dirname(__FILE__) + '/fixtures/http.deflate.dump'), 'r')
     @gzip = File.new(File.expand_path(File.dirname(__FILE__) + '/fixtures/http.gzip.dump'), 'r')
     @body = "blah=foo&bar=baz"
+    @hashed_body = {:blah => 'foo', 'bar' => 'baz'}
   end
   
   after(:each) do
@@ -47,10 +48,15 @@ describe "Yajl HTTP POST request" do
     @uri.should_receive(:query)
     @uri.should_receive(:userinfo)
   end
-  
+
   it "should parse a raw response" do
     prepare_mock_request_dump :raw
     @template_hash.should == Yajl::HttpStream.post(@uri, @body)
+  end
+
+  it "should parse a raw response with hashed body" do
+    prepare_mock_request_dump :raw
+    @template_hash.should == Yajl::HttpStream.post(@uri, @hashed_body)
   end
   
   it "should parse a raw response and symbolize keys" do
