@@ -361,10 +361,9 @@ static VALUE rb_yajl_parser_init(int argc, VALUE * argv, VALUE self) {
 static VALUE rb_yajl_parser_parse(int argc, VALUE * argv, VALUE self) {
     yajl_status stat;
     struct yajl_parser_wrapper * wrapper;
-    VALUE parsed, rbufsize, input, blk;
+    VALUE rbufsize, input, blk;
     
     GetParser(self, wrapper);
-    parsed = rb_str_new2("");
     
     // setup our parameters
     rb_scan_args(argc, argv, "11&", &input, &rbufsize, &blk);
@@ -380,6 +379,7 @@ static VALUE rb_yajl_parser_parse(int argc, VALUE * argv, VALUE self) {
     if (TYPE(input) == T_STRING) {
         yajl_parse_chunk((const unsigned char *)RSTRING_PTR(input), RSTRING_LEN(input), wrapper->parser);
     } else if (rb_respond_to(input, intern_eof)) {
+        VALUE parsed = rb_str_new2("");
         while (rb_funcall(input, intern_eof, 0) != Qtrue) {
             rb_funcall(input, intern_io_read, 2, rbufsize, parsed);
             yajl_parse_chunk((const unsigned char *)RSTRING_PTR(parsed), RSTRING_LEN(parsed), wrapper->parser);
