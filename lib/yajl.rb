@@ -15,6 +15,16 @@ require 'yajl_ext'
 module Yajl
   VERSION = "0.6.4"
   
+  # For compatibility
+  def self.load(str_or_io)
+    Parser.parse(str_or_io)
+  end
+  
+  # For compatibility
+  def self.dump(obj, io=nil)
+    Encoder.encode(obj, io)
+  end
+  
   class Parser
     # A helper method for parse-and-forget use-cases
     #
@@ -25,8 +35,8 @@ module Yajl
     # :allow_comments accepts a boolean will enable/disable checks for in-line comments in the JSON stream
     #
     # :check_utf8 accepts a boolean will enable/disable UTF8 validation for the JSON stream
-    def self.parse(io, options={}, read_bufsize=nil, &block)
-      new(options).parse(io, read_bufsize, &block)
+    def self.parse(str_or_io, options={}, read_bufsize=nil, &block)
+      new(options).parse(str_or_io, read_bufsize, &block)
     end
   end
   
@@ -68,15 +78,15 @@ module Yajl
   # DEPRECATED - See Yajl::Parser and Yajl::Encoder
   module Stream
     # DEPRECATED - See Yajl::Parser
-    def self.parse(io)
-      STDERR.puts "WARNING: Yajl::Stream has be deprecated and will most likely be gone in the next release. Use the Yajl::Parser class instead."
-      Parser.new.parse(io)
+    def self.parse(str_or_io)
+      warn "WARNING: Yajl::Stream has be deprecated and will most likely be gone in the next release. Use the Yajl::Parser class instead."
+      Parser.new.parse(str_or_io)
     end
     
     # DEPRECATED - See Yajl::Encoder
-    def self.encode(obj, io)
-      STDERR.puts "WARNING: Yajl::Stream has be deprecated and will most likely be gone in the next release. Use the Yajl::Encoder class instead."
-      Encoder.new.encode(obj, io)
+    def self.encode(obj, str_or_io=nil)
+      warn "WARNING: Yajl::Stream has be deprecated and will most likely be gone in the next release. Use the Yajl::Encoder class instead."
+      Encoder.new.encode(obj, str_or_io)
     end
   end
 end
