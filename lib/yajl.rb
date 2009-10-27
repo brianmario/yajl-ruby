@@ -15,14 +15,14 @@ require 'yajl_ext'
 module Yajl
   VERSION = "0.6.4"
   
-  # For compatibility
-  def self.load(str_or_io)
-    Parser.parse(str_or_io)
+  # For compatibility, has the same signature of Yajl::Parser.parse
+  def self.load(str_or_io, options={}, read_bufsize=nil, &block)
+    Parser.parse(str_or_io, options, read_bufsize, &block)
   end
   
-  # For compatibility
-  def self.dump(obj, io=nil)
-    Encoder.encode(obj, io)
+  # For compatibility, has the same signature of Yajl::Encoder.encode
+  def self.dump(obj, *args, &block)
+    Encoder.encode(obj, args, &block)
   end
   
   class Parser
@@ -62,6 +62,7 @@ module Yajl
     # If a block is passed, it will be used as (and work the same as) the +on_progress+ callback
     def self.encode(obj, *args, &block)
       # TODO: this code smells, any ideas?
+      args.flatten!
       options = {}
       io = nil
       args.each do |arg|

@@ -17,6 +17,12 @@ describe "Yajl" do
       io.rewind
       io.read.should eql('{"a":1234}') 
     end
+    
+    it "should be able to encode with a block supplied" do
+      Yajl.dump({:a => 1234}) do |chunk|
+        chunk.should eql('{"a":1234}')
+      end
+    end
   end
   
   context "load" do
@@ -31,6 +37,19 @@ describe "Yajl" do
     it "should be able to parse from an IO" do
       io = StringIO.new('{"a":1234}')
       Yajl.load(io).should eql({"a" => 1234})
+    end
+    
+    it "should be able to parse from a string with a block supplied" do
+      Yajl.load('{"a":1234}') do |h|
+        h.should eql({"a" => 1234})
+      end
+    end
+    
+    it "should be able to parse from an IO with a block supplied" do
+      io = StringIO.new('{"a":1234}')
+      Yajl.load(io) do |h|
+        h.should eql({"a" => 1234})
+      end
     end
   end
 end
