@@ -24,11 +24,15 @@ describe "One-off JSON examples" do
   end
   
   it "should not parse invalid UTF8 with :check_utf8 set to true" do
-    pending "not sure how to write this test yet"
+    parser = Yajl::Parser.new(:check_utf8 => true)
+    lambda {
+      parser.parse("[\"#{"\201\203"}\"]")
+    }.should raise_error(Yajl::ParseError)
   end
   
   it "should parse invalid UTF8 with :check_utf8 set to false" do
-    pending "not sure how to write this test yet"
+    parser = Yajl::Parser.new(:check_utf8 => false)
+    puts parser.parse("[\"#{"\201\203"}\"]").inspect
   end
   
   it "should parse using it's class method, from an IO" do
