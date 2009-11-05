@@ -1,11 +1,11 @@
 #include "yajl_ext.h"
 
-// Helpers for building objects
+/* Helpers for building objects */
 inline void yajl_check_and_fire_callback(void * ctx) {
     struct yajl_parser_wrapper * wrapper;
     GetParser((VALUE)ctx, wrapper);
     
-    // No need to do any of this if the callback isn't even setup
+    /* No need to do any of this if the callback isn't even setup */
     if (wrapper->parse_complete_callback != Qnil) {
         int len = RARRAY_LEN(wrapper->builderStack);
         if (len == 1 && wrapper->nestedArrayLevel == 0 && wrapper->nestedHashLevel == 0) {
@@ -98,15 +98,15 @@ void yajl_encode_part(void * wrapper, VALUE obj, VALUE io) {
         case T_HASH:
             status = yajl_gen_map_open(w->encoder);
             
-            // TODO: itterate through keys in the hash
+            /* TODO: itterate through keys in the hash */
             VALUE keys = rb_funcall(obj, intern_keys, 0);
             VALUE entry, keyStr;
             for(idx=0; idx<RARRAY_LEN(keys); idx++) {
                 entry = rb_ary_entry(keys, idx);
-                keyStr = rb_funcall(entry, intern_to_s, 0); // key must be a string
-                // the key
+                keyStr = rb_funcall(entry, intern_to_s, 0); /* key must be a string */
+                /* the key */
                 yajl_encode_part(w, keyStr, io);
-                // the value
+                /* the value */
                 yajl_encode_part(w, rb_hash_aref(obj, entry), io);
             }
             
@@ -144,7 +144,7 @@ void yajl_encode_part(void * wrapper, VALUE obj, VALUE io) {
         default:
             if (rb_respond_to(obj, intern_to_json)) {
                 str = rb_funcall(obj, intern_to_json, 0);
-                quote_strings = 0; // this lets us append on to the buffer without Yajl quoting it again
+                quote_strings = 0; /* this lets us append on to the buffer without Yajl quoting it again */
             } else {
                 str = rb_funcall(obj, intern_to_s, 0);
             }
@@ -177,7 +177,7 @@ void yajl_parse_chunk(const unsigned char * chunk, unsigned int len, yajl_handle
     }
 }
 
-// YAJL Callbacks
+/* YAJL Callbacks */
 static int yajl_found_null(void * ctx) {
     yajl_set_static_value(ctx, Qnil);
     yajl_check_and_fire_callback(ctx);
@@ -217,10 +217,9 @@ static int yajl_found_hash_key(void * ctx, const unsigned char * stringVal, unsi
     struct yajl_parser_wrapper * wrapper;
     GetParser((VALUE)ctx, wrapper);
     VALUE keyStr = rb_str_new((const char *)stringVal, stringLen);
-    
+
     if (wrapper->symbolizeKeys) {
-        ID key = rb_intern(RSTRING_PTR(keyStr));
-        yajl_set_static_value(ctx, ID2SYM(key));
+        yajl_set_static_value(ctx, rb_funcall(keyStr, intern_to_sym, 0));
     } else {
         yajl_set_static_value(ctx, keyStr);
     }
@@ -267,7 +266,7 @@ static int yajl_found_end_array(void * ctx) {
 }
 
 
-// Ruby Interface
+/* Ruby Interface */
 
 /*
  * Document-class: Yajl::Parser
@@ -294,17 +293,17 @@ static VALUE rb_yajl_parser_new(int argc, VALUE * argv, VALUE klass) {
     VALUE opts, obj;
     int allowComments = 1, checkUTF8 = 1, symbolizeKeys = 0;
     
-    // Scan off config vars
+    /* Scan off config vars */
     if (rb_scan_args(argc, argv, "01", &opts) == 1) {
         Check_Type(opts, T_HASH);
         
-        if (rb_hash_aref(opts, ID2SYM(sym_allow_comments)) == Qfalse) {
+        if (rb_hash_aref(opts, sym_allow_comments) == Qfalse) {
             allowComments = 0;
         }
-        if (rb_hash_aref(opts, ID2SYM(sym_check_utf8)) == Qfalse) {
+        if (rb_hash_aref(opts, sym_check_utf8) == Qfalse) {
             checkUTF8 = 0;
         }
-        if (rb_hash_aref(opts, ID2SYM(sym_symbolize_keys)) == Qtrue) {
+        if (rb_hash_aref(opts, sym_symbolize_keys) == Qtrue) {
             symbolizeKeys = 1;
         }
     }
@@ -365,7 +364,7 @@ static VALUE rb_yajl_parser_parse(int argc, VALUE * argv, VALUE self) {
     
     GetParser(self, wrapper);
     
-    // setup our parameters
+    /* setup our parameters */
     rb_scan_args(argc, argv, "11&", &input, &rbufsize, &blk);
     if (NIL_P(rbufsize)) {
         rbufsize = INT2FIX(READ_BUFSIZE);
@@ -388,7 +387,7 @@ static VALUE rb_yajl_parser_parse(int argc, VALUE * argv, VALUE self) {
         rb_raise(cParseError, "input must be a string or IO");
     }
     
-    // parse any remaining buffered data
+    /* parse any remaining buffered data */
     stat = yajl_parse_complete(wrapper->parser);
     
     if (wrapper->parse_complete_callback != Qnil) {
@@ -474,13 +473,13 @@ static VALUE rb_yajl_encoder_new(int argc, VALUE * argv, VALUE klass) {
     const char * indentString = "  ";
     int beautify = 0;
     
-    // Scan off config vars
+    /* Scan off config vars */
     if (rb_scan_args(argc, argv, "01", &opts) == 1) {
         Check_Type(opts, T_HASH);
         
-        if (rb_hash_aref(opts, ID2SYM(sym_pretty)) == Qtrue) {
+        if (rb_hash_aref(opts, sym_pretty) == Qtrue) {
             beautify = 1;
-            indent = rb_hash_aref(opts, ID2SYM(sym_indent));
+            indent = rb_hash_aref(opts, sym_indent);
             if (indent != Qnil) {
                 Check_Type(indent, T_STRING);
                 indentString = RSTRING_PTR(indent);
@@ -492,8 +491,8 @@ static VALUE rb_yajl_encoder_new(int argc, VALUE * argv, VALUE klass) {
     obj = Data_Make_Struct(klass, struct yajl_encoder_wrapper, yajl_encoder_wrapper_mark, yajl_encoder_wrapper_free, wrapper);
     wrapper->encoder = yajl_gen_alloc(&cfg, NULL);
     wrapper->on_progress_callback = Qnil;
-    if (opts != Qnil && rb_funcall(opts, intern_has_key, 1, ID2SYM(sym_terminator)) == Qtrue) {
-        wrapper->terminator = rb_hash_aref(opts, ID2SYM(sym_terminator));
+    if (opts != Qnil && rb_funcall(opts, intern_has_key, 1, sym_terminator) == Qtrue) {
+        wrapper->terminator = rb_hash_aref(opts, sym_terminator);
     } else {
         wrapper->terminator = 0;
     }
@@ -550,10 +549,10 @@ static VALUE rb_yajl_encoder_encode(int argc, VALUE * argv, VALUE self) {
         wrapper->on_progress_callback = blk;
     }
     
-    // begin encode process
+    /* begin encode process */
     yajl_encode_part(wrapper, obj, io);
 
-    // just make sure we output the remaining buffer
+    /* just make sure we output the remaining buffer */
     yajl_gen_get_buf(wrapper->encoder, &buffer, &len);
     outBuff = rb_str_new((const char *)buffer, len);
     yajl_gen_clear(wrapper->encoder);
@@ -597,7 +596,7 @@ static VALUE rb_yajl_encoder_set_progress_cb(VALUE self, VALUE callback) {
 }
 
 
-// JSON Gem compatibility
+/* JSON Gem compatibility */
 
 /*
  * Document-class: Hash
@@ -790,7 +789,7 @@ static VALUE rb_yajl_encoder_enable_json_gem_ext(VALUE klass) {
 }
 
 
-// Ruby Extension initializer
+/* Ruby Extension initializer */
 void Init_yajl_ext() {
     mYajl = rb_define_module("Yajl");
     
@@ -819,12 +818,13 @@ void Init_yajl_ext() {
     intern_keys = rb_intern("keys");
     intern_to_s = rb_intern("to_s");
     intern_to_json = rb_intern("to_json");
-    
-    sym_allow_comments = rb_intern("allow_comments");
-    sym_check_utf8 = rb_intern("check_utf8");
-    sym_pretty = rb_intern("pretty");
-    sym_indent = rb_intern("indent");
-    sym_terminator = rb_intern("terminator");
-    sym_symbolize_keys = rb_intern("symbolize_keys");
+    intern_to_sym = rb_intern("to_sym");
     intern_has_key = rb_intern("has_key?");
+    
+    sym_allow_comments = ID2SYM(rb_intern("allow_comments"));
+    sym_check_utf8 = ID2SYM(rb_intern("check_utf8"));
+    sym_pretty = ID2SYM(rb_intern("pretty"));
+    sym_indent = ID2SYM(rb_intern("indent"));
+    sym_terminator = ID2SYM(rb_intern("terminator"));
+    sym_symbolize_keys = ID2SYM(rb_intern("symbolize_keys"));
 }
