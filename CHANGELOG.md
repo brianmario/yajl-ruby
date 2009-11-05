@@ -2,6 +2,7 @@
 
 ## 0.6.4 (November 4th, 2009)
 * All specs pass on Rubinius :)
+* Added Yajl.load and Yajl.dump for compatibility with other various data format API's in ruby
 * Fixed a bug in Yajl::Encoder which allowed direct, unescaped encoding of NaN, Infinity and -Infinity.
   It will now properly throw a Yajl::EncodeError exception if either of these values are found unescaped.
 * Update bundled Yajl library to 1.0.7
