@@ -55,9 +55,11 @@ module Yajl
     attach_function :yajl_get_error, [:pointer, :int, :string, :uint], :string
     attach_function :yajl_free_error, [:pointer, :string], :void
     
-    attr_reader :on_parse_complete
-    
-    def initialize(options={:symbolize_keys => false, :allow_comments => false, :check_utf8 => false})
+    def initialize(options={
+      :symbolize_keys => false,
+      :allow_comments => false,
+      :check_utf8 => false
+    })
       @builder_stack = []
       @nested_array_level = 0
       @nested_hash_level = 0
