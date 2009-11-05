@@ -14,7 +14,7 @@ uri = URI.parse('http://search.twitter.com/search.json?q=github')
 
 times = ARGV[0] ? ARGV[0].to_i : 1
 puts "Starting benchmark parsing #{uri.to_s} #{times} times\n\n"
-Benchmark.bm { |x|
+Benchmark.bmbm { |x|
   x.report {
     puts "Yajl::HttpStream.get"
     times.times {

@@ -11,9 +11,9 @@ json = File.new(filename, 'r')
 hash = Yajl::Parser.new.parse(json)
 json.close
 
-times = ARGV[0] ? ARGV[0].to_i : 1
+times = ARGV[0] ? ARGV[0].to_i : 1000
 puts "Starting benchmark encoding #{filename} into JSON #{times} times\n\n"
-Benchmark.bm { |x|
+Benchmark.bmbm { |x|
   encoder = Yajl::Encoder.new
   x.report {
     puts "Yajl::Encoder#encode"
@@ -35,9 +35,8 @@ yml = File.new(filename, 'r')
 data = YAML.load_stream(yml)
 yml.close
 
-times = ARGV[0] ? ARGV[0].to_i : 1
 puts "Starting benchmark encoding #{filename} into YAML #{times} times\n\n"
-Benchmark.bm { |x|
+Benchmark.bmbm { |x|
   x.report {
     puts "YAML.dump"
     times.times {

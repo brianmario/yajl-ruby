@@ -12,9 +12,9 @@ json = File.new(filename, 'r')
 hash = Yajl::Parser.new.parse(json)
 json.close
 
-times = ARGV[1] ? ARGV[1].to_i : 1
+times = ARGV[1] ? ARGV[1].to_i : 1000
 puts "Starting benchmark encoding #{filename} #{times} times\n\n"
-Benchmark.bm { |x|
+Benchmark.bmbm { |x|
   io_encoder = Yajl::Encoder.new
   x.report {
     puts "Yajl::Encoder#encode (to an IO)"
@@ -30,7 +30,7 @@ Benchmark.bm { |x|
     }
   }
   x.report {
-    puts "JSON's #to_json"
+    puts "JSON.generate"
     times.times {
       JSON.generate(hash)
     }

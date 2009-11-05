@@ -5,17 +5,14 @@ require 'yajl_ext'
 require 'json'
 require 'activesupport'
 
-filename = ARGV[0] || 'benchmark/subjects/ohai.json'
+filename = ARGV[0] || 'benchmark/subjects/twitter_search.json'
 json = File.new(filename, 'r')
 
-# warm up the filesystem
-json.read
-json.rewind
-
-times = ARGV[1] ? ARGV[1].to_i : 1
+times = ARGV[1] ? ARGV[1].to_i : 1000
 puts "Starting benchmark parsing #{File.size(filename)} bytes of JSON data #{times} times\n\n"
-Benchmark.bm { |x|
+Benchmark.bmbm { |x|
   io_parser = Yajl::Parser.new
+  io_parser.on_parse_complete = lambda {|obj|} if times > 1
   x.report {
     puts "Yajl::Parser#parse (from an IO)"
     times.times {
@@ -24,6 +21,7 @@ Benchmark.bm { |x|
     }
   }
   string_parser = Yajl::Parser.new
+  string_parser.on_parse_complete = lambda {|obj|} if times > 1
   x.report {
     puts "Yajl::Parser#parse (from a String)"
     times.times {
