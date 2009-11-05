@@ -51,7 +51,7 @@ module Yajl
       @callback = block if block_given?
 
       encode_part(obj, io)
-      outBuf = get_buffer
+      outBuf, len = get_buffer
       yajl_gen_clear(@encoder)
       if io
         io.write(outBuf)
@@ -84,15 +84,20 @@ module Yajl
     INFINITY = "Infinity"
     NEG_INFINITY = "-Infinity"
 
-    def get_buffer
+    def get_buffer(include_str=true)
       outBufPtr = FFI::MemoryPointer.new(:pointer)
       outLen = FFI::MemoryPointer.new(:pointer)
       status = yajl_gen_get_buf(@encoder, outBufPtr, outLen)
-      if outLen.read_int > 0
-        outBufPtr = outBufPtr.read_pointer
-        outBufPtr.read_string
+      len = outLen.read_int
+      if include_str
+        if len > 0
+          outBufPtr = outBufPtr.read_pointer
+          [outBufPtr.read_string, len]
+        else
+          ["", 0]
+        end
       else
-        ""
+        len
       end
     end
 
@@ -101,8 +106,9 @@ module Yajl
       len = 0
       
       if io or @callback
-        outBuf = get_buffer
+        len = get_buffer(false)
         if len > WRITE_BUFSIZE
+          outBuf, len = get_buffer
           if io
             io.write(outBuf)
           elsif @callback

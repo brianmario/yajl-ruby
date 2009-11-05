@@ -3,7 +3,11 @@ $LOAD_PATH.unshift File.expand_path(File.dirname(__FILE__) + '/../lib')
 
 require 'rubygems'
 require 'benchmark'
-require 'yajl/ffi'
+begin
+  require 'yajl_ext'
+rescue LoadError
+  require 'yajl/ffi'
+end
 require 'json'
 require 'activesupport'
 
