@@ -1,9 +1,16 @@
 # Changelog
 
-## 0.6.4 (?)
+## 0.6.4 (November 4th, 2009)
 * Fixed a bug in Yajl::Encoder which allowed direct, unescaped encoding of NaN, Infinity and -Infinity.
   It will now properly throw a Yajl::EncodeError exception if either of these values are found unescaped.
-* Update bundled Yajl library to 1.0.6
+* Update bundled Yajl library to 1.0.7
+* Conditionally define RSTRING_* and RARRAY_* for older versions of ruby (1.8.5 is still the default on CentOS)
+* Bugfix for JSON gem exception classes to more accurately match those of the actual JSON gem
+* A few small speed optimizations
+* Updated specs to not run bzip2 related examples if unable to load the bzip2 library
+* Finally added UTF-8 checking specs
+* Removed needless calls to ID2SYM all over the place
+* Updated benchmark scripts to bring the GC into the picture a little more
 
 ## 0.6.3 (August 25th, 2009)
 * Fixed a bug in the JSON gem compatibility API where strings weren't being properly escaped
