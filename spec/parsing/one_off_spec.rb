@@ -32,7 +32,7 @@ describe "One-off JSON examples" do
   
   it "should parse invalid UTF8 with :check_utf8 set to false" do
     parser = Yajl::Parser.new(:check_utf8 => false)
-    puts parser.parse("[\"#{"\201\203"}\"]").inspect
+    parser.parse("[\"#{"\201\203"}\"]").inspect
   end
   
   it "should parse using it's class method, from an IO" do

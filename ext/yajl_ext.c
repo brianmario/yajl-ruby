@@ -216,11 +216,18 @@ static int yajl_found_string(void * ctx, const unsigned char * stringVal, unsign
 static int yajl_found_hash_key(void * ctx, const unsigned char * stringVal, unsigned int stringLen) {
     struct yajl_parser_wrapper * wrapper;
     GetParser((VALUE)ctx, wrapper);
-    VALUE keyStr = rb_str_new((const char *)stringVal, stringLen);
+    VALUE keyStr;
 
     if (wrapper->symbolizeKeys) {
-        yajl_set_static_value(ctx, rb_funcall(keyStr, intern_to_sym, 0));
+        char * cSubString = ALLOC_N(char, stringLen+1);
+        if (cSubString) {
+            memcpy(cSubString, stringVal, stringLen);
+        }
+        cSubString[stringLen] = '\0';
+        yajl_set_static_value(ctx, ID2SYM(rb_intern(cSubString)));
+        free(cSubString);
     } else {
+        keyStr = rb_str_new((const char *)stringVal, stringLen);
         yajl_set_static_value(ctx, keyStr);
     }
     yajl_check_and_fire_callback(ctx);
