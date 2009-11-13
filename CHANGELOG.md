@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.6.5 (November 13th, 2009)
+* optimize symbol creation while symbolize_keys is turned on
+* fix for 32bit integer conversion into ruby
+
 ## 0.6.4 (November 4th, 2009)
 * All specs pass on Rubinius :)
 * Added Yajl.load and Yajl.dump for compatibility with other various data format API's in ruby
