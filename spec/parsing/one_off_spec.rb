@@ -55,4 +55,10 @@ describe "One-off JSON examples" do
     end
     output.should == {"key" => 1234}
   end
+  
+  it "should parse numbers greater than 2,147,483,648" do
+    Yajl::Parser.parse("{\"id\": 2147483649}").should eql({"id" => 2147483649})
+    Yajl::Parser.parse("{\"id\": 5687389800}").should eql({"id" => 5687389800})
+    Yajl::Parser.parse("{\"id\": 1046289770033519442869495707521600000000}").should eql({"id" => 1046289770033519442869495707521600000000})
+  end
 end
