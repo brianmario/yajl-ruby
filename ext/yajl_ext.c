@@ -191,19 +191,16 @@ static int yajl_found_boolean(void * ctx, int boolean) {
 }
 
 static int yajl_found_number(void * ctx, const char * numberVal, unsigned int numberLen) {
-    char * cSubString = ALLOC_N(char, numberLen+1);
-    if (cSubString) {
-        memcpy(cSubString, numberVal, numberLen);
+    char buf[numberLen+1];
+    memcpy(buf, numberVal, numberLen);
+    buf[numberLen] = 0;
+
+    if (strchr(buf, '.') || strchr(buf, 'e') || strchr(buf, 'E')) {
+        yajl_set_static_value(ctx, rb_float_new(strtod(buf, NULL)));
     }
-    cSubString[numberLen] = '\0';
-    
-    if (strchr(cSubString, '.') != NULL || strchr(cSubString, 'e') != NULL || strchr(cSubString, 'E') != NULL) {
-        yajl_set_static_value(ctx, rb_float_new(rb_cstr_to_dbl(cSubString, 10)));
-    } else {
-        yajl_set_static_value(ctx, rb_cstr2inum(cSubString, 10));
+    else {
+        yajl_set_static_value(ctx, rb_cstr2inum(buf, 10));
     }
-    yajl_check_and_fire_callback(ctx);
-    free(cSubString);
     return 1;
 }
 
@@ -219,13 +216,10 @@ static int yajl_found_hash_key(void * ctx, const unsigned char * stringVal, unsi
     VALUE keyStr;
 
     if (wrapper->symbolizeKeys) {
-        char * cSubString = ALLOC_N(char, stringLen+1);
-        if (cSubString) {
-            memcpy(cSubString, stringVal, stringLen);
-        }
-        cSubString[stringLen] = '\0';
-        yajl_set_static_value(ctx, ID2SYM(rb_intern(cSubString)));
-        free(cSubString);
+        char buf[stringLen+1];
+        memcpy(buf, stringVal, stringLen);
+        buf[stringLen] = 0;
+        yajl_set_static_value(ctx, ID2SYM(rb_intern(buf)));
     } else {
         keyStr = rb_str_new((const char *)stringVal, stringLen);
         yajl_set_static_value(ctx, keyStr);
