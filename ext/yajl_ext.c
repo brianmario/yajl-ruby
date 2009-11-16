@@ -78,6 +78,7 @@ void yajl_encode_part(void * wrapper, VALUE obj, VALUE io) {
     yajl_gen_status status;
     int idx = 0;
     const unsigned char * buffer;
+    const char * cptr;
     unsigned int len;
     int quote_strings = 1;
     
@@ -133,13 +134,15 @@ void yajl_encode_part(void * wrapper, VALUE obj, VALUE io) {
         case T_FLOAT:
         case T_BIGNUM:
             str = rb_funcall(obj, intern_to_s, 0);
-            if (strcmp(RSTRING_PTR(str), "NaN") == 0 || strcmp(RSTRING_PTR(str), "Infinity") == 0 || strcmp(RSTRING_PTR(str), "-Infinity") == 0) {
-                rb_raise(cEncodeError, "'%s' is an invalid number", RSTRING_PTR(str));
+            cptr = RSTRING_PTR(str);
+            if (strcmp(cptr, "NaN") == 0 || strcmp(cptr, "Infinity") == 0 || strcmp(cptr, "-Infinity") == 0) {
+                rb_raise(cEncodeError, "'%s' is an invalid number", cptr);
             }
-            status = yajl_gen_number(w->encoder, RSTRING_PTR(str), (unsigned int)RSTRING_LEN(str));
+            status = yajl_gen_number(w->encoder, cptr, (unsigned int)strlen(cptr));
             break;
         case T_STRING:
-            status = yajl_gen_string(w->encoder, (const unsigned char *)RSTRING_PTR(obj), (unsigned int)RSTRING_LEN(obj), 1);
+            cptr = RSTRING_PTR(obj);
+            status = yajl_gen_string(w->encoder, (const unsigned char *)cptr, (unsigned int)strlen(cptr), 1);
             break;
         default:
             if (rb_respond_to(obj, intern_to_json)) {
@@ -148,7 +151,8 @@ void yajl_encode_part(void * wrapper, VALUE obj, VALUE io) {
             } else {
                 str = rb_funcall(obj, intern_to_s, 0);
             }
-            status = yajl_gen_string(w->encoder, (const unsigned char *)RSTRING_PTR(str), (unsigned int)RSTRING_LEN(str), quote_strings);
+            cptr = RSTRING_PTR(str);
+            status = yajl_gen_string(w->encoder, (const unsigned char *)cptr, (unsigned int)strlen(cptr), quote_strings);
             break;
     }
 }
@@ -362,6 +366,7 @@ static VALUE rb_yajl_parser_parse(int argc, VALUE * argv, VALUE self) {
     yajl_status stat;
     struct yajl_parser_wrapper * wrapper;
     VALUE rbufsize, input, blk;
+    const char * cptr;
     
     GetParser(self, wrapper);
     
@@ -377,12 +382,14 @@ static VALUE rb_yajl_parser_parse(int argc, VALUE * argv, VALUE self) {
     }
     
     if (TYPE(input) == T_STRING) {
-        yajl_parse_chunk((const unsigned char *)RSTRING_PTR(input), RSTRING_LEN(input), wrapper->parser);
+        cptr = RSTRING_PTR(input);
+        yajl_parse_chunk((const unsigned char*)cptr, (unsigned int)strlen(cptr), wrapper->parser);
     } else if (rb_respond_to(input, intern_eof)) {
         VALUE parsed = rb_str_new2("");
         while (rb_funcall(input, intern_eof, 0) != Qtrue) {
             rb_funcall(input, intern_io_read, 2, rbufsize, parsed);
-            yajl_parse_chunk((const unsigned char *)RSTRING_PTR(parsed), RSTRING_LEN(parsed), wrapper->parser);
+            cptr = RSTRING_PTR(parsed);
+            yajl_parse_chunk((const unsigned char*)cptr, (unsigned int)strlen(cptr), wrapper->parser);
         }
     } else {
         rb_raise(cParseError, "input must be a string or IO");
@@ -420,7 +427,8 @@ static VALUE rb_yajl_parser_parse_chunk(VALUE self, VALUE chunk) {
     }
     
     if (wrapper->parse_complete_callback != Qnil) {
-        yajl_parse_chunk((const unsigned char *)RSTRING_PTR(chunk), RSTRING_LEN(chunk), wrapper->parser);
+        const char * cptr = RSTRING_PTR(chunk);
+        yajl_parse_chunk((const unsigned char*)cptr, (unsigned int)strlen(cptr), wrapper->parser);
     } else {
         rb_raise(cParseError, "The on_parse_complete callback isn't setup, parsing useless.");
     }
