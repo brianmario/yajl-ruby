@@ -3,7 +3,10 @@ require 'rubygems'
 require 'benchmark'
 require 'yajl_ext'
 require 'stringio'
-require 'json'
+begin
+  require 'json'
+rescue LoadError
+end
 
 times = ARGV[0] ? ARGV[0].to_i : 1000
 filename = 'benchmark/subjects/ohai.json'
@@ -20,12 +23,14 @@ Benchmark.bmbm { |x|
       encoder.encode(hash, StringIO.new)
     }
   }
-  x.report {
-    puts "JSON's #to_json"
-    times.times {
-      JSON.generate(hash)
+  if defined?(JSON)
+    x.report {
+      puts "JSON's #to_json"
+      times.times {
+        JSON.generate(hash)
+      }
     }
-  }
+  end
   x.report {
     puts "Marshal.dump"
     times.times {

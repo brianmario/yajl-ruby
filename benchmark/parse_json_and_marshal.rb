@@ -2,7 +2,10 @@
 require 'rubygems'
 require 'benchmark'
 require 'yajl_ext'
-require 'json'
+begin
+  require 'json'
+rescue LoadError
+end
 
 # JSON section
 filename = 'benchmark/subjects/ohai.json'
@@ -24,13 +27,15 @@ Benchmark.bmbm { |x|
       hash = yajl.parse(json)
     }
   }
-  x.report {
-    puts "JSON.parse"
-    times.times {
-      json.rewind
-      JSON.parse(json.read, :max_nesting => false)
+  if defined?(JSON)
+    x.report {
+      puts "JSON.parse"
+      times.times {
+        json.rewind
+        JSON.parse(json.read, :max_nesting => false)
+      }
     }
-  }
+  end
   x.report {
     puts "Marshal.load"
     times.times {

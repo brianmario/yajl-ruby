@@ -2,8 +2,14 @@
 require 'rubygems'
 require 'benchmark'
 require 'yajl_ext'
-require 'json'
-require 'activesupport'
+begin
+  require 'json'
+rescue LoadError
+end
+begin
+  require 'activesupport'
+rescue LoadError
+end
 
 filename = ARGV[0] || 'benchmark/subjects/twitter_search.json'
 json = File.new(filename, 'r')
@@ -29,19 +35,23 @@ Benchmark.bmbm { |x|
       string_parser.parse(json.read)
     }
   }
-  x.report {
-    puts "JSON.parse"
-    times.times {
-      json.rewind
-      JSON.parse(json.read, :max_nesting => false)
+  if defined?(JSON)
+    x.report {
+      puts "JSON.parse"
+      times.times {
+        json.rewind
+        JSON.parse(json.read, :max_nesting => false)
+      }
     }
-  }
-  x.report {
-    puts "ActiveSupport::JSON.decode"
-    times.times {
-      json.rewind
-      ActiveSupport::JSON.decode(json.read)
+  end
+  if defined?(ActiveSupport::JSON)
+    x.report {
+      puts "ActiveSupport::JSON.decode"
+      times.times {
+        json.rewind
+        ActiveSupport::JSON.decode(json.read)
+      }
     }
-  }
+  end
 }
 json.close

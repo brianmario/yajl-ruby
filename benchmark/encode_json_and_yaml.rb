@@ -2,7 +2,10 @@
 require 'rubygems'
 require 'benchmark'
 require 'yajl_ext'
-require 'json'
+begin
+  require 'json'
+rescue LoadError
+end
 require 'yaml'
 
 # JSON Section
@@ -21,12 +24,14 @@ Benchmark.bmbm { |x|
       encoder.encode(hash, StringIO.new)
     }
   }
-  x.report {
-    puts "JSON's #to_json"
-    times.times {
-      JSON.generate(hash)
+  if defined?(JSON)
+    x.report {
+      puts "JSON's #to_json"
+      times.times {
+        JSON.generate(hash)
+      }
     }
-  }
+  end
 }
 
 # YAML Section

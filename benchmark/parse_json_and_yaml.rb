@@ -2,7 +2,10 @@
 require 'rubygems'
 require 'benchmark'
 require 'yajl_ext'
-require 'json'
+begin
+  require 'json'
+rescue LoadError
+end
 require 'yaml'
 
 # JSON section
@@ -21,13 +24,15 @@ Benchmark.bmbm { |x|
       parser.parse(json)
     }
   }
-  x.report {
-    puts "JSON.parse"
-    times.times {
-      json.rewind
-      JSON.parse(json.read, :max_nesting => false)
+  if defined?(JSON)
+    x.report {
+      puts "JSON.parse"
+      times.times {
+        json.rewind
+        JSON.parse(json.read, :max_nesting => false)
+      }
     }
-  }
+  end
 }
 json.close
 

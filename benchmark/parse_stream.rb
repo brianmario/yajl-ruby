@@ -2,8 +2,14 @@
 require 'rubygems'
 require 'benchmark'
 require 'yajl_ext'
-require 'json'
-require 'activesupport'
+begin
+  require 'json'
+rescue LoadError
+end
+begin
+  require 'activesupport'
+rescue LoadError
+end
 
 filename = 'benchmark/subjects/twitter_stream.json'
 json = File.new(filename, 'r')
@@ -20,23 +26,27 @@ Benchmark.bmbm { |x|
       parser.parse(json)
     }
   }
-  x.report {
-    puts "JSON.parse"
-    times.times {
-      json.rewind
-      while chunk = json.gets
-        JSON.parse(chunk, :max_nesting => false)
-      end
+  if defined?(JSON)
+    x.report {
+      puts "JSON.parse"
+      times.times {
+        json.rewind
+        while chunk = json.gets
+          JSON.parse(chunk, :max_nesting => false)
+        end
+      }
     }
-  }
-  x.report {
-    puts "ActiveSupport::JSON.decode"
-    times.times {
-      json.rewind
-      while chunk = json.gets
-        ActiveSupport::JSON.decode(chunk)
-      end
+  end
+  if defined?(ActiveSupport::JSON)
+    x.report {
+      puts "ActiveSupport::JSON.decode"
+      times.times {
+        json.rewind
+        while chunk = json.gets
+          ActiveSupport::JSON.decode(chunk)
+        end
+      }
     }
-  }
+  end
 }
 json.close

@@ -3,9 +3,15 @@ require 'rubygems'
 require 'benchmark'
 require 'yajl_ext'
 require 'stringio'
-require 'json'
+begin
+  require 'json'
+rescue LoadError
+end
 # Can't use ActiveSuport::JSON.encode with the JSON gem loaded
-# require 'activesupport'
+# begin
+#   require 'activesupport'
+# rescue LoadError
+# end
 
 filename = ARGV[0] || 'benchmark/subjects/ohai.json'
 json = File.new(filename, 'r')
@@ -29,18 +35,22 @@ Benchmark.bmbm { |x|
       output = string_encoder.encode(hash)
     }
   }
-  x.report {
-    puts "JSON.generate"
-    times.times {
-      JSON.generate(hash)
+  if defined?(JSON)
+    x.report {
+      puts "JSON.generate"
+      times.times {
+        JSON.generate(hash)
+      }
     }
-  }
+  end
   # Can't use ActiveSuport::JSON.encode with the JSON gem loaded
   #
-  # x.report {
-  #   puts "ActiveSupport::JSON.encode"
-  #   times.times {
-  #     ActiveSupport::JSON.encode(hash)
+  # if defined?(ActiveSupport::JSON)
+  #   x.report {
+  #     puts "ActiveSupport::JSON.encode"
+  #     times.times {
+  #       ActiveSupport::JSON.encode(hash)
+  #     }
   #   }
-  # }
+  # end
 }
