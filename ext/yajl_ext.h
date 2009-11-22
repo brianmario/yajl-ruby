@@ -24,8 +24,8 @@ static ID intern_io_read, intern_eof, intern_call, intern_keys, intern_to_s,
             intern_to_json, intern_has_key, intern_to_sym;
 static ID sym_allow_comments, sym_check_utf8, sym_pretty, sym_indent, sym_terminator, sym_symbolize_keys;
 
-#define GetParser(obj, sval) (sval = (struct yajl_parser_wrapper*)DATA_PTR(obj));
-#define GetEncoder(obj, sval) (sval = (struct yajl_encoder_wrapper*)DATA_PTR(obj));
+#define GetParser(obj, sval) (sval = (yajl_parser_wrapper*)DATA_PTR(obj));
+#define GetEncoder(obj, sval) (sval = (yajl_encoder_wrapper*)DATA_PTR(obj));
 
 inline void yajl_check_and_fire_callback(void * ctx);
 inline void yajl_set_static_value(void * ctx, VALUE val);
@@ -56,7 +56,7 @@ static yajl_callbacks callbacks = {
     yajl_found_end_array
 };
 
-struct yajl_parser_wrapper {
+typedef struct {
     VALUE builderStack;
     VALUE parse_complete_callback;
     int nestedArrayLevel;
@@ -64,13 +64,13 @@ struct yajl_parser_wrapper {
     int objectsFound;
     int symbolizeKeys;
     yajl_handle parser;
-};
+} yajl_parser_wrapper;
 
-struct yajl_encoder_wrapper {
+typedef struct {
     VALUE on_progress_callback;
     VALUE terminator;
     yajl_gen encoder;
-};
+} yajl_encoder_wrapper;
 
 static VALUE rb_yajl_parser_new(int argc, VALUE * argv, VALUE self);
 static VALUE rb_yajl_parser_init(int argc, VALUE * argv, VALUE self);

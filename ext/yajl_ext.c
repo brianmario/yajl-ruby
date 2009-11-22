@@ -2,7 +2,7 @@
 
 /* Helpers for building objects */
 inline void yajl_check_and_fire_callback(void * ctx) {
-    struct yajl_parser_wrapper * wrapper;
+    yajl_parser_wrapper * wrapper;
     GetParser((VALUE)ctx, wrapper);
     
     /* No need to do any of this if the callback isn't even setup */
@@ -23,7 +23,7 @@ inline void yajl_check_and_fire_callback(void * ctx) {
 }
 
 inline void yajl_set_static_value(void * ctx, VALUE val) {
-    struct yajl_parser_wrapper * wrapper;
+    yajl_parser_wrapper * wrapper;
     VALUE lastEntry, hash;
     int len;
     
@@ -61,20 +61,20 @@ inline void yajl_set_static_value(void * ctx, VALUE val) {
 }
 
 static void yajl_encoder_wrapper_free(void * wrapper) {
-    struct yajl_encoder_wrapper * w = wrapper;
+    yajl_encoder_wrapper * w = wrapper;
     yajl_gen_free(w->encoder);
     free(w);
 }
 
 static void yajl_encoder_wrapper_mark(void * wrapper) {
-    struct yajl_encoder_wrapper * w = wrapper;
+    yajl_encoder_wrapper * w = wrapper;
     rb_gc_mark(w->on_progress_callback);
     rb_gc_mark(w->terminator);
 }
 
 void yajl_encode_part(void * wrapper, VALUE obj, VALUE io) {
     VALUE str, outBuff, otherObj;
-    struct yajl_encoder_wrapper * w = wrapper;
+    yajl_encoder_wrapper * w = wrapper;
     yajl_gen_status status;
     int idx = 0;
     const unsigned char * buffer;
@@ -158,13 +158,13 @@ void yajl_encode_part(void * wrapper, VALUE obj, VALUE io) {
 }
 
 void yajl_parser_wrapper_free(void * wrapper) {
-    struct yajl_parser_wrapper * w = wrapper;
+    yajl_parser_wrapper * w = wrapper;
     yajl_free(w->parser);
     free(w);
 }
 
 void yajl_parser_wrapper_mark(void * wrapper) {
-    struct yajl_parser_wrapper * w = wrapper;
+    yajl_parser_wrapper * w = wrapper;
     rb_gc_mark(w->builderStack);
     rb_gc_mark(w->parse_complete_callback);
 }
@@ -215,7 +215,7 @@ static int yajl_found_string(void * ctx, const unsigned char * stringVal, unsign
 }
 
 static int yajl_found_hash_key(void * ctx, const unsigned char * stringVal, unsigned int stringLen) {
-    struct yajl_parser_wrapper * wrapper;
+    yajl_parser_wrapper * wrapper;
     GetParser((VALUE)ctx, wrapper);
     VALUE keyStr;
 
@@ -233,7 +233,7 @@ static int yajl_found_hash_key(void * ctx, const unsigned char * stringVal, unsi
 }
 
 static int yajl_found_start_hash(void * ctx) {
-    struct yajl_parser_wrapper * wrapper;
+    yajl_parser_wrapper * wrapper;
     GetParser((VALUE)ctx, wrapper);
     wrapper->nestedHashLevel++;
     yajl_set_static_value(ctx, rb_hash_new());
@@ -241,7 +241,7 @@ static int yajl_found_start_hash(void * ctx) {
 }
 
 static int yajl_found_end_hash(void * ctx) {
-    struct yajl_parser_wrapper * wrapper;
+    yajl_parser_wrapper * wrapper;
     GetParser((VALUE)ctx, wrapper);
     wrapper->nestedHashLevel--;
     if (RARRAY_LEN(wrapper->builderStack) > 1) {
@@ -252,7 +252,7 @@ static int yajl_found_end_hash(void * ctx) {
 }
 
 static int yajl_found_start_array(void * ctx) {
-    struct yajl_parser_wrapper * wrapper;
+    yajl_parser_wrapper * wrapper;
     GetParser((VALUE)ctx, wrapper);
     wrapper->nestedArrayLevel++;
     yajl_set_static_value(ctx, rb_ary_new());
@@ -260,7 +260,7 @@ static int yajl_found_start_array(void * ctx) {
 }
 
 static int yajl_found_end_array(void * ctx) {
-    struct yajl_parser_wrapper * wrapper;
+    yajl_parser_wrapper * wrapper;
     GetParser((VALUE)ctx, wrapper);
     wrapper->nestedArrayLevel--;
     if (RARRAY_LEN(wrapper->builderStack) > 1) {
@@ -293,7 +293,7 @@ static int yajl_found_end_array(void * ctx) {
  * :check_utf8 will validate UTF8 characters found in the JSON stream, defaults to true.
  */
 static VALUE rb_yajl_parser_new(int argc, VALUE * argv, VALUE klass) {
-    struct yajl_parser_wrapper * wrapper;
+    yajl_parser_wrapper * wrapper;
     yajl_parser_config cfg;
     VALUE opts, obj;
     int allowComments = 1, checkUTF8 = 1, symbolizeKeys = 0;
@@ -314,7 +314,7 @@ static VALUE rb_yajl_parser_new(int argc, VALUE * argv, VALUE klass) {
     }
     cfg = (yajl_parser_config){allowComments, checkUTF8};
     
-    obj = Data_Make_Struct(klass, struct yajl_parser_wrapper, yajl_parser_wrapper_mark, yajl_parser_wrapper_free, wrapper);
+    obj = Data_Make_Struct(klass, yajl_parser_wrapper, yajl_parser_wrapper_mark, yajl_parser_wrapper_free, wrapper);
     wrapper->parser = yajl_alloc(&callbacks, &cfg, NULL, (void *)obj);
     wrapper->nestedArrayLevel = 0;
     wrapper->nestedHashLevel = 0;
@@ -364,7 +364,7 @@ static VALUE rb_yajl_parser_init(int argc, VALUE * argv, VALUE self) {
 */
 static VALUE rb_yajl_parser_parse(int argc, VALUE * argv, VALUE self) {
     yajl_status stat;
-    struct yajl_parser_wrapper * wrapper;
+    yajl_parser_wrapper * wrapper;
     VALUE rbufsize, input, blk;
     const char * cptr;
     
@@ -418,7 +418,7 @@ static VALUE rb_yajl_parser_parse(int argc, VALUE * argv, VALUE self) {
  * parsed off the stream as they're found.
  */
 static VALUE rb_yajl_parser_parse_chunk(VALUE self, VALUE chunk) {
-    struct yajl_parser_wrapper * wrapper;
+    yajl_parser_wrapper * wrapper;
     
     GetParser(self, wrapper);
     if (NIL_P(chunk)) {
@@ -446,7 +446,7 @@ static VALUE rb_yajl_parser_parse_chunk(VALUE self, VALUE chunk) {
  * It will pass a single parameter, the ruby object built from the last parsed JSON object
  */
 static VALUE rb_yajl_parser_set_complete_cb(VALUE self, VALUE callback) {
-    struct yajl_parser_wrapper * wrapper;
+    yajl_parser_wrapper * wrapper;
     GetParser(self, wrapper);
     wrapper->parse_complete_callback = callback;
     return Qnil;
@@ -476,7 +476,7 @@ static VALUE rb_yajl_parser_set_complete_cb(VALUE self, VALUE callback) {
   * the encoder will still pass it - I hope that makes sense ;).
  */
 static VALUE rb_yajl_encoder_new(int argc, VALUE * argv, VALUE klass) {
-    struct yajl_encoder_wrapper * wrapper;
+    yajl_encoder_wrapper * wrapper;
     yajl_gen_config cfg;
     VALUE opts, obj, indent;
     const char * indentString = "  ";
@@ -497,7 +497,7 @@ static VALUE rb_yajl_encoder_new(int argc, VALUE * argv, VALUE klass) {
     }
     cfg = (yajl_gen_config){beautify, indentString};
     
-    obj = Data_Make_Struct(klass, struct yajl_encoder_wrapper, yajl_encoder_wrapper_mark, yajl_encoder_wrapper_free, wrapper);
+    obj = Data_Make_Struct(klass, yajl_encoder_wrapper, yajl_encoder_wrapper_mark, yajl_encoder_wrapper_free, wrapper);
     wrapper->encoder = yajl_gen_alloc(&cfg, NULL);
     wrapper->on_progress_callback = Qnil;
     if (opts != Qnil && rb_funcall(opts, intern_has_key, 1, sym_terminator) == Qtrue) {
@@ -545,7 +545,7 @@ static VALUE rb_yajl_encoder_init(int argc, VALUE * argv, VALUE self) {
  * ruby objects to encode. This is how streaming is accomplished.
  */
 static VALUE rb_yajl_encoder_encode(int argc, VALUE * argv, VALUE self) {
-    struct yajl_encoder_wrapper * wrapper;
+    yajl_encoder_wrapper * wrapper;
     const unsigned char * buffer;
     unsigned int len;
     VALUE obj, io, blk, outBuff;
@@ -598,7 +598,7 @@ static VALUE rb_yajl_encoder_encode(int argc, VALUE * argv, VALUE self) {
  * For example, encoding a large object that would normally result in 24288 bytes of data will result in 3 calls to this callback (assuming the 8kb default encode buffer).
  */
 static VALUE rb_yajl_encoder_set_progress_cb(VALUE self, VALUE callback) {
-    struct yajl_encoder_wrapper * wrapper;
+    yajl_encoder_wrapper * wrapper;
     GetEncoder(self, wrapper);
     wrapper->on_progress_callback = callback;
     return Qnil;
