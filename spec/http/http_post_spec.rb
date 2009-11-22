@@ -31,6 +31,7 @@ describe "Yajl HTTP POST request" do
     @gzip = File.new(File.expand_path(File.dirname(__FILE__) + '/fixtures/http.gzip.dump'), 'r')
     @body = "blah=foo&bar=baz"
     @hashed_body = {:blah => 'foo', 'bar' => 'baz'}
+    @chunked_body = {"item"=>{"price"=>1.99, "updated_by_id"=>nil, "cached_tag_list"=>"", "name"=>"generated", "created_at"=>"2009-03-24T05:25:09Z", "cost"=>0.597, "delta"=>false, "created_by_id"=>nil, "updated_at"=>"2009-03-24T05:25:09Z", "import_tag"=>nil, "account_id"=>16, "id"=>1, "taxable"=>true, "unit"=>nil, "sku"=>"06317-0306", "company_id"=>0, "description"=>nil, "active"=>true}}
   end
   
   after(:each) do
@@ -96,7 +97,12 @@ describe "Yajl HTTP POST request" do
     @template_hash_symbolized.should == Yajl::HttpStream.post(@uri, @body, :symbolize_keys => true)
   end
 
-  it "should parse a chunked raw response"
+  it "should parse a chunked raw response" do
+    prepare_mock_request_dump :chunked
+    Yajl::HttpStream.post(@uri, @body) do |obj|
+      obj.should eql(@chunked_body)
+    end
+  end
 
   it "should throw Exception if chunked response and no block given" do
     prepare_mock_request_dump :chunked
