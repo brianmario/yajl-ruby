@@ -29,6 +29,7 @@ describe "Yajl HTTP GET request" do
     
     @deflate = File.new(File.expand_path(File.dirname(__FILE__) + '/fixtures/http.deflate.dump'), 'r')
     @gzip = File.new(File.expand_path(File.dirname(__FILE__) + '/fixtures/http.gzip.dump'), 'r')
+    @chunked_body = {"item"=>{"price"=>1.99, "updated_by_id"=>nil, "cached_tag_list"=>"", "name"=>"generated", "created_at"=>"2009-03-24T05:25:09Z", "cost"=>0.597, "delta"=>false, "created_by_id"=>nil, "updated_at"=>"2009-03-24T05:25:09Z", "import_tag"=>nil, "account_id"=>16, "id"=>1, "taxable"=>true, "unit"=>nil, "sku"=>"06317-0306", "company_id"=>0, "description"=>nil, "active"=>true}}
   end
   
   after(:each) do
@@ -63,7 +64,13 @@ describe "Yajl HTTP GET request" do
     @template_hash.should == stream.get(@uri)
   end
   
-  it "should parse a chunked response using instance method"
+  it "should parse a chunked response using instance method" do
+    prepare_mock_request_dump :chunked
+    stream = Yajl::HttpStream.new
+    stream.get(@uri) do |obj|
+      obj.should eql(@chunked_body)
+    end
+  end
   
   if defined?(Yajl::Bzip2::StreamReader)
     it "should parse a bzip2 compressed response" do
