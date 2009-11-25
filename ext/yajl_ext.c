@@ -62,14 +62,18 @@ inline void yajl_set_static_value(void * ctx, VALUE val) {
 
 static void yajl_encoder_wrapper_free(void * wrapper) {
     yajl_encoder_wrapper * w = wrapper;
-    yajl_gen_free(w->encoder);
-    free(w);
+    if (w) {
+        yajl_gen_free(w->encoder);
+        free(w);
+    }
 }
 
 static void yajl_encoder_wrapper_mark(void * wrapper) {
     yajl_encoder_wrapper * w = wrapper;
-    rb_gc_mark(w->on_progress_callback);
-    rb_gc_mark(w->terminator);
+    if (w) {
+        rb_gc_mark(w->on_progress_callback);
+        rb_gc_mark(w->terminator);
+    }
 }
 
 void yajl_encode_part(void * wrapper, VALUE obj, VALUE io) {
@@ -159,14 +163,18 @@ void yajl_encode_part(void * wrapper, VALUE obj, VALUE io) {
 
 void yajl_parser_wrapper_free(void * wrapper) {
     yajl_parser_wrapper * w = wrapper;
-    yajl_free(w->parser);
-    free(w);
+    if (w) {
+        yajl_free(w->parser);
+        free(w);
+    }
 }
 
 void yajl_parser_wrapper_mark(void * wrapper) {
     yajl_parser_wrapper * w = wrapper;
-    rb_gc_mark(w->builderStack);
-    rb_gc_mark(w->parse_complete_callback);
+    if (w) {
+        rb_gc_mark(w->builderStack);
+        rb_gc_mark(w->parse_complete_callback);
+    }
 }
 
 void yajl_parse_chunk(const unsigned char * chunk, unsigned int len, yajl_handle parser) {
