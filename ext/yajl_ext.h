@@ -2,8 +2,8 @@
 #include "api/yajl_gen.h"
 #include <ruby.h>
 
-#define READ_BUFSIZE 8092
-#define WRITE_BUFSIZE 8092
+#define READ_BUFSIZE 8192
+#define WRITE_BUFSIZE 8192
 
 // Older versions of Ruby (< 1.8.6) need these
 #ifndef RSTRING_PTR
