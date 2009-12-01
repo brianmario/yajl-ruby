@@ -7,7 +7,7 @@ begin
 rescue LoadError
 end
 begin
-  require 'activesupport'
+  require 'active_support'
 rescue LoadError
 end
 

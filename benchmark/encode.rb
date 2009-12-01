@@ -9,7 +9,7 @@ rescue LoadError
 end
 # Can't use ActiveSuport::JSON.encode with the JSON gem loaded
 # begin
-#   require 'activesupport'
+#   require 'active_support'
 # rescue LoadError
 # end
 
