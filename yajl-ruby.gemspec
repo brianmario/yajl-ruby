@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{yajl-ruby}
-  s.version = "0.6.5"
+  s.version = "0.6.6"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Brian Lopez", "Lloyd Hilaiel"]
-  s.date = %q{2009-11-13}
+  s.date = %q{2009-12-01}
   s.email = %q{seniorlopez@gmail.com}
   s.extensions = ["ext/extconf.rb"]
   s.extra_rdoc_files = [
@@ -81,8 +81,10 @@ Gem::Specification.new do |s|
      "spec/encoding/encoding_spec.rb",
      "spec/global/global_spec.rb",
      "spec/http/fixtures/http.bzip2.dump",
+     "spec/http/fixtures/http.chunked.dump",
      "spec/http/fixtures/http.deflate.dump",
      "spec/http/fixtures/http.gzip.dump",
+     "spec/http/fixtures/http.html.dump",
      "spec/http/fixtures/http.raw.dump",
      "spec/http/http_delete_spec.rb",
      "spec/http/http_get_spec.rb",

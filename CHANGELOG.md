@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.6.6 (December 1st, 2009)
+* Brought over some optimizations from Macruby's use of some yajl-ruby codez
+* Yajl::HttpStream now supports being killed for long-running requests, thanks to Filipe Giusti <filipegiusti@gmail.com>
+
 ## 0.6.5 (November 13th, 2009)
 * optimize symbol creation while symbolize_keys is turned on
 * fix for 32bit integer conversion into ruby
