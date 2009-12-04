@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.6.7 (December 4th, 2009)
+* Bump internal version constant to the proper value (doh!)
+* Bring over latest from Yajl upstream
+
 ## 0.6.6 (December 1st, 2009)
 * Brought over some optimizations from Macruby's use of some yajl-ruby codez
 * Yajl::HttpStream now supports being killed for long-running requests, thanks to Filipe Giusti <filipegiusti@gmail.com>
