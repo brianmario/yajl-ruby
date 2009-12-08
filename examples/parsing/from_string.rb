@@ -1,6 +1,6 @@
 # encoding: UTF-8
+$LOAD_PATH.unshift File.expand_path(File.dirname(__FILE__) + '/../../lib')
 
-require 'rubygems'
 require 'yajl'
 require 'stringio'
 
@@ -9,7 +9,5 @@ unless string = ARGV[0]
   exit(0)
 end
 
-json = StringIO.new(string)
-
-hash = Yajl::Parser.parse(json)
+hash = Yajl::Parser.parse(string)
 puts hash.inspect
