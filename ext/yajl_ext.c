@@ -23,16 +23,16 @@
 
 #include "yajl_ext.h"
 
-char * strnchr(const char * s, size_t count, int c) {
+inline const char * strnchr(const char * s, size_t count, char c) {
     for (; count-- && *s != '\0'; ++s) {
-        if (*s == (char)c) {
-            return (char *)s;
+        if (*s == c) {
+            return s;
         }
     }
     return NULL;
 }
 
-double strntod(const char * s, size_t count) {
+inline double strntod(const char * s, size_t count) {
     char buf[count+1];
     memcpy(buf, s, count);
     buf[count] = 0;
@@ -40,7 +40,7 @@ double strntod(const char * s, size_t count) {
     return strtod(buf, NULL);
 }
 
-VALUE rb_cstrn2inum(const char * s, size_t count) {
+inline VALUE rb_cstrn2inum(const char * s, size_t count) {
     char buf[count+1];
     memcpy(buf, s, count);
     buf[count] = 0;
