@@ -76,6 +76,10 @@ module Yajl
     
     protected
       def self.request(method, uri, opts = {}, &block)
+        if uri.is_a?(String)
+          uri = URI.parse(uri)
+        end
+        
         user_agent = opts.has_key?('User-Agent') ? opts.delete(['User-Agent']) : "Yajl::HttpStream #{Yajl::VERSION}"
         if method == "POST" || method == "PUT"
           content_type = opts.has_key?('Content-Type') ? opts.delete(['Content-Type']) : "application/x-www-form-urlencoded"
@@ -86,6 +90,9 @@ module Yajl
         end
 
         socket = opts.has_key?(:socket) ? opts.delete(:socket) : TCPSocket.new(uri.host, uri.port)
+        trap("INT") {
+          return
+        }
         request = "#{method} #{uri.path}#{uri.query ? "?"+uri.query : nil} HTTP/1.1\r\n"
         request << "Host: #{uri.host}\r\n"
         request << "Authorization: Basic #{[uri.userinfo].pack('m').strip!}\r\n" unless uri.userinfo.nil?
