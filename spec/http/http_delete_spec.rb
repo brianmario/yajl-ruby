@@ -40,11 +40,6 @@ describe "Yajl HTTP DELETE request" do
     @uri = 'file://'+File.expand_path(File.dirname(__FILE__) + "/fixtures/http/http.#{format}.dump")
     TCPSocket.should_receive(:new).and_return(@request)
     @request.should_receive(:write)
-    @uri.should_receive(:host).at_least(2).times
-    @uri.should_receive(:port)
-    @uri.should_receive(:path)
-    @uri.should_receive(:query)
-    @uri.should_receive(:userinfo)
   end
   
   it "should parse a raw response" do
@@ -54,6 +49,8 @@ describe "Yajl HTTP DELETE request" do
   
   it "should parse a raw response using instance method" do
     prepare_mock_request_dump :raw
+    @uri.should_receive(:host)
+    @uri.should_receive(:port)
     stream = Yajl::HttpStream.new
     @template_hash.should == stream.delete(@uri)
   end
