@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.6.8 (January 1st, 2010)
+* A couple of small performance patches
+* Allow passing a string to Yajl::HttpStream methods instead of only a URI
+
 ## 0.6.7 (December 4th, 2009)
 * Bump internal version constant to the proper value (doh!)
 * Bring over latest from Yajl upstream
