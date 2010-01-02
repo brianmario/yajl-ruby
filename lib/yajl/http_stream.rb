@@ -169,7 +169,7 @@ module Yajl
           end
         end
       ensure
-        socket.close unless socket.closed?
+        socket.close if !socket.nil? and !socket.closed?
       end
 
   private
