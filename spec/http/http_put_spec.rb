@@ -98,4 +98,9 @@ describe "Yajl HTTP PUT request" do
     prepare_mock_request_dump :gzip
     @template_hash_symbolized.should == Yajl::HttpStream.put(@uri, @body, :symbolize_keys => true)
   end
+  
+  it "should raise when an HTTP code that isn't 200 is returned" do
+    prepare_mock_request_dump :error
+    lambda { Yajl::HttpStream.put(@uri, @body) }.should raise_exception(Yajl::HttpStream::HttpError)
+  end
 end

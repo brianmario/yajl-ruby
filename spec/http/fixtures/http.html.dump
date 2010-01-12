@@ -1,4 +1,4 @@
-HTTP/1.1 406 Not Acceptable
+HTTP/1.1 200 Not Acceptable
 Content-Type: text/html; charset=iso-8859-1
 Server: Jetty(6.1.17)
 

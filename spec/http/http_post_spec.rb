@@ -116,4 +116,9 @@ describe "Yajl HTTP POST request" do
     prepare_mock_request_dump :html
     lambda {Yajl::HttpStream.post(@uri, @body)}.should raise_error(Yajl::HttpStream::InvalidContentType)
   end
+  
+  it "should raise when an HTTP code that isn't 200 is returned" do
+    prepare_mock_request_dump :error
+    lambda { Yajl::HttpStream.post(@uri, @body) }.should raise_exception(Yajl::HttpStream::HttpError)
+  end
 end

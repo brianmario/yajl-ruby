@@ -11,6 +11,15 @@ module Yajl
     # This Exception is thrown when an HTTP response isn't in ALLOWED_MIME_TYPES
     # and therefore cannot be parsed.
     class InvalidContentType < Exception; end
+    class HttpError < StandardError
+      
+      attr_reader :message, :headers
+      
+      def initialize(message, headers)
+        @message = message
+        @headers = headers
+      end
+    end
     
     # The mime-type we expect the response to be. If it's anything else, we can't parse it
     # and an InvalidContentType is raised.
@@ -131,6 +140,7 @@ module Yajl
             end
           end
         end
+        
         parser = Yajl::Parser.new(opts)
         parser.on_parse_complete = block if block_given?
         if response_head[:headers]["Transfer-Encoding"] == 'chunked'
@@ -151,6 +161,10 @@ module Yajl
             raise Exception, "Chunked responses detected, but no block given to handle the chunks."
           end
         else
+          if (response_head[:code] != 200)
+            raise HttpError.new("Code 200 expected got #{response_head[:code]}", response_head[:headers]) 
+          end
+          
           content_type = response_head[:headers]["Content-Type"].split(';')
           content_type = content_type.first
           if ALLOWED_MIME_TYPES.include?(content_type)
