@@ -441,7 +441,7 @@ static VALUE rb_yajl_parser_parse(int argc, VALUE * argv, VALUE self) {
     } else if (rb_respond_to(input, intern_eof)) {
         VALUE parsed = rb_str_new2("");
         while (rb_funcall(input, intern_eof, 0) != Qtrue) {
-            rb_funcall(input, intern_io_read, 2, rbufsize, parsed);
+            parsed = rb_funcall(input, intern_io_read, 1, rbufsize);
             cptr = RSTRING_PTR(parsed);
             yajl_parse_chunk((const unsigned char*)cptr, (unsigned int)strlen(cptr), wrapper->parser);
         }
