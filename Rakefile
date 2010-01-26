@@ -15,7 +15,7 @@ begin
     gem.rubyforge_project = "yajl-ruby"
   end
 rescue LoadError
-  puts "Jeweler, or one of its dependencies, is not available. Install it with: sudo gem install technicalpickles-jeweler -s http://gems.github.com"
+  puts "Jeweler, or one of its dependencies, is not available. Install it with: sudo gem install jeweler -s http://gems.github.com"
 end
 
 require 'rake'

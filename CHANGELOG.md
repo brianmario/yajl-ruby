@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.6.9 (January 26th, 2010)
+* HttpStream patches merged in from Luke Redpath <contact@lukeredpath.co.uk>
+* Changed how Yajl::Parser was calling IO#read to better conform to the Rack spec and thus can be used to directly parse a rack.input stream
+
 ## 0.6.8 (January 1st, 2010)
 * A couple of small performance patches
 * Allow passing a string to Yajl::HttpStream methods instead of only a URI
