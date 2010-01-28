@@ -25,6 +25,11 @@
 #include "api/yajl_gen.h"
 #include <ruby.h>
 
+#ifdef HAVE_RUBY_ENCODING_H
+#include <ruby/encoding.h>
+int utf8Encoding;
+#endif
+
 #define READ_BUFSIZE 8192
 #define WRITE_BUFSIZE 8192
 

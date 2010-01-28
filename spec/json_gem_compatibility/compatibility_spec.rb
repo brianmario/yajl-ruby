@@ -81,7 +81,6 @@ describe "JSON Gem compatability API" do
   
   context "ported tests for Unicode" do
     it "should be able to encode and parse unicode" do
-      pending if RUBY_VERSION.include?('1.9') # FIXME: Some string encoding problem with 1.9
       '""'.should eql(''.to_json)
       '"\\b"'.should eql("\b".to_json)
       '"\u0001"'.should eql(0x1.chr.to_json)
@@ -89,7 +88,7 @@ describe "JSON Gem compatability API" do
       '" "'.should eql(' '.to_json)
       "\"#{0x7f.chr}\"".should eql(0x7f.chr.to_json)
       utf8 = [ "© ≠ €! \01" ]
-      json = '["© ≠ €! \u0001"]'
+      json = "[\"© ≠ €! \\u0001\"]"
       json.should eql(utf8.to_json)
       utf8.should eql(JSON.parse(json))
       utf8 = ["\343\201\202\343\201\204\343\201\206\343\201\210\343\201\212"]
