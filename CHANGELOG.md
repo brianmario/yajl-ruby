@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.7.0 (February 5th, 2010)
+* ensure utf8 encoding is set on relevant strings during parse/encode in 1.9
+
 ## 0.6.9 (January 26th, 2010)
 * HttpStream patches merged in from Luke Redpath <contact@lukeredpath.co.uk>
 * Changed how Yajl::Parser was calling IO#read to better conform to the Rack spec and thus can be used to directly parse a rack.input stream
