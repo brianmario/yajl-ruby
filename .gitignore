@@ -6,3 +6,4 @@ benchmark/subjects/contacts.*
 *.bundle
 TODO.txt
 tmp/*
+pkg/*
