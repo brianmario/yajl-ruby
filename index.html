@@ -47,10 +47,9 @@
         </div>
         <p>
             yajl-ruby is C bindings to libyajl for Ruby.<br/>
-            It's designed to parse JSON as a stream (off any IO object that responds to read(len, buffer) and eof?).<br/>
+            It's designed to parse JSON as a stream (off any IO object that responds to read(len)).<br/>
             It ships with support for parsing raw, gzip, deflate and bzip2 compressed streams.<br/>
-            It also has basic HTTP GET support, which makes a request then parses the JSON body directly off the socket itself; as it's being received over the wire. If gzip, deflate and/or bzip2 support is loaded in Yajl, the HTTP layer will request compressed response bodies supporting all loaded compression types.<br/>
-            My plans for the HTTP layer are to make it work extremely similar to rest-client (http://github.com/adamwiggins/rest-client) but with a focus on streaming JSON back and forth.
+            It also has a basic HTTP client, which makes a request then parses the JSON body directly off the socket itself; as it's being received over the wire. If gzip, deflate and/or bzip2 support is loaded in Yajl, the HTTP layer will request compressed response bodies supporting all loaded compression types.
         </p>
         <h2>Install</h2>
         <p>sudo gem install yajl-ruby</p>
