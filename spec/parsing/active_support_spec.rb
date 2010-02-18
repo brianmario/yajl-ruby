@@ -12,10 +12,10 @@ describe "ActiveSupport test cases" do
     %({"a": "a's, b's and c's", "b": "5,000"})   => {"a" => "a's, b's and c's", "b" => "5,000"},
     # multibyte
     %({"matzue": "松江", "asakusa": "浅草"}) => {"matzue" => "松江", "asakusa" => "浅草"},
-    %({"a": "2007-01-01"})                       => {'a' => "2007-01-01"}, 
-    %({"a": "2007-01-01 01:12:34 Z"})            => {'a' => "2007-01-01 01:12:34 Z"}, 
+    %({"a": "2007-01-01"})                       => {'a' => "2007-01-01"},
+    %({"a": "2007-01-01 01:12:34 Z"})            => {'a' => "2007-01-01 01:12:34 Z"},
     # no time zone
-    %({"a": "2007-01-01 01:12:34"})              => {'a' => "2007-01-01 01:12:34"}, 
+    %({"a": "2007-01-01 01:12:34"})              => {'a' => "2007-01-01 01:12:34"},
     # needs to be *exact*
     %({"a": " 2007-01-01 01:12:34 Z "})          => {'a' => " 2007-01-01 01:12:34 Z "},
     %({"a": "2007-01-01 : it's your birthday"})  => {'a' => "2007-01-01 : it's your birthday"},
@@ -33,7 +33,7 @@ describe "ActiveSupport test cases" do
     %q({"a": "\u003cbr /\u003e"}) => {'a' => "<br />"},
     %q({"b":["\u003ci\u003e","\u003cb\u003e","\u003cu\u003e"]}) => {'b' => ["<i>","<b>","<u>"]}
   }
-  
+
   TESTS.each do |json, expected|
     it "should be able to parse #{json} as an IO" do
       lambda {
@@ -41,7 +41,7 @@ describe "ActiveSupport test cases" do
       }.should_not raise_error(Yajl::ParseError)
     end
   end
-  
+
   TESTS.each do |json, expected|
     it "should be able to parse #{json} as a string" do
       lambda {
@@ -55,7 +55,7 @@ describe "ActiveSupport test cases" do
       Yajl::Parser.parse(StringIO.new("{: 1}"))
     }.should raise_error(Yajl::ParseError)
   end
-  
+
   it "should fail parsing {: 1} as a string" do
     lambda {
       Yajl::Parser.parse("{: 1}")

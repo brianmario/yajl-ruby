@@ -15,7 +15,7 @@ end
 module JSON
   class JSONError < StandardError; end unless defined?(JSON::JSONError)
   class GeneratorError < JSONError; end unless defined?(JSON::GeneratorError)
-  
+
   def self.generate(obj, opts={})
     begin
       options_map = {}
@@ -28,7 +28,7 @@ module JSON
       raise JSON::GeneratorError, e.message
     end
   end
-  
+
   def self.pretty_generate(obj, opts={})
     begin
       options_map = {}
@@ -39,7 +39,7 @@ module JSON
       raise JSON::GeneratorError, e.message
     end
   end
-  
+
   def self.dump(obj, io=nil, *args)
     begin
       Yajl::Encoder.encode(obj, io)

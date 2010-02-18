@@ -14,17 +14,17 @@ require 'yajl_ext'
 # Ruby bindings to the excellent Yajl (Yet Another JSON Parser) ANSI C library.
 module Yajl
   VERSION = "0.7.1"
-  
+
   # For compatibility, has the same signature of Yajl::Parser.parse
   def self.load(str_or_io, options={}, read_bufsize=nil, &block)
     Parser.parse(str_or_io, options, read_bufsize, &block)
   end
-  
+
   # For compatibility, has the same signature of Yajl::Encoder.encode
   def self.dump(obj, *args, &block)
     Encoder.encode(obj, args, &block)
   end
-  
+
   class Parser
     # A helper method for parse-and-forget use-cases
     #
@@ -39,7 +39,7 @@ module Yajl
       new(options).parse(str_or_io, read_bufsize, &block)
     end
   end
-  
+
   class Encoder
     # A helper method for encode-and-forget use-cases
     #
@@ -75,7 +75,7 @@ module Yajl
       new(options).encode(obj, io, &block)
     end
   end
-  
+
   # DEPRECATED - See Yajl::Parser and Yajl::Encoder
   module Stream
     # DEPRECATED - See Yajl::Parser
@@ -83,7 +83,7 @@ module Yajl
       warn "WARNING: Yajl::Stream has be deprecated and will most likely be gone in the next release. Use the Yajl::Parser class instead."
       Parser.new.parse(str_or_io)
     end
-    
+
     # DEPRECATED - See Yajl::Encoder
     def self.encode(obj, str_or_io=nil)
       warn "WARNING: Yajl::Stream has be deprecated and will most likely be gone in the next release. Use the Yajl::Encoder class instead."

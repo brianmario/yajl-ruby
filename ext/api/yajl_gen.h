@@ -1,22 +1,22 @@
 /*
  * Copyright 2007-2009, Lloyd Hilaiel.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
  * met:
- * 
+ *
  *  1. Redistributions of source code must retain the above copyright
  *     notice, this list of conditions and the following disclaimer.
- * 
+ *
  *  2. Redistributions in binary form must reproduce the above copyright
  *     notice, this list of conditions and the following disclaimer in
  *     the documentation and/or other materials provided with the
  *     distribution.
- * 
+ *
  *  3. Neither the name of Lloyd Hilaiel nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
  * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -28,7 +28,7 @@
  * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- */ 
+ */
 
 /**
  * \file yajl_gen.h
@@ -42,7 +42,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif    
+#endif
     /** generator status codes */
     typedef enum {
         /** no error */
@@ -57,7 +57,7 @@ extern "C" {
          *  state */
         yajl_gen_in_error_state,
         /** A complete JSON document has been generated */
-        yajl_gen_generation_complete,                
+        yajl_gen_generation_complete,
         /** yajl_gen_double was passed an invalid floating point value
          *  (infinity or NaN). */
         yajl_gen_invalid_number,
@@ -119,7 +119,7 @@ extern "C" {
                                       const yajl_alloc_funcs * allocFuncs,
                                       void * ctx);
 
-    /** free a generator handle */    
+    /** free a generator handle */
     void YAJL_API yajl_gen_free(yajl_gen handle);
 
     yajl_gen_status YAJL_API yajl_gen_integer(yajl_gen hand, long int number);
@@ -154,6 +154,6 @@ extern "C" {
 
 #ifdef __cplusplus
 }
-#endif    
+#endif
 
 #endif

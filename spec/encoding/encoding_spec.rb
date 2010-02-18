@@ -9,7 +9,7 @@ end
 
 describe "Yajl JSON encoder" do
   FILES = Dir[File.dirname(__FILE__)+'/../../benchmark/subjects/*.json']
-  
+
   FILES.each do |file|
      it "should encode #{File.basename(file)} to an IO" do
        # we don't care about testing the stream subject as it has multiple JSON strings in it
@@ -27,7 +27,7 @@ describe "Yajl JSON encoder" do
        end
      end
    end
-   
+
    FILES.each do |file|
      it "should encode #{File.basename(file)} and return a String" do
        # we don't care about testing the stream subject as it has multiple JSON strings in it
@@ -42,7 +42,7 @@ describe "Yajl JSON encoder" do
        end
      end
    end
-   
+
    FILES.each do |file|
      it "should encode #{File.basename(file)} call the passed block, passing it a String" do
        # we don't care about testing the stream subject as it has multiple JSON strings in it
@@ -60,7 +60,7 @@ describe "Yajl JSON encoder" do
        end
      end
    end
-  
+
   it "should encode with :pretty turned on and a single space indent, to an IO" do
     output = "{\n \"foo\": 1234\n}"
     obj = {:foo => 1234}
@@ -70,7 +70,7 @@ describe "Yajl JSON encoder" do
     io.rewind
     io.read.should == output
   end
-  
+
   it "should encode with :pretty turned on and a single space indent, and return a String" do
     output = "{\n \"foo\": 1234\n}"
     obj = {:foo => 1234}
@@ -78,7 +78,7 @@ describe "Yajl JSON encoder" do
     output = encoder.encode(obj)
     output.should == output
   end
-  
+
   it "should encode with :pretty turned on and a tab character indent, to an IO" do
     output = "{\n\t\"foo\": 1234\n}"
     obj = {:foo => 1234}
@@ -88,7 +88,7 @@ describe "Yajl JSON encoder" do
     io.rewind
     io.read.should == output
   end
-  
+
   it "should encode with :pretty turned on and a tab character indent, and return a String" do
     output = "{\n\t\"foo\": 1234\n}"
     obj = {:foo => 1234}
@@ -96,7 +96,7 @@ describe "Yajl JSON encoder" do
     output = encoder.encode(obj)
     output.should == output
   end
-  
+
   it "should encode with it's class method with :pretty and a tab character indent options set, to an IO" do
     output = "{\n\t\"foo\": 1234\n}"
     obj = {:foo => 1234}
@@ -105,14 +105,14 @@ describe "Yajl JSON encoder" do
     io.rewind
     io.read.should == output
   end
-  
+
   it "should encode with it's class method with :pretty and a tab character indent options set, and return a String" do
     output = "{\n\t\"foo\": 1234\n}"
     obj = {:foo => 1234}
     output = Yajl::Encoder.encode(obj, :pretty => true, :indent => "\t")
     output.should == output
   end
-  
+
   it "should encode with it's class method with :pretty and a tab character indent options set, to a block" do
     output = "{\n\t\"foo\": 1234\n}"
     obj = {:foo => 1234}
@@ -122,7 +122,7 @@ describe "Yajl JSON encoder" do
     end
     output.should == output
   end
-  
+
   it "should encode multiple objects into a single stream, to an IO" do
     io = StringIO.new
     obj = {:foo => 1234}
@@ -134,7 +134,7 @@ describe "Yajl JSON encoder" do
     output = "{\"foo\":1234}{\"foo\":1234}{\"foo\":1234}{\"foo\":1234}{\"foo\":1234}"
     io.read.should == output
   end
-  
+
   it "should encode multiple objects into a single stream, and return a String" do
     obj = {:foo => 1234}
     encoder = Yajl::Encoder.new
@@ -145,37 +145,37 @@ describe "Yajl JSON encoder" do
     output = "{\"foo\":1234}{\"foo\":1234}{\"foo\":1234}{\"foo\":1234}{\"foo\":1234}"
     json_output.should == output
   end
-  
+
   it "should encode all map keys as strings" do
     Yajl::Encoder.encode({1=>1}).should eql("{\"1\":1}")
   end
-  
+
   it "should check for and call #to_json if it exists on custom objects" do
     d = Dummy2.new
     Yajl::Encoder.encode({:foo => d}).should eql('{"foo":"hawtness"}')
   end
-  
+
   it "should encode a hash where the key and value can be symbols" do
     Yajl::Encoder.encode({:foo => :bar}).should eql('{"foo":"bar"}')
   end
-  
+
   it "should encode using a newline or nil terminator" do
     Yajl::Encoder.new(:terminator => "\n").encode({:foo => :bar}).should eql("{\"foo\":\"bar\"}\n")
     Yajl::Encoder.new(:terminator => nil).encode({:foo => :bar}).should eql("{\"foo\":\"bar\"}")
   end
-  
+
   it "should encode using a newline or nil terminator, to an IO" do
     s = StringIO.new
     Yajl::Encoder.new(:terminator => "\n").encode({:foo => :bar}, s)
     s.rewind
     s.read.should eql("{\"foo\":\"bar\"}\n")
-    
+
     s = StringIO.new
     Yajl::Encoder.new(:terminator => nil).encode({:foo => :bar}, s)
     s.rewind
     s.read.should eql("{\"foo\":\"bar\"}")
   end
-  
+
   it "should encode using a newline or nil terminator, using a block" do
     s = StringIO.new
     Yajl::Encoder.new(:terminator => "\n").encode({:foo => :bar}) do |chunk|
@@ -183,7 +183,7 @@ describe "Yajl JSON encoder" do
     end
     s.rewind
     s.read.should eql("{\"foo\":\"bar\"}\n")
-    
+
     s = StringIO.new
     nilpassed = false
     Yajl::Encoder.new(:terminator => nil).encode({:foo => :bar}) do |chunk|
@@ -194,13 +194,13 @@ describe "Yajl JSON encoder" do
     s.rewind
     s.read.should eql("{\"foo\":\"bar\"}")
   end
-  
+
   it "should not encode NaN" do
     lambda {
       Yajl::Encoder.encode(0.0/0.0)
     }.should raise_error(Yajl::EncodeError)
   end
-  
+
   it "should not encode Infinity or -Infinity" do
     lambda {
       Yajl::Encoder.encode(1.0/0.0)

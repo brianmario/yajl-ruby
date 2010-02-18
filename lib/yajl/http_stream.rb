@@ -7,24 +7,24 @@ module Yajl
   # This module is for making HTTP requests to which the response bodies (and possibly requests in the near future)
   # are streamed directly into Yajl.
   class HttpStream
-    
+
     # This Exception is thrown when an HTTP response isn't in ALLOWED_MIME_TYPES
     # and therefore cannot be parsed.
     class InvalidContentType < Exception; end
     class HttpError < StandardError
-      
+
       attr_reader :message, :headers
-      
+
       def initialize(message, headers)
         @message = message
         @headers = headers
       end
     end
-    
+
     # The mime-type we expect the response to be. If it's anything else, we can't parse it
     # and an InvalidContentType is raised.
     ALLOWED_MIME_TYPES = ["application/json", "text/plain"]
-    
+
     # Makes a basic HTTP GET request to the URI provided
     def self.get(uri, opts = {}, &block)
       request("GET", uri, opts, &block)
@@ -42,7 +42,7 @@ module Yajl
     def self.post(uri, body, opts = {}, &block)
       request("POST", uri, opts.merge({:body => body}), &block)
     end
-    
+
     # Makes a basic HTTP POST request to the URI provided allowing the user to terminate the connection
     def post(uri, body, opts = {}, &block)
       initialize_socket(uri, opts)
@@ -55,7 +55,7 @@ module Yajl
     def self.put(uri, body, opts = {}, &block)
       request("PUT", uri, opts.merge({:body => body}), &block)
     end
-    
+
     # Makes a basic HTTP PUT request to the URI provided allowing the user to terminate the connection
     def put(uri, body, opts = {}, &block)
       initialize_socket(uri, opts)
@@ -82,13 +82,13 @@ module Yajl
       @intentional_termination = true
       @socket.close
     end
-    
+
     protected
       def self.request(method, uri, opts = {}, &block)
         if uri.is_a?(String)
           uri = URI.parse(uri)
         end
-        
+
         user_agent = opts.has_key?('User-Agent') ? opts.delete(['User-Agent']) : "Yajl::HttpStream #{Yajl::VERSION}"
         if method == "POST" || method == "PUT"
           content_type = opts.has_key?('Content-Type') ? opts.delete(['Content-Type']) : "application/x-www-form-urlencoded"
@@ -140,11 +140,11 @@ module Yajl
             end
           end
         end
-        
+
         if (response_head[:code] != 200)
-          raise HttpError.new("Code 200 expected got #{response_head[:code]}", response_head[:headers]) 
+          raise HttpError.new("Code 200 expected got #{response_head[:code]}", response_head[:headers])
         end
-        
+
         parser = Yajl::Parser.new(opts)
         parser.on_parse_complete = block if block_given?
         if response_head[:headers]["Transfer-Encoding"] == 'chunked'

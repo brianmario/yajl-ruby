@@ -1,394 +1,394 @@
---- 
-kernel: 
+---
+kernel:
   name: Darwin
   machine: i386
-  modules: 
-    com.apple.driver.AppleAPIC: 
+  modules:
+    com.apple.driver.AppleAPIC:
       size: 12288
       version: "1.4"
       index: "26"
       refcount: "0"
-    com.apple.driver.AirPort.Atheros: 
+    com.apple.driver.AirPort.Atheros:
       size: 593920
       version: 318.8.3
       index: "88"
       refcount: "0"
-    com.apple.driver.AppleIntelCPUPowerManagement: 
+    com.apple.driver.AppleIntelCPUPowerManagement:
       size: 102400
       version: 59.0.1
       index: "22"
       refcount: "0"
-    com.apple.iokit.IOStorageFamily: 
+    com.apple.iokit.IOStorageFamily:
       size: 98304
       version: 1.5.5
       index: "44"
       refcount: "9"
-    com.apple.iokit.IOATAPIProtocolTransport: 
+    com.apple.iokit.IOATAPIProtocolTransport:
       size: 16384
       version: 1.5.2
       index: "52"
       refcount: "0"
-    com.apple.iokit.IOPCIFamily: 
+    com.apple.iokit.IOPCIFamily:
       size: 65536
       version: "2.5"
       index: "17"
       refcount: "18"
-    org.virtualbox.kext.VBoxDrv: 
+    org.virtualbox.kext.VBoxDrv:
       size: 118784
       version: 2.2.0
       index: "114"
       refcount: "3"
-    com.cisco.nke.ipsec: 
+    com.cisco.nke.ipsec:
       size: 454656
       version: 2.0.1
       index: "111"
       refcount: "0"
-    com.apple.driver.AppleHPET: 
+    com.apple.driver.AppleHPET:
       size: 12288
       version: "1.3"
       index: "33"
       refcount: "0"
-    com.apple.driver.AppleUSBHub: 
+    com.apple.driver.AppleUSBHub:
       size: 49152
       version: 3.2.7
       index: "47"
       refcount: "0"
-    com.apple.iokit.IOFireWireFamily: 
+    com.apple.iokit.IOFireWireFamily:
       size: 258048
       version: 3.4.6
       index: "49"
       refcount: "2"
-    com.apple.driver.AppleUSBComposite: 
+    com.apple.driver.AppleUSBComposite:
       size: 16384
       version: 3.2.0
       index: "60"
       refcount: "1"
-    com.apple.driver.AppleIntelPIIXATA: 
+    com.apple.driver.AppleIntelPIIXATA:
       size: 36864
       version: 2.0.0
       index: "41"
       refcount: "0"
-    com.apple.driver.AppleSmartBatteryManager: 
+    com.apple.driver.AppleSmartBatteryManager:
       size: 28672
       version: 158.6.0
       index: "32"
       refcount: "0"
-    com.apple.filesystems.udf: 
+    com.apple.filesystems.udf:
       size: 233472
       version: 2.0.2
       index: "119"
       refcount: "0"
-    com.apple.iokit.IOSMBusFamily: 
+    com.apple.iokit.IOSMBusFamily:
       size: 12288
       version: "1.1"
       index: "27"
       refcount: "2"
-    com.apple.iokit.IOACPIFamily: 
+    com.apple.iokit.IOACPIFamily:
       size: 16384
       version: 1.2.0
       index: "18"
       refcount: "10"
-    foo.tap: 
+    foo.tap:
       size: 24576
       version: "1.0"
       index: "113"
       refcount: "0"
-    com.vmware.kext.vmx86: 
+    com.vmware.kext.vmx86:
       size: 864256
       version: 2.0.4
       index: "104"
       refcount: "0"
-    com.apple.iokit.CHUDUtils: 
+    com.apple.iokit.CHUDUtils:
       size: 28672
       version: "200"
       index: "98"
       refcount: "0"
-    com.apple.driver.AppleACPIButtons: 
+    com.apple.driver.AppleACPIButtons:
       size: 16384
       version: 1.2.4
       index: "30"
       refcount: "0"
-    com.apple.driver.AppleFWOHCI: 
+    com.apple.driver.AppleFWOHCI:
       size: 139264
       version: 3.7.2
       index: "50"
       refcount: "0"
-    com.apple.iokit.IOSCSIArchitectureModelFamily: 
+    com.apple.iokit.IOSCSIArchitectureModelFamily:
       size: 102400
       version: 2.0.5
       index: "51"
       refcount: "4"
-    org.virtualbox.kext.VBoxNetAdp: 
+    org.virtualbox.kext.VBoxNetAdp:
       size: 8192
       version: 2.2.0
       index: "117"
       refcount: "0"
-    com.apple.filesystems.autofs: 
+    com.apple.filesystems.autofs:
       size: 45056
       version: 2.0.1
       index: "109"
       refcount: "0"
-    com.vmware.kext.vmnet: 
+    com.vmware.kext.vmnet:
       size: 36864
       version: 2.0.4
       index: "108"
       refcount: "0"
-    com.apple.iokit.IOSCSIBlockCommandsDevice: 
+    com.apple.iokit.IOSCSIBlockCommandsDevice:
       size: 90112
       version: 2.0.5
       index: "57"
       refcount: "1"
-    com.apple.driver.AppleACPIPCI: 
+    com.apple.driver.AppleACPIPCI:
       size: 12288
       version: 1.2.4
       index: "31"
       refcount: "0"
-    com.apple.security.seatbelt: 
+    com.apple.security.seatbelt:
       size: 98304
       version: "107.10"
       index: "25"
       refcount: "0"
-    com.apple.driver.AppleUpstreamUserClient: 
+    com.apple.driver.AppleUpstreamUserClient:
       size: 16384
       version: 2.7.2
       index: "100"
       refcount: "0"
-    com.apple.kext.OSvKernDSPLib: 
+    com.apple.kext.OSvKernDSPLib:
       size: 12288
       version: "1.1"
       index: "79"
       refcount: "1"
-    com.apple.iokit.IOBDStorageFamily: 
+    com.apple.iokit.IOBDStorageFamily:
       size: 20480
       version: "1.5"
       index: "58"
       refcount: "1"
-    com.apple.iokit.IOGraphicsFamily: 
+    com.apple.iokit.IOGraphicsFamily:
       size: 118784
       version: 1.7.1
       index: "70"
       refcount: "5"
-    com.apple.iokit.IONetworkingFamily: 
+    com.apple.iokit.IONetworkingFamily:
       size: 90112
       version: 1.6.1
       index: "82"
       refcount: "4"
-    com.apple.iokit.IOATAFamily: 
+    com.apple.iokit.IOATAFamily:
       size: 53248
       version: 2.0.0
       index: "40"
       refcount: "2"
-    com.apple.iokit.IOUSBHIDDriver: 
+    com.apple.iokit.IOUSBHIDDriver:
       size: 20480
       version: 3.2.2
       index: "63"
       refcount: "2"
-    org.virtualbox.kext.VBoxUSB: 
+    org.virtualbox.kext.VBoxUSB:
       size: 28672
       version: 2.2.0
       index: "115"
       refcount: "0"
-    com.apple.security.TMSafetyNet: 
+    com.apple.security.TMSafetyNet:
       size: 12288
       version: "3"
       index: "23"
       refcount: "0"
-    com.apple.iokit.IONDRVSupport: 
+    com.apple.iokit.IONDRVSupport:
       size: 57344
       version: 1.7.1
       index: "71"
       refcount: "3"
-    com.apple.BootCache: 
+    com.apple.BootCache:
       size: 20480
       version: "30.3"
       index: "20"
       refcount: "0"
-    com.vmware.kext.vmioplug: 
+    com.vmware.kext.vmioplug:
       size: 24576
       version: 2.0.4
       index: "107"
       refcount: "0"
-    com.apple.iokit.IOUSBUserClient: 
+    com.apple.iokit.IOUSBUserClient:
       size: 8192
       version: 3.2.4
       index: "46"
       refcount: "1"
-    com.apple.iokit.IOSCSIMultimediaCommandsDevice: 
+    com.apple.iokit.IOSCSIMultimediaCommandsDevice:
       size: 90112
       version: 2.0.5
       index: "59"
       refcount: "0"
-    com.apple.driver.AppleIRController: 
+    com.apple.driver.AppleIRController:
       size: 20480
       version: "110"
       index: "78"
       refcount: "0"
-    com.apple.driver.AudioIPCDriver: 
+    com.apple.driver.AudioIPCDriver:
       size: 16384
       version: 1.0.5
       index: "81"
       refcount: "0"
-    com.apple.driver.AppleLPC: 
+    com.apple.driver.AppleLPC:
       size: 12288
       version: 1.2.11
       index: "73"
       refcount: "0"
-    org.virtualbox.kext.VBoxNetFlt: 
+    org.virtualbox.kext.VBoxNetFlt:
       size: 16384
       version: 2.2.0
       index: "116"
       refcount: "0"
-    com.apple.iokit.CHUDKernLib: 
+    com.apple.iokit.CHUDKernLib:
       size: 20480
       version: "196"
       index: "93"
       refcount: "2"
-    com.apple.iokit.CHUDProf: 
+    com.apple.iokit.CHUDProf:
       size: 49152
       version: "207"
       index: "97"
       refcount: "0"
-    com.apple.NVDAResman: 
+    com.apple.NVDAResman:
       size: 2478080
       version: 5.3.6
       index: "90"
       refcount: "2"
-    com.apple.driver.AppleACPIEC: 
+    com.apple.driver.AppleACPIEC:
       size: 20480
       version: 1.2.4
       index: "28"
       refcount: "0"
-    foo.tun: 
+    foo.tun:
       size: 24576
       version: "1.0"
       index: "118"
       refcount: "0"
-    com.apple.iokit.IOSerialFamily: 
+    com.apple.iokit.IOSerialFamily:
       size: 36864
       version: "9.3"
       index: "102"
       refcount: "1"
-    com.apple.GeForce: 
+    com.apple.GeForce:
       size: 622592
       version: 5.3.6
       index: "96"
       refcount: "0"
-    com.apple.iokit.IOCDStorageFamily: 
+    com.apple.iokit.IOCDStorageFamily:
       size: 32768
       version: "1.5"
       index: "55"
       refcount: "3"
-    com.apple.driver.AppleUSBEHCI: 
+    com.apple.driver.AppleUSBEHCI:
       size: 73728
       version: 3.2.5
       index: "39"
       refcount: "0"
-    com.apple.nvidia.nv50hal: 
+    com.apple.nvidia.nv50hal:
       size: 2445312
       version: 5.3.6
       index: "91"
       refcount: "0"
-    com.apple.driver.AppleSMBIOS: 
+    com.apple.driver.AppleSMBIOS:
       size: 16384
       version: 1.1.1
       index: "29"
       refcount: "0"
-    com.apple.driver.AppleBacklight: 
+    com.apple.driver.AppleBacklight:
       size: 16384
       version: 1.4.4
       index: "72"
       refcount: "0"
-    com.apple.driver.AppleACPIPlatform: 
+    com.apple.driver.AppleACPIPlatform:
       size: 253952
       version: 1.2.4
       index: "19"
       refcount: "3"
-    com.apple.iokit.SCSITaskUserClient: 
+    com.apple.iokit.SCSITaskUserClient:
       size: 24576
       version: 2.0.5
       index: "54"
       refcount: "0"
-    com.apple.iokit.IOHIDFamily: 
+    com.apple.iokit.IOHIDFamily:
       size: 233472
       version: 1.5.3
       index: "21"
       refcount: "7"
-    com.apple.driver.DiskImages: 
+    com.apple.driver.DiskImages:
       size: 65536
       version: 195.2.2
       index: "101"
       refcount: "0"
-    com.apple.iokit.IODVDStorageFamily: 
+    com.apple.iokit.IODVDStorageFamily:
       size: 24576
       version: "1.5"
       index: "56"
       refcount: "2"
-    com.apple.iokit.IOFireWireIP: 
+    com.apple.iokit.IOFireWireIP:
       size: 36864
       version: 1.7.6
       index: "83"
       refcount: "0"
-    com.apple.driver.AppleRTC: 
+    com.apple.driver.AppleRTC:
       size: 20480
       version: 1.2.3
       index: "34"
       refcount: "0"
-    com.apple.driver.XsanFilter: 
+    com.apple.driver.XsanFilter:
       size: 20480
       version: 2.7.91
       index: "53"
       refcount: "0"
-    com.apple.driver.AppleEFIRuntime: 
+    com.apple.driver.AppleEFIRuntime:
       size: 12288
       version: 1.2.0
       index: "35"
       refcount: "1"
-    com.apple.iokit.IOAHCIBlockStorage: 
+    com.apple.iokit.IOAHCIBlockStorage:
       size: 69632
       version: 1.2.0
       index: "48"
       refcount: "0"
-    com.apple.nke.applicationfirewall: 
+    com.apple.nke.applicationfirewall:
       size: 32768
       version: 1.0.77
       index: "24"
       refcount: "0"
-    com.apple.iokit.IO80211Family: 
+    com.apple.iokit.IO80211Family:
       size: 126976
       version: "215.1"
       index: "87"
       refcount: "1"
-    com.vmware.kext.vmci: 
+    com.vmware.kext.vmci:
       size: 45056
       version: 2.0.4
       index: "106"
       refcount: "0"
-    com.apple.iokit.IOAHCIFamily: 
+    com.apple.iokit.IOAHCIFamily:
       size: 24576
       version: 1.5.0
       index: "42"
       refcount: "2"
-    com.apple.driver.AppleUSBUHCI: 
+    com.apple.driver.AppleUSBUHCI:
       size: 57344
       version: 3.2.5
       index: "38"
       refcount: "0"
-    com.apple.driver.AppleUSBMergeNub: 
+    com.apple.driver.AppleUSBMergeNub:
       size: 12288
       version: 3.2.4
       index: "61"
       refcount: "0"
-    com.apple.iokit.IOUSBFamily: 
+    com.apple.iokit.IOUSBFamily:
       size: 167936
       version: 3.2.7
       index: "37"
       refcount: "13"
-    com.apple.driver.AppleEFINVRAM: 
+    com.apple.driver.AppleEFINVRAM:
       size: 24576
       version: 1.2.0
       index: "36"
       refcount: "0"
-    com.apple.driver.AppleAHCIPort: 
+    com.apple.driver.AppleAHCIPort:
       size: 53248
       version: 1.5.2
       index: "43"
@@ -396,18 +396,18 @@ kernel:
   os: Darwin
   version: "Darwin Kernel Version 9.6.0: Mon Nov 24 17:37:00 PST 2008; root:xnu-1228.9.59~1/RELEASE_I386"
   release: 9.6.0
-command: 
+command:
   ps: ps -ef
 platform: mac_os_x
 platform_version: 10.5.6
-keys: 
-  ssh: 
+keys:
+  ssh:
     host_dsa_public: private
     host_rsa_public: private
 ipaddress: 192.168.88.1
 fqdn: local.local
-network: 
-  settings: 
+network:
+  settings:
     net.inet6.ip6.forwarding: "0"
     net.inet.ip.dummynet.debug: "0"
     net.inet.ip.rtexpire: "10"
@@ -636,16 +636,16 @@ network:
     net.inet6.ipsec6.ah_trans_deflev: "1"
     net.inet.ip.random_id: "1"
     net.inet.icmp.timestamp: "0"
-  interfaces: 
-    stf0: 
+  interfaces:
+    stf0:
       flags: []
 
       number: "0"
       mtu: "1280"
       type: stf
       encapsulation: 6to4
-    vmnet1: 
-      flags: 
+    vmnet1:
+      flags:
       - UP
       - BROADCAST
       - SMART
@@ -653,7 +653,7 @@ network:
       - SIMPLEX
       - MULTICAST
       number: "1"
-      addresses: 
+      addresses:
       - broadcast: 192.168.88.255
         netmask: 255.255.255.0
         family: inet
@@ -663,27 +663,27 @@ network:
       mtu: "1500"
       type: vmnet
       encapsulation: Ethernet
-    vboxnet0: 
-      flags: 
+    vboxnet0:
+      flags:
       - BROADCAST
       - RUNNING
       - SIMPLEX
       - MULTICAST
       number: "0"
-      addresses: 
+      addresses:
       - family: lladdr
         address: private
       mtu: "1500"
       type: vboxnet
       encapsulation: Ethernet
-    lo0: 
-      flags: 
+    lo0:
+      flags:
       - UP
       - LOOPBACK
       - RUNNING
       - MULTICAST
       number: "0"
-      addresses: 
+      addresses:
       - scope: Link
         prefixlen: "64"
         family: inet6
@@ -702,9 +702,9 @@ network:
       mtu: "16384"
       type: lo
       encapsulation: Loopback
-    vboxn: 
-      counters: 
-        tx: 
+    vboxn:
+      counters:
+        tx:
           packets: "0"
           bytes: "0"
           compressed: 0
@@ -713,7 +713,7 @@ network:
           errors: "0"
           drop: 0
           overrun: 0
-        rx: 
+        rx:
           packets: "0"
           bytes: "0"
           compressed: 0
@@ -722,17 +722,17 @@ network:
           overrun: 0
           multicast: 0
           frame: 0
-    gif0: 
-      flags: 
+    gif0:
+      flags:
       - POINTOPOINT
       - MULTICAST
       number: "0"
       mtu: "1280"
       type: gif
       encapsulation: IPIP
-    vmnet: 
-      counters: 
-        tx: 
+    vmnet:
+      counters:
+        tx:
           packets: "0"
           bytes: "0"
           compressed: 0
@@ -741,7 +741,7 @@ network:
           errors: "0"
           drop: 0
           overrun: 0
-        rx: 
+        rx:
           packets: "0"
           bytes: "0"
           compressed: 0
@@ -750,8 +750,8 @@ network:
           overrun: 0
           multicast: 0
           frame: 0
-    en0: 
-      flags: 
+    en0:
+      flags:
       - UP
       - BROADCAST
       - SMART
@@ -760,64 +760,64 @@ network:
       - MULTICAST
       status: inactive
       number: "0"
-      addresses: 
+      addresses:
       - family: lladdr
         address: private
       mtu: "1500"
       type: en
-      media: 
-        supported: 
-        - autoselect: 
+      media:
+        supported:
+        - autoselect:
             options: []
 
-        - 10baseT/UTP: 
-            options: 
+        - 10baseT/UTP:
+            options:
             - half-duplex
-        - 10baseT/UTP: 
-            options: 
+        - 10baseT/UTP:
+            options:
             - full-duplex
-        - 10baseT/UTP: 
-            options: 
+        - 10baseT/UTP:
+            options:
             - full-duplex
             - hw-loopback
-        - 10baseT/UTP: 
-            options: 
+        - 10baseT/UTP:
+            options:
             - full-duplex
             - flow-control
-        - 100baseTX: 
-            options: 
+        - 100baseTX:
+            options:
             - half-duplex
-        - 100baseTX: 
-            options: 
+        - 100baseTX:
+            options:
             - full-duplex
-        - 100baseTX: 
-            options: 
-            - full-duplex
-            - hw-loopback
-        - 100baseTX: 
-            options: 
-            - full-duplex
-            - flow-control
-        - 1000baseT: 
-            options: 
-            - full-duplex
-        - 1000baseT: 
-            options: 
+        - 100baseTX:
+            options:
             - full-duplex
             - hw-loopback
-        - 1000baseT: 
-            options: 
+        - 100baseTX:
+            options:
             - full-duplex
             - flow-control
-        - none: 
+        - 1000baseT:
+            options:
+            - full-duplex
+        - 1000baseT:
+            options:
+            - full-duplex
+            - hw-loopback
+        - 1000baseT:
+            options:
+            - full-duplex
+            - flow-control
+        - none:
             options: []
 
-        selected: 
-        - autoselect: 
+        selected:
+        - autoselect:
             options: []
 
-      counters: 
-        tx: 
+      counters:
+        tx:
           packets: "0"
           bytes: "342"
           compressed: 0
@@ -826,7 +826,7 @@ network:
           errors: "0"
           drop: 0
           overrun: 0
-        rx: 
+        rx:
           packets: "0"
           bytes: "0"
           compressed: 0
@@ -836,8 +836,8 @@ network:
           multicast: 0
           frame: 0
       encapsulation: Ethernet
-    vmnet8: 
-      flags: 
+    vmnet8:
+      flags:
       - UP
       - BROADCAST
       - SMART
@@ -845,7 +845,7 @@ network:
       - SIMPLEX
       - MULTICAST
       number: "8"
-      addresses: 
+      addresses:
       - broadcast: 192.168.237.255
         netmask: 255.255.255.0
         family: inet
@@ -855,8 +855,8 @@ network:
       mtu: "1500"
       type: vmnet
       encapsulation: Ethernet
-    en1: 
-      flags: 
+    en1:
+      flags:
       - UP
       - BROADCAST
       - SMART
@@ -865,7 +865,7 @@ network:
       - MULTICAST
       status: active
       number: "1"
-      addresses: 
+      addresses:
       - scope: Link
         prefixlen: "64"
         family: inet6
@@ -878,17 +878,17 @@ network:
         address: private
       mtu: "1500"
       type: en
-      media: 
-        supported: 
-        - autoselect: 
+      media:
+        supported:
+        - autoselect:
             options: []
 
-        selected: 
-        - autoselect: 
+        selected:
+        - autoselect:
             options: []
 
-      counters: 
-        tx: 
+      counters:
+        tx:
           packets: "7041789"
           bytes: "449206298"
           compressed: 0
@@ -897,7 +897,7 @@ network:
           errors: "95"
           drop: 0
           overrun: 0
-        rx: 
+        rx:
           packets: "19966002"
           bytes: "13673879120"
           compressed: 0
@@ -907,10 +907,10 @@ network:
           multicast: 0
           frame: 0
       encapsulation: Ethernet
-      arp: 
+      arp:
         192.168.1.7: private
-    fw0: 
-      flags: 
+    fw0:
+      flags:
       - UP
       - BROADCAST
       - SMART
@@ -919,22 +919,22 @@ network:
       - MULTICAST
       status: inactive
       number: "0"
-      addresses: 
+      addresses:
       - family: lladdr
         address: private
       mtu: "4078"
       type: fw
-      media: 
-        supported: 
-        - autoselect: 
-            options: 
+      media:
+        supported:
+        - autoselect:
+            options:
             - full-duplex
-        selected: 
-        - autoselect: 
-            options: 
+        selected:
+        - autoselect:
+            options:
             - full-duplex
-      counters: 
-        tx: 
+      counters:
+        tx:
           packets: "0"
           bytes: "346"
           compressed: 0
@@ -943,7 +943,7 @@ network:
           errors: "0"
           drop: 0
           overrun: 0
-        rx: 
+        rx:
           packets: "0"
           bytes: "0"
           compressed: 0
@@ -959,8 +959,8 @@ ohai_time: 1240624355.08575
 platform_build: 9G55
 os_version: 9.6.0
 hostname: local
-languages: 
-  ruby: 
+languages:
+  ruby:
     target_os: darwin9.0
     platform: universal-darwin9.0
     host_vendor: apple

@@ -4,7 +4,7 @@ module Yajl
     # This is a wrapper around Bzip::Reader to allow it's #read method to adhere
     # to the IO spec, allowing for two parameters (length, and buffer)
     class StreamReader < ::Bzip2::Reader
-      
+
       # A helper method to allow use similar to IO#read
       def read(len=nil, buffer=nil)
         unless buffer.nil?
@@ -21,7 +21,7 @@ module Yajl
         if input.is_a?(String)
           input = StringIO.new(input)
         end
-        
+
         Yajl::Parser.new(options).parse(new(input), buffer_size, &block)
       end
     end

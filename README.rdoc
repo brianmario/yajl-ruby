@@ -64,18 +64,18 @@ only had access to chunks of it at a time. No problem!
  def post_init
     @parser = Yajl::Parser.new
  end
- 
+
  def object_parsed(obj)
     puts "Sometimes one pays most for the things one gets for nothing. - Albert Einstein"
     puts obj.inspect
   end
-  
+
  def connection_completed
    # once a full JSON object has been parsed from the stream
    # object_parsed will be called, and passed the constructed object
    @parser.on_parse_complete = method(:object_parsed)
  end
- 
+
  def receive_data(data)
    # continue passing chunks
    @parser << data
@@ -92,13 +92,13 @@ This actually makes a request using a raw TCPSocket, then parses the JSON body r
 
  require 'uri'
  require 'yajl/http_stream'
- 
+
  url = URI.parse("http://search.twitter.com/search.json?q=engineyard")
  results = Yajl::HttpStream.get(url)
 
 Or do the same request, with Gzip and Deflate output compression support (also supports Bzip2, if loaded):
 (this does the same raw socket Request, but transparently parses the compressed response body)
- 
+
  require 'uri'
  require 'yajl/gzip'
  require 'yajl/deflate'
@@ -118,7 +118,7 @@ it's much better to leave string keys enabled (the default), so they can get GC'
 
  require 'uri'
  require 'yajl/http_stream'
- 
+
  uri = URI.parse("http://#{username}:#{password}@stream.twitter.com/spritzer.json")
  Yajl::HttpStream.get(uri, :symbolize_keys => true) do |hash|
    puts hash.inspect
@@ -127,7 +127,7 @@ it's much better to leave string keys enabled (the default), so they can get GC'
 Or how about parsing directly from a compressed file?
 
  require 'yajl/bzip2'
- 
+
  file = File.new('some.json.bz2', 'r')
  result = Yajl::Bzip2::StreamReader.parse(file)
 
@@ -170,7 +170,7 @@ Using EventMachine and you want to encode and send in chunks?
     status = File.read("/path/to/huge/status_file.txt")
     @motd = {:motd => motd_contents, :system_status => status}
  end
-  
+
  def connection_completed
    # The encoder will do it's best to hand you data in chunks that
    # are around 8kb (but you may see some that are larger)
