@@ -216,21 +216,13 @@ yajl_gen_number(yajl_gen g, const char * s, unsigned int l)
 
 yajl_gen_status
 yajl_gen_string(yajl_gen g, const unsigned char * str,
-                unsigned int len, int quote)
+                unsigned int len)
 {
     ENSURE_VALID_STATE; INSERT_SEP; INSERT_WHITESPACE;
-    if (quote) {
-        g->print(g->ctx, "\"", 1);
-        yajl_string_encode2(g->print, g->ctx, str, len);
-        g->print(g->ctx, "\"", 1);
-    } else {
-        g->print(g->ctx, (const char *)str, len);
-    }
+    g->print(g->ctx, "\"", 1);
+    yajl_string_encode2(g->print, g->ctx, str, len);
+    g->print(g->ctx, "\"", 1);
     
-    
-    APPENDED_ATOM;
-    FINAL_NEWLINE;
-    return yajl_gen_status_ok;
     
     APPENDED_ATOM;
     FINAL_NEWLINE;
