@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.7.1 (February 17th, 2010)
+* revert a patch made to bundled Yajl enabling optional quoting of strings that broke binary API compatibility
+
 ## 0.7.0 (February 5th, 2010)
 * ensure utf8 encoding is set on relevant strings during parse/encode in 1.9
 
