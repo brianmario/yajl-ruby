@@ -37,13 +37,6 @@
 #include <string.h>
 #include <stdio.h>
 
-static void CharToHex(unsigned char c, char * hexBuf)
-{
-    const char * hexchar = "0123456789ABCDEF";
-    hexBuf[0] = hexchar[c >> 4];
-    hexBuf[1] = hexchar[c & 0x0F];
-}
-
 void
 yajl_string_encode(yajl_buf buf, const unsigned char * str,
                    unsigned int len)
@@ -51,45 +44,126 @@ yajl_string_encode(yajl_buf buf, const unsigned char * str,
     yajl_string_encode2((const yajl_print_t) &yajl_buf_append, buf, str, len);
 }
 
+static const unsigned long utf8_limits[] = {
+    0x0,			/* 1 */
+    0x80,			/* 2 */
+    0x800,			/* 3 */
+    0x10000,			/* 4 */
+    0x200000,			/* 5 */
+    0x4000000,			/* 6 */
+    0x80000000,			/* 7 */
+};
+
 void
 yajl_string_encode2(const yajl_print_t print,
                     void * ctx,
                     const unsigned char * str,
                     unsigned int len)
 {
-    unsigned int beg = 0;
-    unsigned int end = 0;    
-    char hexBuf[7];
-    hexBuf[0] = '\\'; hexBuf[1] = 'u'; hexBuf[2] = '0'; hexBuf[3] = '0';
-    hexBuf[6] = 0;
+    yajl_string_encode3(print, ctx, str, len, 0);
+}
 
-    while (end < len) {
+void
+yajl_string_encode3(const yajl_print_t print,
+                    void * ctx,
+                    const unsigned char * str,
+                    unsigned int len,
+                    unsigned int asciiOnly)
+{
+    unsigned int curPos = 0;
+    char curByte;
+
+    while (curPos < len) {
         const char * escaped = NULL;
-        switch (str[end]) {
+        curByte = str[curPos];
+        switch (curByte) {
             case '\r': escaped = "\\r"; break;
             case '\n': escaped = "\\n"; break;
             case '\\': escaped = "\\\\"; break;
-            /* case '/': escaped = "\\/"; break; */
             case '"': escaped = "\\\""; break;
             case '\f': escaped = "\\f"; break;
             case '\b': escaped = "\\b"; break;
             case '\t': escaped = "\\t"; break;
-            default:
-                if ((unsigned char) str[end] < 32) {
-                    CharToHex(str[end], hexBuf + 4);
-                    escaped = hexBuf;
+            default: {
+                int codePointChar = curByte & 0xff;
+                unsigned long codePoint = codePointChar;
+                char hexEsc[7] = "\\u0000";
+                const unsigned char hexChars[17] = "0123456789abcdef";
+
+                if (asciiOnly) {
+                    unsigned int numChars;
+
+                    if (!(codePoint & 0x80)) {
+                        if (curByte < 0x20) {
+                            hexEsc[5] = hexChars[codePoint & 0x0f];
+                            hexEsc[4] = hexChars[(codePoint >> 4) & 0x0f];
+                            escaped = hexEsc;
+                        }
+                        break;
+                    }
+
+                    if (!(codePoint & 0x40)) {
+                        // malformed UTF-8 character
+                        // return invalidUtf8;
+                        return;
+                    }
+
+                    if      (!(codePoint & 0x20)) { numChars = 2; codePoint &= 0x1f; }
+                    else if (!(codePoint & 0x10)) { numChars = 3; codePoint &= 0x0f; }
+                    else if (!(codePoint & 0x08)) { numChars = 4; codePoint &= 0x07; }
+                    else if (!(codePoint & 0x04)) { numChars = 5; codePoint &= 0x03; }
+                    else if (!(codePoint & 0x02)) { numChars = 6; codePoint &= 0x01; }
+                    else {
+                        // malformed UTF-8 character
+                        // return invalidUtf8;
+                        return;
+                    }
+                    while(--numChars) {
+                        curByte = str[++curPos];
+                        codePointChar = curByte & 0xff;
+                        if ((codePointChar & 0xc0) != 0x80) {
+                            // malformed UTF-8 character
+                            // return invalidUtf8;
+                            return;
+                        } else {
+                            codePointChar &= 0x3f;
+                            codePoint = codePoint << 6 | codePointChar;
+                        }
+                    }
+
+                    if (codePoint < utf8_limits[numChars]) {
+                        // redundant UTF-8 sequence
+                        // return invalidUtf8;
+                        return;
+                    }
+
+                    hexEsc[5] = hexChars[codePoint & 0x0f];
+                    hexEsc[4] = hexChars[(codePoint >> 4) & 0x0f];
+                    hexEsc[3] = hexChars[(codePoint >> 8) & 0x0f];
+                    hexEsc[2] = hexChars[(codePoint >> 12) & 0x0f];
+                    escaped = hexEsc;
+                    break;
+                } else {
+                    // let everything pass through un-touched
+                    // except ascii control chars
+                    if (!(codePoint & 0x80)) {
+                        if (curByte < 0x20) {
+                            hexEsc[5] = hexChars[codePoint & 0x0f];
+                            hexEsc[4] = hexChars[(codePoint >> 4) & 0x0f];
+                            escaped = hexEsc;
+                        }
+                    }
+                    break;
                 }
-                break;
+            }
         }
         if (escaped != NULL) {
-            print(ctx, (const char *) (str + beg), end - beg);
             print(ctx, escaped, strlen(escaped));
-            beg = ++end;
         } else {
-            ++end;
+            print(ctx, &curByte, 1);
         }
+        curPos++;
     }
-    print(ctx, (const char *) (str + beg), end - beg);
 }
 
 static void hexToDigit(unsigned int * val, const unsigned char * hex)

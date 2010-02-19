@@ -527,10 +527,10 @@ static VALUE rb_yajl_parser_set_complete_cb(VALUE self, VALUE callback) {
  */
 static VALUE rb_yajl_encoder_new(int argc, VALUE * argv, VALUE klass) {
     yajl_encoder_wrapper * wrapper;
-    yajl_gen_config cfg;
+    yajl_gen_config2 cfg;
     VALUE opts, obj, indent;
     const char * indentString = "  ";
-    int beautify = 0;
+    int beautify = 0, asciiOnly = 0;
 
     /* Scan off config vars */
     if (rb_scan_args(argc, argv, "01", &opts) == 1) {
@@ -547,11 +547,14 @@ static VALUE rb_yajl_encoder_new(int argc, VALUE * argv, VALUE klass) {
                 indentString = RSTRING_PTR(indent);
             }
         }
+        if (rb_hash_aref(opts, sym_ascii_only) == Qtrue) {
+            asciiOnly = 1;
+        }
     }
-    cfg = (yajl_gen_config){beautify, indentString};
+    cfg = (yajl_gen_config2){beautify, indentString, asciiOnly};
 
     obj = Data_Make_Struct(klass, yajl_encoder_wrapper, yajl_encoder_wrapper_mark, yajl_encoder_wrapper_free, wrapper);
-    wrapper->encoder = yajl_gen_alloc(&cfg, NULL);
+    wrapper->encoder = yajl_gen_alloc3(NULL, &cfg, NULL, NULL);
     wrapper->on_progress_callback = Qnil;
     if (opts != Qnil && rb_funcall(opts, intern_has_key, 1, sym_terminator) == Qtrue) {
         wrapper->terminator = rb_hash_aref(opts, sym_terminator);
@@ -897,6 +900,7 @@ void Init_yajl_ext() {
     sym_indent = ID2SYM(rb_intern("indent"));
     sym_terminator = ID2SYM(rb_intern("terminator"));
     sym_symbolize_keys = ID2SYM(rb_intern("symbolize_keys"));
+    sym_ascii_only = ID2SYM(rb_intern("ascii_only"));
 
 #ifdef HAVE_RUBY_ENCODING_H
     utf8Encoding = rb_enc_find_index("UTF-8");

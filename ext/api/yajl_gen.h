@@ -83,6 +83,13 @@ extern "C" {
          *  member is only relevant when beautify is true */
         const char * indentString;
     } yajl_gen_config;
+    
+    typedef struct {
+        unsigned int beautify;
+        const char * indentString;
+        /* tells the encoder to \uXXXX escape all characters < 0x20 and > 0x7F */
+        unsigned int asciiOnly;
+    } yajl_gen_config2;
 
     /** allocate a generator handle
      *  \param config a pointer to a structure containing parameters which
@@ -116,6 +123,11 @@ extern "C" {
      */
     YAJL_API yajl_gen yajl_gen_alloc2(const yajl_print_t callback,
                                       const yajl_gen_config * config,
+                                      const yajl_alloc_funcs * allocFuncs,
+                                      void * ctx);
+    
+    yajl_gen YAJL_API yajl_gen_alloc3(yajl_print_t callback,
+                                      const yajl_gen_config2 * config,
                                       const yajl_alloc_funcs * allocFuncs,
                                       void * ctx);
 

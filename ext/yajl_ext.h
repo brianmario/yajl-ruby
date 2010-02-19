@@ -50,7 +50,8 @@ int utf8Encoding;
 static VALUE cParseError, cEncodeError, mYajl, cParser, cEncoder;
 static ID intern_io_read, intern_call, intern_keys, intern_to_s,
             intern_to_json, intern_has_key, intern_to_sym, intern_as_json;
-static ID sym_allow_comments, sym_check_utf8, sym_pretty, sym_indent, sym_terminator, sym_symbolize_keys;
+static ID sym_allow_comments, sym_check_utf8, sym_pretty, sym_indent,
+          sym_terminator, sym_symbolize_keys, sym_ascii_only;
 
 #define GetParser(obj, sval) (sval = (yajl_parser_wrapper*)DATA_PTR(obj));
 #define GetEncoder(obj, sval) (sval = (yajl_encoder_wrapper*)DATA_PTR(obj));

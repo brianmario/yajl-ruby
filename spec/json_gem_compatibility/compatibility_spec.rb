@@ -84,7 +84,7 @@ describe "JSON Gem compatability API" do
       '""'.should eql(''.to_json)
       '"\\b"'.should eql("\b".to_json)
       '"\u0001"'.should eql(0x1.chr.to_json)
-      '"\u001F"'.should eql(0x1f.chr.to_json)
+      '"\u001f"'.should eql(0x1f.chr.to_json)
       '" "'.should eql(' '.to_json)
       "\"#{0x7f.chr}\"".should eql(0x7f.chr.to_json)
       utf8 = [ "© ≠ €! \01" ]
