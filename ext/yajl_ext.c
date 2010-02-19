@@ -421,10 +421,9 @@ static VALUE rb_yajl_parser_parse(int argc, VALUE * argv, VALUE self) {
     if (TYPE(input) == T_STRING) {
         cptr = RSTRING_PTR(input);
         yajl_parse_chunk((const unsigned char*)cptr, (unsigned int)strlen(cptr), wrapper->parser);
-    } else if (rb_respond_to(input, intern_eof)) {
+    } else if (rb_respond_to(input, intern_io_read)) {
         VALUE parsed = rb_str_new("", READ_BUFSIZE);
-        while (rb_funcall(input, intern_eof, 0) != Qtrue) {
-            parsed = rb_funcall(input, intern_io_read, 1, rbufsize);
+        while ((parsed = rb_funcall(input, intern_io_read, 1, rbufsize)) != Qnil) {
             cptr = RSTRING_PTR(parsed);
             yajl_parse_chunk((const unsigned char*)cptr, (unsigned int)strlen(cptr), wrapper->parser);
         }
@@ -870,7 +869,6 @@ void Init_yajl_ext() {
     rb_define_singleton_method(cEncoder, "enable_json_gem_compatability", rb_yajl_encoder_enable_json_gem_ext, 0);
 
     intern_io_read = rb_intern("read");
-    intern_eof = rb_intern("eof?");
     intern_call = rb_intern("call");
     intern_keys = rb_intern("keys");
     intern_to_s = rb_intern("to_s");

@@ -48,7 +48,7 @@ int utf8Encoding;
 #endif
 
 static VALUE cParseError, cEncodeError, mYajl, cParser, cEncoder;
-static ID intern_io_read, intern_eof, intern_call, intern_keys, intern_to_s,
+static ID intern_io_read, intern_call, intern_keys, intern_to_s,
             intern_to_json, intern_has_key, intern_to_sym;
 static ID sym_allow_comments, sym_check_utf8, sym_pretty, sym_indent, sym_terminator, sym_symbolize_keys;
 
