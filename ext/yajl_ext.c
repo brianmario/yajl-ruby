@@ -23,31 +23,6 @@
 
 #include "yajl_ext.h"
 
-inline const char * strnchr(const char * s, size_t count, char c) {
-    for (; count-- && *s != '\0'; ++s) {
-        if (*s == c) {
-            return s;
-        }
-    }
-    return NULL;
-}
-
-inline double strntod(const char * s, size_t count) {
-    char buf[count+1];
-    memcpy(buf, s, count);
-    buf[count] = 0;
-
-    return strtod(buf, NULL);
-}
-
-inline VALUE rb_cstrn2inum(const char * s, size_t count) {
-    char buf[count+1];
-    memcpy(buf, s, count);
-    buf[count] = 0;
-
-    return rb_cstr2inum(buf, 10);
-}
-
 /* Helpers for building objects */
 inline void yajl_check_and_fire_callback(void * ctx) {
     yajl_parser_wrapper * wrapper;
@@ -249,13 +224,16 @@ static int yajl_found_boolean(void * ctx, int boolean) {
 }
 
 static int yajl_found_number(void * ctx, const char * numberVal, unsigned int numberLen) {
-    if (strnchr(numberVal, numberLen, '.') ||
-        strnchr(numberVal, numberLen, 'e') ||
-        strnchr(numberVal, numberLen, 'E')) {
-        yajl_set_static_value(ctx, rb_float_new(strntod(numberVal, numberLen)));
-    }
-    else {
-        yajl_set_static_value(ctx, rb_cstrn2inum(numberVal, numberLen));
+    char buf[numberLen+1];
+    buf[numberLen] = 0;
+    memcpy(buf, numberVal, numberLen);
+
+    if (memchr(buf, '.', numberLen) ||
+        memchr(buf, 'e', numberLen) ||
+        memchr(buf, 'E', numberLen)) {
+        yajl_set_static_value(ctx, rb_float_new(strtod(buf, NULL)));
+    } else {
+        yajl_set_static_value(ctx, rb_cstr2inum(buf, 10));
     }
     return 1;
 }
