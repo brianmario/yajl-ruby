@@ -131,9 +131,12 @@ yajl_lex_alloc(yajl_alloc_funcs * alloc,
 
 yajl_lexer
 yajl_lex_realloc(yajl_lexer orig) {
-    yajl_lexer newLxr = yajl_lex_alloc(orig->alloc, orig->allowComments, orig->validateUTF8);
-    yajl_lex_free(orig);
-    return newLxr;
+    yajl_buf_clear(orig->buf);
+    orig->bufInUse = 0;
+    orig->bufOff = 0;
+    orig->lineOff = 0;
+    orig->lineOff = 0;
+    return orig;
 }
 
 void
