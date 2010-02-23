@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.7.2 (February 23rd, 2010)
+* fixed broken to_json compatibility
+* removed strlen in a few places in favor of RSTRING_LEN since ruby already knows the length of the string
+* patched Yajl to more efficiently reset it's lexer (no more malloc/free)
+* removed dependency on IO#eof? when parsing from an IO for full Rack-spec compatibility
+* removed some various cruft code in C
+
 ## 0.7.1 (February 17th, 2010)
 * revert a patch made to bundled Yajl enabling optional quoting of strings that broke binary API compatibility
 
