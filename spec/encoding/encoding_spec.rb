@@ -3,7 +3,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 class Dummy2
   def to_json
-    "hawtness"
+    "hawtness".dump
   end
 end
 

@@ -8,7 +8,7 @@ Yajl::Encoder.enable_json_gem_compatability
 # Our fallback to_json definition
 class Object
   def to_json(*args, &block)
-    "\"#{to_s}\""
+    to_s.dump
   end
 end
 
