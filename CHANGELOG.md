@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.7.3 (February 23rd, 2010)
+* remove trap from HttpStream code, it's really not needed
+
 ## 0.7.2 (February 23rd, 2010)
 * fixed broken to_json compatibility
 * removed strlen in a few places in favor of RSTRING_LEN since ruby already knows the length of the string
