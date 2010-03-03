@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{yajl-ruby}
-  s.version = "0.7.3"
+  s.version = "0.7.4"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Brian Lopez", "Lloyd Hilaiel"]
-  s.date = %q{2010-02-23}
+  s.date = %q{2010-03-03}
   s.email = %q{seniorlopez@gmail.com}
   s.extensions = ["ext/extconf.rb"]
   s.extra_rdoc_files = [
@@ -163,7 +163,7 @@ Gem::Specification.new do |s|
   s.rdoc_options = ["--charset=UTF-8"]
   s.require_paths = ["lib", "ext"]
   s.rubyforge_project = %q{yajl-ruby}
-  s.rubygems_version = %q{1.3.5}
+  s.rubygems_version = %q{1.3.6}
   s.summary = %q{Ruby C bindings to the excellent Yajl JSON stream-based parser library.}
   s.test_files = [
     "spec/encoding/encoding_spec.rb",

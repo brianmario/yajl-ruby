@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.7.4 (March 3rd, 2010)
+* bugfix for the JSON gem compatibility API's Object#to_json method improperly encoding strings
+
 ## 0.7.3 (February 23rd, 2010)
 * remove trap from HttpStream code, it's really not needed
 
