@@ -173,7 +173,10 @@ void yajl_encode_part(void * wrapper, VALUE obj, VALUE io) {
             status = yajl_gen_string(w->encoder, (const unsigned char *)cptr, len);
             break;
         default:
-            if (rb_respond_to(obj, intern_to_json)) {
+            if (rb_respond_to(obj, intern_as_json)) {
+                obj = rb_funcall(obj, intern_as_json, 0);
+                yajl_encode_part(w, obj, io);
+            } else if (rb_respond_to(obj, intern_to_json)) {
                 str = rb_funcall(obj, intern_to_json, 0);
                 cptr = RSTRING_PTR(str);
                 len = RSTRING_LEN(str);
@@ -886,6 +889,7 @@ void Init_yajl_ext() {
     intern_to_json = rb_intern("to_json");
     intern_to_sym = rb_intern("to_sym");
     intern_has_key = rb_intern("has_key?");
+    intern_as_json = rb_intern("as_json");
 
     sym_allow_comments = ID2SYM(rb_intern("allow_comments"));
     sym_check_utf8 = ID2SYM(rb_intern("check_utf8"));

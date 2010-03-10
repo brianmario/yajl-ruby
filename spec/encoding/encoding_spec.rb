@@ -3,7 +3,13 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 class Dummy2
   def to_json
-    "hawtness".dump
+    "{\"hawtness\":true}"
+  end
+end
+
+class Dummy3
+  def as_json
+    {:hawtness => true}
   end
 end
 
@@ -152,7 +158,12 @@ describe "Yajl JSON encoder" do
 
   it "should check for and call #to_json if it exists on custom objects" do
     d = Dummy2.new
-    Yajl::Encoder.encode({:foo => d}).should eql('{"foo":"hawtness"}')
+    Yajl::Encoder.encode({:foo => d}).should eql('{"foo":{"hawtness":true}}')
+  end
+
+  it "should check for and call #as_json if it exists on custom objects" do
+    d = Dummy3.new
+    Yajl::Encoder.encode(d).should eql('{"hawtness":true}')
   end
 
   it "should encode a hash where the key and value can be symbols" do
