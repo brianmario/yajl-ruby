@@ -7,8 +7,12 @@ begin
 rescue LoadError
 end
 begin
-  require 'active_support'
+  require 'active_support/json'
 rescue LoadError
+  begin
+    require 'active_support'
+  rescue LoadError
+  end
 end
 
 filename = 'benchmark/subjects/twitter_stream.json'

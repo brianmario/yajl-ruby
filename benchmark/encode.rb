@@ -9,8 +9,12 @@ rescue LoadError
 end
 # Can't use ActiveSuport::JSON.encode with the JSON gem loaded
 # begin
-#   require 'active_support'
+#   require 'active_support/json'
 # rescue LoadError
+#   begin
+#     require 'active_support'
+#   rescue LoadError
+#   end
 # end
 
 filename = ARGV[0] || 'benchmark/subjects/ohai.json'
