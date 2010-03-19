@@ -433,7 +433,7 @@ static VALUE rb_yajl_parser_parse(int argc, VALUE * argv, VALUE self) {
         len = RSTRING_LEN(input);
         yajl_parse_chunk((const unsigned char*)cptr, len, wrapper->parser);
     } else if (rb_respond_to(input, intern_io_read)) {
-        VALUE parsed = rb_str_new("", READ_BUFSIZE);
+        VALUE parsed = rb_str_new2("");
         while ((parsed = rb_funcall(input, intern_io_read, 1, rbufsize)) != Qnil) {
             cptr = RSTRING_PTR(parsed);
             len = RSTRING_LEN(parsed);
