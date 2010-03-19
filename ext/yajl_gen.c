@@ -1,22 +1,22 @@
 /*
- * Copyright 2007-2009, Lloyd Hilaiel.
- *
+ * Copyright 2010, Lloyd Hilaiel.
+ * 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
  * met:
- *
+ * 
  *  1. Redistributions of source code must retain the above copyright
  *     notice, this list of conditions and the following disclaimer.
- *
+ * 
  *  2. Redistributions in binary form must reproduce the above copyright
  *     notice, this list of conditions and the following disclaimer in
  *     the documentation and/or other materials provided with the
  *     distribution.
- *
+ * 
  *  3. Neither the name of Lloyd Hilaiel nor the names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
- *
+ * 
  * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
  * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -28,7 +28,7 @@
  * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- */
+ */ 
 
 #include "api/yajl_gen.h"
 #include "yajl_buf.h"
@@ -50,7 +50,7 @@ typedef enum {
     yajl_gen_error
 } yajl_gen_state;
 
-struct yajl_gen_t
+struct yajl_gen_t 
 {
     unsigned int depth;
     unsigned int pretty;
@@ -70,7 +70,7 @@ yajl_gen_alloc(const yajl_gen_config * config,
 }
 
 yajl_gen
-yajl_gen_alloc2(yajl_print_t callback,
+yajl_gen_alloc2(const yajl_print_t callback,
                 const yajl_gen_config * config,
                 const yajl_alloc_funcs * afs,
                 void * ctx)
@@ -125,7 +125,7 @@ yajl_gen_free(yajl_gen g)
     } else if (g->state[g->depth] == yajl_gen_map_val) {        \
         g->print(g->ctx, ":", 1);                               \
         if (g->pretty) g->print(g->ctx, " ", 1);                \
-   }
+   } 
 
 #define INSERT_WHITESPACE                                               \
     if (g->pretty) {                                                    \
@@ -187,14 +187,14 @@ yajl_gen_integer(yajl_gen g, long int number)
 #ifdef WIN32
 #include <float.h>
 #define isnan _isnan
-#define isinf _finite
+#define isinf !_finite
 #endif
 
 yajl_gen_status
 yajl_gen_double(yajl_gen g, double number)
 {
     char i[32];
-    ENSURE_VALID_STATE; ENSURE_NOT_KEY;
+    ENSURE_VALID_STATE; ENSURE_NOT_KEY; 
     if (isnan(number) || isinf(number)) return yajl_gen_invalid_number;
     INSERT_SEP; INSERT_WHITESPACE;
     sprintf(i, "%g", number);
@@ -222,8 +222,6 @@ yajl_gen_string(yajl_gen g, const unsigned char * str,
     g->print(g->ctx, "\"", 1);
     yajl_string_encode2(g->print, g->ctx, str, len);
     g->print(g->ctx, "\"", 1);
-
-
     APPENDED_ATOM;
     FINAL_NEWLINE;
     return yajl_gen_status_ok;
@@ -255,8 +253,8 @@ yajl_gen_status
 yajl_gen_map_open(yajl_gen g)
 {
     ENSURE_VALID_STATE; ENSURE_NOT_KEY; INSERT_SEP; INSERT_WHITESPACE;
-    INCREMENT_DEPTH;
-
+    INCREMENT_DEPTH; 
+    
     g->state[g->depth] = yajl_gen_map_start;
     g->print(g->ctx, "{", 1);
     if (g->pretty) g->print(g->ctx, "\n", 1);
@@ -267,7 +265,7 @@ yajl_gen_map_open(yajl_gen g)
 yajl_gen_status
 yajl_gen_map_close(yajl_gen g)
 {
-    ENSURE_VALID_STATE;
+    ENSURE_VALID_STATE; 
     (g->depth)--;
     if (g->pretty) g->print(g->ctx, "\n", 1);
     APPENDED_ATOM;
@@ -281,7 +279,7 @@ yajl_gen_status
 yajl_gen_array_open(yajl_gen g)
 {
     ENSURE_VALID_STATE; ENSURE_NOT_KEY; INSERT_SEP; INSERT_WHITESPACE;
-    INCREMENT_DEPTH;
+    INCREMENT_DEPTH; 
     g->state[g->depth] = yajl_gen_array_start;
     g->print(g->ctx, "[", 1);
     if (g->pretty) g->print(g->ctx, "\n", 1);
