@@ -12,9 +12,16 @@ module Yajl
       end
 
       # A helper method to allow use similar to IO#read
-      def read(len=nil)
-        return nil if finished? or ended?
-        inflate(@io.read(len))
+      def read(len=nil, buffer=nil)
+        if val = @io.read(len)
+          unless buffer.nil?
+            buffer.replace(inflate(val))
+            return buffer
+          end
+          inflate(@io.read(len))
+        else
+          nil
+        end
       end
 
       # Helper method for one-off parsing from a deflate-compressed stream
