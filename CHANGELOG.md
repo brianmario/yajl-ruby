@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.7.5 (March 23rd, 2010)
+* check for existence of and use as_json method on custom objects
+* bugfix with read buffer when parsing from an IO (thanks to Pavel Valodzka <pavel@valodzka.name>)
+* merged in latest yajl
+* enable -Wextra during compilation
+* brought back ability to pass a buffer to bzip/gzip/deflate #read helper methods
+
 ## 0.7.4 (March 3rd, 2010)
 * bugfix for the JSON gem compatibility API's Object#to_json method improperly encoding strings
 
