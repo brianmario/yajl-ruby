@@ -162,7 +162,7 @@ void yajl_encode_part(void * wrapper, VALUE obj, VALUE io) {
             str = rb_funcall(obj, intern_to_s, 0);
             cptr = RSTRING_PTR(str);
             len = RSTRING_LEN(str);
-            if (strcmp(cptr, "NaN") == 0 || strcmp(cptr, "Infinity") == 0 || strcmp(cptr, "-Infinity") == 0) {
+            if (memcmp(cptr, "NaN", 3) == 0 || memcmp(cptr, "Infinity", 8) == 0 || memcmp(cptr, "-Infinity", 9) == 0) {
                 rb_raise(cEncodeError, "'%s' is an invalid number", cptr);
             }
             status = yajl_gen_number(w->encoder, cptr, len);
