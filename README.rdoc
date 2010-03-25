@@ -298,7 +298,7 @@ NOTE: I converted the 2.4MB JSON file to a Hash and a dump file from Marshal.dum
 
 This project includes code from the BSD licensed yajl project, copyright 2007-2009 Lloyd Hilaiel
 
-== Special Thanks
+== Special Thanks & Contributors
 
 For those of you using yajl-ruby out in the wild, please hit me up on Twitter (brianmario) or send me a message here on the Githubs describing the site and how you're using it. I'd love to get a list going!
 
@@ -308,7 +308,13 @@ I've had a lot of inspiration, and a lot of help. Thanks to everyone who's been 
 * Josh Ferguson - http://github.com/besquared - for peer-pressuring me into getting back into C; it worked ;) Also tons of support over IM
 * Jonathan Novak - http://github.com/cypriss - pointer-hacking help
 * Tom Smith - http://github.com/rtomsmith - pointer-hacking help
-* Rick http://github.com/technoweenie - for making an ActiveSupport patch with support for this library and teasing me that it might go into Rails 3. You sure lit a fire under my ass and I got a ton of work done because of it! :)
+* Rick Olson - http://github.com/technoweenie - for making an ActiveSupport patch with support for this library and teasing me that it might go into Rails 3. You sure lit a fire under my ass and I got a ton of work done because of it! :)
 * The entire Github Crew - http://github.com/ - my inspiration, time spent writing this, finding Yajl, So many-MANY other things wouldn't have been possible without this awesome service. I owe you guys some whiskey at Kilowatt.
-* benburkert - http://github.com/benburkert
+* Ben Burkert - http://github.com/benburkert
 * Aman Gupta - http://github.com/tmm1 - tons of suggestions and inspiration for the most recent features, and hopefully more to come ;)
+* Filipe Giusti
+* Jonathan George
+* Luke Redpath
+* Neil Berkman
+* Pavel Valodzka
+* Rob Sharp
