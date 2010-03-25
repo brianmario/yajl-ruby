@@ -62,7 +62,7 @@ only had access to chunks of it at a time. No problem!
 (Assume we're in an EventMachine::Connection instance)
 
  def post_init
-    @parser = Yajl::Parser.new
+    @parser = Yajl::Parser.new(:symbolize_keys => true)
  end
 
  def object_parsed(obj)
@@ -165,7 +165,7 @@ Using EventMachine and you want to encode and send in chunks?
  def post_init
     # Passing a :terminator character will let us determine when the encoder
     # is done encoding the current object
-    @encoder = Yajl::Encoder.new(:terminator => nil)
+    @encoder = Yajl::Encoder.new
     motd_contents = File.read("/path/to/motd.txt")
     status = File.read("/path/to/huge/status_file.txt")
     @motd = {:motd => motd_contents, :system_status => status}
@@ -216,15 +216,14 @@ Once the compatibility API is enabled, your existing or new project should work 
 
 There are a lot more possibilities that I'd love to see other gems/plugins for someday.
 
-Some ideas are:
+Some ideas:
 * parsing logs in JSON format
 * a Rails plugin - DONE! (http://github.com/technoweenie/yajl-rails)
-* builtin support in Rails 3?
+* official support in Rails 3 - DONE (http://github.com/rails/rails/commit/a96bf4ab5e73fccdafb78b99e8a122cc2172b505)
+** and is the default (if installed) - http://github.com/rails/rails/commit/63bb955a99eb46e257655c93dd64e86ebbf05651
 * Rack middleware (ideally the JSON body could be handed to the parser while it's still being received, this is apparently possible with Unicorn)
-* use with ohai - DONE! (http://github.com/opscode/ohai/commit/f89baccc3b9ab587d23e0b6257f6fedffe223c02)
-* JSON API clients (http://github.com/brianmario/crack, http://github.com/brianmario/freckle-api)
-* Patch Marshal#load and Marshal#dump to use JSON? ;)
-* etc...
+* JSON API clients (http://github.com/brianmario/freckle-api)
+* ???
 
 == Benchmarks
 
