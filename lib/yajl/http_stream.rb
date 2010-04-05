@@ -147,8 +147,10 @@ module Yajl
         if response_head[:headers]["Transfer-Encoding"] == 'chunked'
           if block_given?
             chunkLeft = 0
-            while !socket.eof? && (size = socket.gets.hex)
-              next if size == 0
+            while !socket.eof? && (line = socket.gets)
+              break if line.match /0.*?\r\n/
+              next if line == "\r\n"
+              size = line.hex
               json = socket.read(size)
               chunkLeft = size-json.size
               if chunkLeft == 0
