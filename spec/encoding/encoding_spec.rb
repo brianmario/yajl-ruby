@@ -220,4 +220,9 @@ describe "Yajl JSON encoder" do
       Yajl::Encoder.encode(-1.0/0.0)
     }.should raise_error(Yajl::EncodeError)
   end
+
+  it "should encode with unicode chars in the key" do
+    hash = {"浅草" => "<- those are unicode"}
+    Yajl::Encoder.encode(hash).should eql("{\"浅草\":\"<- those are unicode\"}")
+  end
 end
