@@ -8,7 +8,5 @@ unless keywords = ARGV[0]
   puts "\nUsage: ruby examples/http/twitter_search_api.rb keyword\n\n"
   exit(0)
 end
-captured = 0
-uri = URI.parse("http://search.twitter.com/search.json?q=#{keywords}")
 
-puts Yajl::HttpStream.get(uri).inspect
+puts Yajl::HttpStream.get("http://search.twitter.com/search.json?q=#{keywords}").inspect

@@ -11,7 +11,7 @@ unless (username = ARGV[0]) && (password = ARGV[1])
   exit(0)
 end
 captured = 0
-uri = URI.parse("http://#{username}:#{password}@stream.twitter.com/spritzer.json")
+uri = URI.parse("http://#{username}:#{password}@stream.twitter.com/1/statuses/sample.json")
 
 trap('INT') {
   puts "\n\nCaptured #{captured} objects from the stream"
