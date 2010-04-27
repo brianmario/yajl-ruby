@@ -7,7 +7,7 @@ begin
 rescue LoadError
 end
 begin
-  require 'active_support/json'
+  require 'active_support/all'
 rescue LoadError
   begin
     require 'active_support'
