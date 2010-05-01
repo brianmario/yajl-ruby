@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.7.6 (May 1st, 2010)
+* use memcmp instead of strcmp for invalid Fixnum check
+* add a spec to verify unicode chars can be used as keys
+* twitter examples updated
+* only use -Wextra if ENV['DEBUG'] is set as gcc 3 doesn't know about it
+* fix chunked http encoding parse logic to further comply with the spec (thanks to Sebastian Cohnen <sebastian.cohnen@gmx.net>)
+* removed as_json checks and usage in encoder to prevent infinite loops
+** In Rails a lot of objects return self from the as_json method - which is wrong IMO - and needs to be fixed before this feature will work properly
+
 ## 0.7.5 (March 23rd, 2010)
 * check for existence of and use as_json method on custom objects
 * bugfix with read buffer when parsing from an IO (thanks to Pavel Valodzka <pavel@valodzka.name>)
