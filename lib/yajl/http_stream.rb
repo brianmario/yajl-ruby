@@ -152,6 +152,7 @@ module Yajl
               next if line == "\r\n"
               size = line.hex
               json = socket.read(size)
+              next if json.nil?
               chunkLeft = size-json.size
               if chunkLeft == 0
                 parser << json
