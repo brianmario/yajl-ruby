@@ -8,7 +8,7 @@ begin
     gem.homepage = "http://github.com/brianmario/yajl-ruby"
     gem.authors = ["Brian Lopez", "Lloyd Hilaiel"]
     gem.require_paths = ["lib", "ext"]
-    gem.extra_rdoc_files = `git ls-files *.rdoc`.split("\n")
+    gem.extra_rdoc_files = `git ls-files *.rdoc`.split("\n") << 'ext/yajl.c'
     gem.files = `git ls-files`.split("\n")
     gem.extensions = ["ext/extconf.rb"]
     gem.files.include %w(lib/jeweler/templates/.document lib/jeweler/templates/.gitignore)
