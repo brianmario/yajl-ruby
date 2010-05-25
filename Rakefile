@@ -32,6 +32,7 @@ begin
   end
   Spec::Rake::SpecTask.new('spec') do |t|
     t.spec_files = FileList['spec/']
+    t.libs << 'ext'
     t.spec_opts << '--options' << 'spec/spec.opts'
   end
 rescue LoadError
