@@ -1,4 +1,6 @@
 # encoding: UTF-8
+$LOAD_PATH.unshift File.expand_path(File.dirname(__FILE__) + '/..')
+
 require 'rubygems'
 require 'benchmark'
 require 'yajl_ext'
@@ -7,12 +9,8 @@ begin
 rescue LoadError
 end
 begin
-  require 'active_support/json'
+  require 'active_support'
 rescue LoadError
-  begin
-    require 'active_support'
-  rescue LoadError
-  end
 end
 
 filename = 'benchmark/subjects/twitter_stream.json'

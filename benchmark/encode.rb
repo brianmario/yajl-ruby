@@ -1,4 +1,6 @@
 # encoding: UTF-8
+$LOAD_PATH.unshift File.expand_path(File.dirname(__FILE__) + '/..')
+
 require 'rubygems'
 require 'benchmark'
 require 'yajl_ext'
@@ -9,12 +11,8 @@ rescue LoadError
 end
 # Can't use ActiveSuport::JSON.encode with the JSON gem loaded
 # begin
-#   require 'active_support/json'
+#   require 'active_support'
 # rescue LoadError
-#   begin
-#     require 'active_support'
-#   rescue LoadError
-#   end
 # end
 
 filename = ARGV[0] || 'benchmark/subjects/ohai.json'
