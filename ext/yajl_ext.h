@@ -27,7 +27,7 @@
 
 #ifdef HAVE_RUBY_ENCODING_H
 #include <ruby/encoding.h>
-int utf8Encoding;
+static rb_encoding *utf8Encoding;
 #endif
 
 #define READ_BUFSIZE 8192

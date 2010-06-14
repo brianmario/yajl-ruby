@@ -247,7 +247,11 @@ static int yajl_found_number(void * ctx, const char * numberVal, unsigned int nu
 static int yajl_found_string(void * ctx, const unsigned char * stringVal, unsigned int stringLen) {
     VALUE str = rb_str_new((const char *)stringVal, stringLen);
 #ifdef HAVE_RUBY_ENCODING_H
-    rb_enc_associate_index(str, utf8Encoding);
+    rb_encoding *default_internal_enc = rb_default_internal_encoding();
+    rb_enc_associate(str, utf8Encoding);
+    if (default_internal_enc) {
+      str = rb_str_export_to_enc(str, default_internal_enc);
+    }
 #endif
     yajl_set_static_value(ctx, str);
     yajl_check_and_fire_callback(ctx);
@@ -258,6 +262,9 @@ static int yajl_found_hash_key(void * ctx, const unsigned char * stringVal, unsi
     yajl_parser_wrapper * wrapper;
     GetParser((VALUE)ctx, wrapper);
     VALUE keyStr;
+#ifdef HAVE_RUBY_ENCODING_H
+    rb_encoding *default_internal_enc = rb_default_internal_encoding();
+#endif
 
     if (wrapper->symbolizeKeys) {
         char buf[stringLen+1];
@@ -267,7 +274,10 @@ static int yajl_found_hash_key(void * ctx, const unsigned char * stringVal, unsi
     } else {
         keyStr = rb_str_new((const char *)stringVal, stringLen);
 #ifdef HAVE_RUBY_ENCODING_H
-        rb_enc_associate_index(keyStr, utf8Encoding);
+        rb_enc_associate(keyStr, utf8Encoding);
+        if (default_internal_enc) {
+          keyStr = rb_str_export_to_enc(keyStr, default_internal_enc);
+        }
 #endif
         yajl_set_static_value(ctx, keyStr);
     }
@@ -538,7 +548,7 @@ static VALUE rb_yajl_encoder_new(int argc, VALUE * argv, VALUE klass) {
             indent = rb_hash_aref(opts, sym_indent);
             if (indent != Qnil) {
 #ifdef HAVE_RUBY_ENCODING_H
-                rb_enc_associate_index(indent, utf8Encoding);
+                indent = rb_str_export_to_enc(indent, utf8Encoding);
 #endif
                 Check_Type(indent, T_STRING);
                 indentString = RSTRING_PTR(indent);
@@ -554,7 +564,7 @@ static VALUE rb_yajl_encoder_new(int argc, VALUE * argv, VALUE klass) {
         wrapper->terminator = rb_hash_aref(opts, sym_terminator);
 #ifdef HAVE_RUBY_ENCODING_H
         if (TYPE(wrapper->terminator) == T_STRING) {
-            rb_enc_associate_index(wrapper->terminator, utf8Encoding);
+            wrapper->terminator = rb_str_export_to_enc(wrapper->terminator, utf8Encoding);
         }
 #endif
     } else {
@@ -620,7 +630,7 @@ static VALUE rb_yajl_encoder_encode(int argc, VALUE * argv, VALUE self) {
     yajl_gen_get_buf(wrapper->encoder, &buffer, &len);
     outBuff = rb_str_new((const char *)buffer, len);
 #ifdef HAVE_RUBY_ENCODING_H
-    rb_enc_associate_index(outBuff, utf8Encoding);
+    rb_enc_associate(outBuff, utf8Encoding);
 #endif
     yajl_gen_clear(wrapper->encoder);
 
@@ -896,6 +906,6 @@ void Init_yajl_ext() {
     sym_symbolize_keys = ID2SYM(rb_intern("symbolize_keys"));
 
 #ifdef HAVE_RUBY_ENCODING_H
-    utf8Encoding = rb_enc_find_index("UTF-8");
+    utf8Encoding = rb_utf8_encoding();
 #endif
 }

@@ -61,4 +61,21 @@ describe "One-off JSON examples" do
     Yajl::Parser.parse("{\"id\": 5687389800}").should eql({"id" => 5687389800})
     Yajl::Parser.parse("{\"id\": 1046289770033519442869495707521600000000}").should eql({"id" => 1046289770033519442869495707521600000000})
   end
+
+  if RUBY_VERSION =~ /^1.9/
+    it "should return strings and hash keys in utf-8 if Encoding.default_internal is nil" do
+      Encoding.default_internal = nil
+      Yajl::Parser.parse('{"key": "value"}').keys.first.encoding.should eql(Encoding.find('utf-8'))
+      Yajl::Parser.parse('{"key": "value"}').values.first.encoding.should eql(Encoding.find('utf-8'))
+    end
+
+    it "should return strings and hash keys encoded as specified in Encoding.default_internal if it's set" do
+      Encoding.default_internal = Encoding.find('utf-8')
+      Yajl::Parser.parse('{"key": "value"}').keys.first.encoding.should eql(Encoding.default_internal)
+      Yajl::Parser.parse('{"key": "value"}').values.first.encoding.should eql(Encoding.default_internal)
+      Encoding.default_internal = Encoding.find('us-ascii')
+      Yajl::Parser.parse('{"key": "value"}').keys.first.encoding.should eql(Encoding.default_internal)
+      Yajl::Parser.parse('{"key": "value"}').values.first.encoding.should eql(Encoding.default_internal)
+    end
+  end
 end

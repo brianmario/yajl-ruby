@@ -214,4 +214,21 @@ describe "Yajl JSON encoder" do
     hash = {"浅草" => "<- those are unicode"}
     Yajl::Encoder.encode(hash).should eql("{\"浅草\":\"<- those are unicode\"}")
   end
+
+  if RUBY_VERSION =~ /^1.9/
+    it "should return a string encoded in utf-8 if Encoding.default_internal is nil" do
+      Encoding.default_internal = nil
+      hash = {"浅草" => "<- those are unicode"}
+      Yajl::Encoder.encode(hash).encoding.should eql(Encoding.find('utf-8'))
+    end
+
+    it "should return a string encoded in utf-8 even if Encoding.default_internal *is* set" do
+      Encoding.default_internal = Encoding.find('utf-8')
+      hash = {"浅草" => "<- those are unicode"}
+      Yajl::Encoder.encode(hash).encoding.should eql(Encoding.default_internal)
+      Encoding.default_internal = Encoding.find('us-ascii')
+      hash = {"浅草" => "<- those are unicode"}
+      Yajl::Encoder.encode(hash).encoding.should eql(Encoding.find('utf-8'))
+    end
+  end
 end
