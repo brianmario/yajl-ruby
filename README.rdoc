@@ -2,7 +2,7 @@
 
 This gem is a C binding to the excellent YAJL JSON parsing and generation library.
 
-You can read more info at the projects website http://lloyd.github.com/yajl or check out it's codes at http://github.com/lloyd/yajl.
+You can read more info at the project's website http://lloyd.github.com/yajl or check out its code at http://github.com/lloyd/yajl.
 
 == Features
 
@@ -113,7 +113,7 @@ unserialized off the stream. For the case of this Twitter Streaming API call, th
 The code below is all that's needed to make the request and stream unserialized Ruby hashes off the response, continuously.
 You'll note that I've enabled the :symbolize_keys parser option as well. Doing so is much more efficient for parsing JSON streams with
 lots of repetitive keys - for things like result sets or multiple API requests - than the same parse with string keys.
-This is because Ruby will reuse (and never GC) it's symbol table. Be that as it may, if you want to parse JSON strings with random key names
+This is because Ruby will reuse (and never GC) its symbol table. Be that as it may, if you want to parse JSON strings with random key names
 it's much better to leave string keys enabled (the default), so they can get GC'd later.
 
  require 'uri'
@@ -172,7 +172,7 @@ Using EventMachine and you want to encode and send in chunks?
  end
 
  def connection_completed
-   # The encoder will do it's best to hand you data in chunks that
+   # The encoder will do its best to hand you data in chunks that
    # are around 8kb (but you may see some that are larger)
    #
    # It should be noted that you could have also assigned the _on_progress_ callback
@@ -205,7 +205,7 @@ The JSON gem compatibility API isn't enabled by default. You have to explicitly 
 
 That's right, you can just replace "require 'json'" with the line above and you're done!
 
-This will require yajl-ruby itself, as well as enable it's JSON gem compatibility API.
+This will require yajl-ruby itself, as well as enable its JSON gem compatibility API.
 
 This includes the following API:
 
@@ -231,8 +231,8 @@ After I finished implementation - this library performs close to the same as the
 
 But on larger files, and higher amounts of iteration, this library was around 2x faster than JSON.parse.
 
-The main benefit of this library is in it's memory usage.
-Since it's able to parse the stream in chunks, it's memory requirements are very, very low.
+The main benefit of this library is in its memory usage.
+Since it's able to parse the stream in chunks, its memory requirements are very, very low.
 
 Here's what parsing a 2.43MB JSON file off the filesystem 20 times looks like:
 
