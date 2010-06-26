@@ -23,6 +23,15 @@
 
 #include "yajl_ext.h"
 
+#define YAJL_RB_TO_JSON                                   \
+ VALUE rb_encoder;                                        \
+ rb_scan_args(argc, argv, "01", &rb_encoder);             \
+ VALUE cls = rb_obj_class(rb_encoder);                    \
+ if (rb_encoder == Qnil || cls != cEncoder) {             \
+     rb_encoder = rb_yajl_encoder_new(0, NULL, cEncoder); \
+ }                                                        \
+ return rb_yajl_encoder_encode(1, &self, rb_encoder);     \
+
 /* Helpers for building objects */
 inline void yajl_check_and_fire_callback(void * ctx) {
     yajl_parser_wrapper * wrapper;
@@ -688,12 +697,7 @@ static VALUE rb_yajl_encoder_set_progress_cb(VALUE self, VALUE callback) {
  * Encodes an instance of Hash to JSON
  */
 static VALUE rb_yajl_json_ext_hash_to_json(int argc, VALUE * argv, VALUE self) {
-    VALUE rb_encoder;
-    rb_scan_args(argc, argv, "01", &rb_encoder);
-    if (rb_encoder == Qnil) {
-        rb_encoder = rb_yajl_encoder_new(0, NULL, cEncoder);
-    }
-    return rb_yajl_encoder_encode(1, &self, rb_encoder);
+  YAJL_RB_TO_JSON;
 }
 
 /*
@@ -709,12 +713,7 @@ static VALUE rb_yajl_json_ext_hash_to_json(int argc, VALUE * argv, VALUE self) {
  * Encodes an instance of Array to JSON
  */
 static VALUE rb_yajl_json_ext_array_to_json(int argc, VALUE * argv, VALUE self) {
-    VALUE rb_encoder;
-    rb_scan_args(argc, argv, "01", &rb_encoder);
-    if (rb_encoder == Qnil) {
-        rb_encoder = rb_yajl_encoder_new(0, NULL, cEncoder);
-    }
-    return rb_yajl_encoder_encode(1, &self, rb_encoder);
+  YAJL_RB_TO_JSON;
 }
 
 /*
@@ -730,12 +729,7 @@ static VALUE rb_yajl_json_ext_array_to_json(int argc, VALUE * argv, VALUE self) 
  * Encodes an instance of Fixnum to JSON
  */
 static VALUE rb_yajl_json_ext_fixnum_to_json(int argc, VALUE * argv, VALUE self) {
-    VALUE rb_encoder;
-    rb_scan_args(argc, argv, "01", &rb_encoder);
-    if (rb_encoder == Qnil) {
-        rb_encoder = rb_yajl_encoder_new(0, NULL, cEncoder);
-    }
-    return rb_yajl_encoder_encode(1, &self, rb_encoder);
+  YAJL_RB_TO_JSON;
 }
 
 /*
@@ -751,12 +745,7 @@ static VALUE rb_yajl_json_ext_fixnum_to_json(int argc, VALUE * argv, VALUE self)
  * Encodes an instance of Float to JSON
  */
 static VALUE rb_yajl_json_ext_float_to_json(int argc, VALUE * argv, VALUE self) {
-    VALUE rb_encoder;
-    rb_scan_args(argc, argv, "01", &rb_encoder);
-    if (rb_encoder == Qnil) {
-        rb_encoder = rb_yajl_encoder_new(0, NULL, cEncoder);
-    }
-    return rb_yajl_encoder_encode(1, &self, rb_encoder);
+  YAJL_RB_TO_JSON;
 }
 
 /*
@@ -772,12 +761,7 @@ static VALUE rb_yajl_json_ext_float_to_json(int argc, VALUE * argv, VALUE self) 
  * Encodes an instance of TrueClass to JSON
  */
 static VALUE rb_yajl_json_ext_string_to_json(int argc, VALUE * argv, VALUE self) {
-    VALUE rb_encoder;
-    rb_scan_args(argc, argv, "01", &rb_encoder);
-    if (rb_encoder == Qnil) {
-        rb_encoder = rb_yajl_encoder_new(0, NULL, cEncoder);
-    }
-    return rb_yajl_encoder_encode(1, &self, rb_encoder);
+  YAJL_RB_TO_JSON;
 }
 
 /*
@@ -793,12 +777,7 @@ static VALUE rb_yajl_json_ext_string_to_json(int argc, VALUE * argv, VALUE self)
  * Encodes an instance of TrueClass to JSON
  */
 static VALUE rb_yajl_json_ext_true_to_json(int argc, VALUE * argv, VALUE self) {
-    VALUE rb_encoder;
-    rb_scan_args(argc, argv, "01", &rb_encoder);
-    if (rb_encoder == Qnil) {
-        rb_encoder = rb_yajl_encoder_new(0, NULL, cEncoder);
-    }
-    return rb_yajl_encoder_encode(1, &self, rb_encoder);
+  YAJL_RB_TO_JSON;
 }
 
 /*
@@ -814,12 +793,7 @@ static VALUE rb_yajl_json_ext_true_to_json(int argc, VALUE * argv, VALUE self) {
  * Encodes an instance of FalseClass to JSON
  */
 static VALUE rb_yajl_json_ext_false_to_json(int argc, VALUE * argv, VALUE self) {
-    VALUE rb_encoder;
-    rb_scan_args(argc, argv, "01", &rb_encoder);
-    if (rb_encoder == Qnil) {
-        rb_encoder = rb_yajl_encoder_new(0, NULL, cEncoder);
-    }
-    return rb_yajl_encoder_encode(1, &self, rb_encoder);
+  YAJL_RB_TO_JSON;
 }
 
 /*
@@ -835,12 +809,7 @@ static VALUE rb_yajl_json_ext_false_to_json(int argc, VALUE * argv, VALUE self) 
  * Encodes an instance of NilClass to JSON
  */
 static VALUE rb_yajl_json_ext_nil_to_json(int argc, VALUE * argv, VALUE self) {
-    VALUE rb_encoder;
-    rb_scan_args(argc, argv, "01", &rb_encoder);
-    if (rb_encoder == Qnil) {
-        rb_encoder = rb_yajl_encoder_new(0, NULL, cEncoder);
-    }
-    return rb_yajl_encoder_encode(1, &self, rb_encoder);
+  YAJL_RB_TO_JSON;
 }
 
 /*
