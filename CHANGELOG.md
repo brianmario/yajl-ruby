@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.7.7 (July 12th, 2010)
+* full string encoding support for 1.9, respecting Encoding.default_internal
+* refactor the #to_json function bodies into a C macro
+* some misc code cleanup in the benchmark scripts
+
 ## 0.7.6 (May 1st, 2010)
 * use memcmp instead of strcmp for invalid Fixnum check
 * add a spec to verify unicode chars can be used as keys
