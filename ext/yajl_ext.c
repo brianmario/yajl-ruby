@@ -846,7 +846,7 @@ void Init_yajl_ext() {
     rb_define_singleton_method(cParser, "new", rb_yajl_parser_new, -1);
     rb_define_method(cParser, "initialize", rb_yajl_parser_init, -1);
     rb_define_method(cParser, "parse", rb_yajl_parser_parse, -1);
-    rb_define_method(cParser, "parse_chunk", rb_yajl_parser_parse_chunk, -1);
+    rb_define_method(cParser, "parse_chunk", rb_yajl_parser_parse_chunk, 1);
     rb_define_method(cParser, "<<", rb_yajl_parser_parse_chunk, 1);
     rb_define_method(cParser, "on_parse_complete=", rb_yajl_parser_set_complete_cb, 1);
 
