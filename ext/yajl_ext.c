@@ -24,9 +24,9 @@
 #include "yajl_ext.h"
 
 #define YAJL_RB_TO_JSON                                   \
- VALUE rb_encoder;                                        \
+ VALUE rb_encoder, cls;                                   \
  rb_scan_args(argc, argv, "01", &rb_encoder);             \
- VALUE cls = rb_obj_class(rb_encoder);                    \
+ cls = rb_obj_class(rb_encoder);                          \
  if (rb_encoder == Qnil || cls != cEncoder) {             \
      rb_encoder = rb_yajl_encoder_new(0, NULL, cEncoder); \
  }                                                        \
@@ -116,6 +116,7 @@ void yajl_encode_part(void * wrapper, VALUE obj, VALUE io) {
     const unsigned char * buffer;
     const char * cptr;
     unsigned int len;
+    VALUE keys, entry, keyStr;
 
     if (io != Qnil || w->on_progress_callback != Qnil) {
         status = yajl_gen_get_buf(w->encoder, &buffer, &len);
@@ -135,8 +136,7 @@ void yajl_encode_part(void * wrapper, VALUE obj, VALUE io) {
             status = yajl_gen_map_open(w->encoder);
 
             /* TODO: itterate through keys in the hash */
-            VALUE keys = rb_funcall(obj, intern_keys, 0);
-            VALUE entry, keyStr;
+            keys = rb_funcall(obj, intern_keys, 0);
             for(idx=0; idx<RARRAY_LEN(keys); idx++) {
                 entry = rb_ary_entry(keys, idx);
                 keyStr = rb_funcall(entry, intern_to_s, 0); /* key must be a string */
@@ -269,10 +269,13 @@ static int yajl_found_string(void * ctx, const unsigned char * stringVal, unsign
 
 static int yajl_found_hash_key(void * ctx, const unsigned char * stringVal, unsigned int stringLen) {
     yajl_parser_wrapper * wrapper;
-    GetParser((VALUE)ctx, wrapper);
     VALUE keyStr;
 #ifdef HAVE_RUBY_ENCODING_H
-    rb_encoding *default_internal_enc = rb_default_internal_encoding();
+    rb_encoding *default_internal_enc;
+#endif
+    GetParser((VALUE)ctx, wrapper);
+#ifdef HAVE_RUBY_ENCODING_H
+    default_internal_enc = rb_default_internal_encoding();
 #endif
 
     if (wrapper->symbolizeKeys) {
