@@ -171,7 +171,7 @@ yajl_gen_free(yajl_gen g)
     }                                               \
 
 #define FINAL_NEWLINE
-
+    
 yajl_gen_status
 yajl_gen_integer(yajl_gen g, long int number)
 {
@@ -197,7 +197,7 @@ yajl_gen_double(yajl_gen g, double number)
     ENSURE_VALID_STATE; ENSURE_NOT_KEY; 
     if (isnan(number) || isinf(number)) return yajl_gen_invalid_number;
     INSERT_SEP; INSERT_WHITESPACE;
-    sprintf(i, "%g", number);
+    sprintf(i, "%.20g", number);
     g->print(g->ctx, i, strlen(i));
     APPENDED_ATOM;
     FINAL_NEWLINE;
