@@ -95,6 +95,9 @@ inline void yajl_set_static_value(void * ctx, VALUE val) {
 static void yajl_encoder_wrapper_free(void * wrapper) {
     yajl_encoder_wrapper * w = wrapper;
     if (w) {
+        if (w->indentString) {
+          free(w->indentString);
+        }
         yajl_gen_free(w->encoder);
         free(w);
     }
@@ -548,7 +551,7 @@ static VALUE rb_yajl_encoder_new(int argc, VALUE * argv, VALUE klass) {
     yajl_encoder_wrapper * wrapper;
     yajl_gen_config cfg;
     VALUE opts, obj, indent;
-    const char * indentString = "  ";
+    unsigned char * indentString = "  ";
     int beautify = 0;
 
     /* Scan off config vars */
@@ -563,11 +566,13 @@ static VALUE rb_yajl_encoder_new(int argc, VALUE * argv, VALUE klass) {
                 indent = rb_str_export_to_enc(indent, utf8Encoding);
 #endif
                 Check_Type(indent, T_STRING);
-                indentString = RSTRING_PTR(indent);
+                wrapper->indentString = (unsigned char*)calloc(RSTRING_LEN(indent), sizeof(unsigned char));
+                memcpy(wrapper->indentString, RSTRING_PTR(indent), RSTRING_LEN(indent));
+                indentString = wrapper->indentString;
             }
         }
     }
-    cfg = (yajl_gen_config){beautify, indentString};
+    cfg = (yajl_gen_config){beautify, (const char *)indentString};
 
     obj = Data_Make_Struct(klass, yajl_encoder_wrapper, yajl_encoder_wrapper_mark, yajl_encoder_wrapper_free, wrapper);
     wrapper->encoder = yajl_gen_alloc(&cfg, NULL);

@@ -98,6 +98,7 @@ typedef struct {
     VALUE on_progress_callback;
     VALUE terminator;
     yajl_gen encoder;
+    unsigned char *indentString;
 } yajl_encoder_wrapper;
 
 static VALUE rb_yajl_parser_new(int argc, VALUE * argv, VALUE self);
