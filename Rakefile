@@ -19,22 +19,18 @@ rescue LoadError
 end
 
 begin
-  require 'rake'
-  require 'spec/rake/spectask'
+  require 'rspec'
+  require 'rspec/core/rake_task'
 
   desc "Run all examples with RCov"
-  Spec::Rake::SpecTask.new('spec:rcov') do |t|
-    t.spec_files = FileList['spec/']
+  RSpec::Core::RakeTask.new('spec:rcov') do |t|
     t.rcov = true
-    t.rcov_opts = lambda do
-      IO.readlines("spec/rcov.opts").map {|l| l.chomp.split " "}.flatten
-    end
   end
-  Spec::Rake::SpecTask.new('spec') do |t|
-    t.spec_files = FileList['spec/']
-    t.libs << 'ext'
-    t.spec_opts << '--options' << 'spec/spec.opts'
+  RSpec::Core::RakeTask.new('spec') do |t|
+    t.verbose = true
   end
+
+  task :default => :spec
 rescue LoadError
-  puts "RSpec, or one of its dependencies, is not available. Install it with: sudo gem install rspec"
+  puts "rspec, or one of its dependencies, is not available. Install it with: sudo gem install rspec"
 end
