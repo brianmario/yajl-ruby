@@ -75,19 +75,4 @@ module Yajl
       new(options).encode(obj, io, &block)
     end
   end
-
-  # DEPRECATED - See Yajl::Parser and Yajl::Encoder
-  module Stream
-    # DEPRECATED - See Yajl::Parser
-    def self.parse(str_or_io)
-      warn "WARNING: Yajl::Stream has be deprecated and will most likely be gone in the next release. Use the Yajl::Parser class instead."
-      Parser.new.parse(str_or_io)
-    end
-
-    # DEPRECATED - See Yajl::Encoder
-    def self.encode(obj, str_or_io=nil)
-      warn "WARNING: Yajl::Stream has be deprecated and will most likely be gone in the next release. Use the Yajl::Encoder class instead."
-      Encoder.new.encode(obj, str_or_io)
-    end
-  end
 end
