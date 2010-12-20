@@ -844,7 +844,7 @@ static VALUE rb_yajl_encoder_enable_json_gem_ext(VALUE klass) {
 
 
 /* Ruby Extension initializer */
-void Init_yajl_ext() {
+void Init_yajl() {
     mYajl = rb_define_module("Yajl");
 
     cParseError = rb_define_class_under(mYajl, "ParseError", rb_eStandardError);

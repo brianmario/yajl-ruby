@@ -1,5 +1,5 @@
 # encoding: UTF-8
-require 'yajl_ext'
+require 'yajl/yajl'
 
 # = Extras
 # We're not going to load these auotmatically, because you might not need them ;)

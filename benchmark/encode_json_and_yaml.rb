@@ -4,7 +4,7 @@ $LOAD_PATH.unshift File.expand_path(File.dirname(__FILE__) + '/../lib')
 
 require 'rubygems'
 require 'benchmark'
-require 'yajl_ext'
+require 'yajl'
 begin
   require 'json'
 rescue LoadError

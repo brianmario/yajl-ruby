@@ -7,3 +7,4 @@ benchmark/subjects/contacts.*
 TODO.txt
 tmp/*
 pkg/*
+vendor/gems

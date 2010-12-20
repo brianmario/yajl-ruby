@@ -11,15 +11,16 @@ Gem::Specification.new do |s|
   s.authors = ["Brian Lopez", "Lloyd Hilaiel"]
   s.date = %q{2010-12-19}
   s.email = %q{seniorlopez@gmail.com}
-  s.extensions = ["ext/extconf.rb"]
+  s.extensions = ["ext/yajl/extconf.rb"]
   s.extra_rdoc_files = [
-    "README.rdoc",
-    "ext/yajl.c"
+    "README.rdoc"
   ]
   s.files = [
     ".gitignore",
     ".rspec",
     "CHANGELOG.md",
+    "Gemfile",
+    "Gemfile.lock",
     "MIT-LICENSE",
     "README.rdoc",
     "Rakefile",
@@ -47,27 +48,27 @@ Gem::Specification.new do |s|
     "examples/parsing/from_file.rb",
     "examples/parsing/from_stdin.rb",
     "examples/parsing/from_string.rb",
-    "ext/api/yajl_common.h",
-    "ext/api/yajl_gen.h",
-    "ext/api/yajl_parse.h",
-    "ext/api/yajl_version.h",
-    "ext/extconf.rb",
-    "ext/yajl.c",
-    "ext/yajl_alloc.c",
-    "ext/yajl_alloc.h",
-    "ext/yajl_buf.c",
-    "ext/yajl_buf.h",
-    "ext/yajl_bytestack.h",
-    "ext/yajl_encode.c",
-    "ext/yajl_encode.h",
-    "ext/yajl_ext.c",
-    "ext/yajl_ext.h",
-    "ext/yajl_gen.c",
-    "ext/yajl_lex.c",
-    "ext/yajl_lex.h",
-    "ext/yajl_parser.c",
-    "ext/yajl_parser.h",
-    "ext/yajl_version.c",
+    "ext/yajl/api/yajl_common.h",
+    "ext/yajl/api/yajl_gen.h",
+    "ext/yajl/api/yajl_parse.h",
+    "ext/yajl/api/yajl_version.h",
+    "ext/yajl/extconf.rb",
+    "ext/yajl/yajl.c",
+    "ext/yajl/yajl_alloc.c",
+    "ext/yajl/yajl_alloc.h",
+    "ext/yajl/yajl_buf.c",
+    "ext/yajl/yajl_buf.h",
+    "ext/yajl/yajl_bytestack.h",
+    "ext/yajl/yajl_encode.c",
+    "ext/yajl/yajl_encode.h",
+    "ext/yajl/yajl_ext.c",
+    "ext/yajl/yajl_ext.h",
+    "ext/yajl/yajl_gen.c",
+    "ext/yajl/yajl_lex.c",
+    "ext/yajl/yajl_lex.h",
+    "ext/yajl/yajl_parser.c",
+    "ext/yajl/yajl_parser.h",
+    "ext/yajl/yajl_version.c",
     "lib/yajl.rb",
     "lib/yajl/bzip2.rb",
     "lib/yajl/bzip2/stream_reader.rb",
@@ -160,11 +161,13 @@ Gem::Specification.new do |s|
     "spec/parsing/one_off_spec.rb",
     "spec/rcov.opts",
     "spec/spec_helper.rb",
+    "tasks/compile.rake",
+    "tasks/jeweler.rake",
+    "tasks/rspec.rake",
     "yajl-ruby.gemspec"
   ]
   s.homepage = %q{http://github.com/brianmario/yajl-ruby}
   s.require_paths = ["lib", "ext"]
-  s.rubyforge_project = %q{yajl-ruby}
   s.rubygems_version = %q{1.3.7}
   s.summary = %q{Ruby C bindings to the excellent Yajl JSON stream-based parser library.}
   s.test_files = [
@@ -196,9 +199,18 @@ Gem::Specification.new do |s|
     s.specification_version = 3
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
+      s.add_development_dependency(%q<rake-compiler>, [">= 0.7.5"])
+      s.add_development_dependency(%q<jeweler>, [">= 0"])
+      s.add_development_dependency(%q<rspec>, [">= 0"])
     else
+      s.add_dependency(%q<rake-compiler>, [">= 0.7.5"])
+      s.add_dependency(%q<jeweler>, [">= 0"])
+      s.add_dependency(%q<rspec>, [">= 0"])
     end
   else
+    s.add_dependency(%q<rake-compiler>, [">= 0.7.5"])
+    s.add_dependency(%q<jeweler>, [">= 0"])
+    s.add_dependency(%q<rspec>, [">= 0"])
   end
 end
 
