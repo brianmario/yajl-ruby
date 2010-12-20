@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2009 Brian Lopez - http://github.com/brianmario
+ * Copyright (c) 2008-2010 Brian Lopez - http://github.com/brianmario
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
