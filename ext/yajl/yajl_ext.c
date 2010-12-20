@@ -532,6 +532,7 @@ static VALUE rb_yajl_parser_set_complete_cb(VALUE self, VALUE callback) {
  * The JSON stream created is written to the IO in chunks, as it's being created.
  */
 
+static unsigned char * defaultIndentString = (unsigned char *)"  ";
 /*
  * Document-method: new
  *
@@ -551,7 +552,7 @@ static VALUE rb_yajl_encoder_new(int argc, VALUE * argv, VALUE klass) {
     yajl_encoder_wrapper * wrapper;
     yajl_gen_config cfg;
     VALUE opts, obj, indent;
-    unsigned char * indentString = "  ";
+    unsigned char *indentString = NULL, *actualIndent = NULL;
     int beautify = 0;
 
     /* Scan off config vars */
@@ -566,15 +567,20 @@ static VALUE rb_yajl_encoder_new(int argc, VALUE * argv, VALUE klass) {
                 indent = rb_str_export_to_enc(indent, utf8Encoding);
 #endif
                 Check_Type(indent, T_STRING);
-                wrapper->indentString = (unsigned char*)calloc(RSTRING_LEN(indent), sizeof(unsigned char));
-                memcpy(wrapper->indentString, RSTRING_PTR(indent), RSTRING_LEN(indent));
-                indentString = wrapper->indentString;
+                indentString = (unsigned char*)malloc(RSTRING_LEN(indent)+1);
+                memcpy(indentString, RSTRING_PTR(indent), RSTRING_LEN(indent));
+                indentString[RSTRING_LEN(indent)+1] = '\0';
+                actualIndent = indentString;
             }
         }
+    }
+    if (!indentString) {
+      indentString = defaultIndentString;
     }
     cfg = (yajl_gen_config){beautify, (const char *)indentString};
 
     obj = Data_Make_Struct(klass, yajl_encoder_wrapper, yajl_encoder_wrapper_mark, yajl_encoder_wrapper_free, wrapper);
+    wrapper->indentString = actualIndent;
     wrapper->encoder = yajl_gen_alloc(&cfg, NULL);
     wrapper->on_progress_callback = Qnil;
     if (opts != Qnil && rb_funcall(opts, intern_has_key, 1, sym_terminator) == Qtrue) {
