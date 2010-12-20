@@ -3,7 +3,6 @@ require 'mkmf'
 require 'rbconfig'
 
 $CFLAGS << ' -Wall -funroll-loops'
-$CFLAGS << ' -Wextra' if ENV['DEBUG']
-# $CFLAGS << ' -O0 -ggdb'
+$CFLAGS << ' -Wextra -O0 -ggdb3' if ENV['DEBUG']
 
 create_makefile("yajl")
