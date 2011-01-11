@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.7.9 (January 11th, 2011)
+* moved to rspec2
+* fixed some compilation warnings on 1.9.3
+* brought over latest from Yajl upstream
+* finally removed the deprecated Yajl::Stream methods
+* moved to rake-compiler
+* moved to Bundler for development
+* fix memory corruption bug when using :pretty => true and a custom indent string
+* fixed memory leak when exceptions were being raised during a parse
+
+## 0.7.8 (September 27th, 2010)
+* fix a bug in chunked http response regex (thanks to http://github.com/kevn for catching this)
+* Make sure json compability doesn't break ActiveSupport#to_json
+* fix improper usage of rb_define_method
+
 ## 0.7.7 (July 12th, 2010)
 * full string encoding support for 1.9, respecting Encoding.default_internal
 * refactor the #to_json function bodies into a C macro
