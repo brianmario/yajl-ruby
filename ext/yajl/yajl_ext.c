@@ -495,7 +495,6 @@ static VALUE rb_yajl_parser_parse_chunk(VALUE self, VALUE chunk) {
     GetParser(self, wrapper);
     if (NIL_P(chunk)) {
         rb_raise(cParseError, "Can't parse a nil string.");
-        return Qnil;
     }
 
     if (wrapper->parse_complete_callback != Qnil) {
