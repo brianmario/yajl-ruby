@@ -569,7 +569,7 @@ static VALUE rb_yajl_encoder_new(int argc, VALUE * argv, VALUE klass) {
                 Check_Type(indent, T_STRING);
                 indentString = (unsigned char*)malloc(RSTRING_LEN(indent)+1);
                 memcpy(indentString, RSTRING_PTR(indent), RSTRING_LEN(indent));
-                indentString[RSTRING_LEN(indent)+1] = '\0';
+                indentString[RSTRING_LEN(indent)] = '\0';
                 actualIndent = indentString;
             }
         }
