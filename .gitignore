@@ -8,3 +8,4 @@ TODO.txt
 tmp/*
 pkg/*
 vendor/gems
+Gemfile.lock

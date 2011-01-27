@@ -13,8 +13,6 @@ require 'yajl/yajl'
 #
 # Ruby bindings to the excellent Yajl (Yet Another JSON Parser) ANSI C library.
 module Yajl
-  VERSION = "0.7.9"
-
   # For compatibility, has the same signature of Yajl::Parser.parse
   def self.load(str_or_io, options={}, read_bufsize=nil, &block)
     Parser.parse(str_or_io, options, read_bufsize, &block)
