@@ -46,16 +46,17 @@ static void CharToHex(unsigned char c, char * hexBuf)
 
 void
 yajl_string_encode(yajl_buf buf, const unsigned char * str,
-                   unsigned int len)
+                   unsigned int len, unsigned int htmlSafe)
 {
-    yajl_string_encode2((const yajl_print_t) &yajl_buf_append, buf, str, len);
+    yajl_string_encode2((const yajl_print_t) &yajl_buf_append, buf, str, len, htmlSafe);
 }
 
 void
 yajl_string_encode2(const yajl_print_t print,
                     void * ctx,
                     const unsigned char * str,
-                    unsigned int len)
+                    unsigned int len,
+                    unsigned int htmlSafe)
 {
     unsigned int beg = 0;
     unsigned int end = 0;    
@@ -74,6 +75,11 @@ yajl_string_encode2(const yajl_print_t print,
             case '\f': escaped = "\\f"; break;
             case '\b': escaped = "\\b"; break;
             case '\t': escaped = "\\t"; break;
+            case '/':
+              if (htmlSafe) {
+                escaped = "\\/";
+              }
+              break;
             default:
                 if ((unsigned char) str[end] < 32) {
                     CharToHex(str[end], hexBuf + 4);

@@ -553,7 +553,7 @@ static VALUE rb_yajl_encoder_new(int argc, VALUE * argv, VALUE klass) {
     yajl_gen_config cfg;
     VALUE opts, obj, indent;
     unsigned char *indentString = NULL, *actualIndent = NULL;
-    int beautify = 0;
+    int beautify = 0, htmlSafe = 0;
 
     /* Scan off config vars */
     if (rb_scan_args(argc, argv, "01", &opts) == 1) {
@@ -573,11 +573,14 @@ static VALUE rb_yajl_encoder_new(int argc, VALUE * argv, VALUE klass) {
                 actualIndent = indentString;
             }
         }
+        if (rb_hash_aref(opts, sym_html_safe) == Qtrue) {
+          htmlSafe = 1;
+        }
     }
     if (!indentString) {
       indentString = defaultIndentString;
     }
-    cfg = (yajl_gen_config){beautify, (const char *)indentString};
+    cfg = (yajl_gen_config){beautify, (const char *)indentString, htmlSafe};
 
     obj = Data_Make_Struct(klass, yajl_encoder_wrapper, yajl_encoder_wrapper_mark, yajl_encoder_wrapper_free, wrapper);
     wrapper->indentString = actualIndent;
@@ -885,6 +888,7 @@ void Init_yajl() {
     sym_check_utf8 = ID2SYM(rb_intern("check_utf8"));
     sym_pretty = ID2SYM(rb_intern("pretty"));
     sym_indent = ID2SYM(rb_intern("indent"));
+    sym_html_safe = ID2SYM(rb_intern("html_safe"));
     sym_terminator = ID2SYM(rb_intern("terminator"));
     sym_symbolize_keys = ID2SYM(rb_intern("symbolize_keys"));
 

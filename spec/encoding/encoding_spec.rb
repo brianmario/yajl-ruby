@@ -231,4 +231,17 @@ describe "Yajl JSON encoder" do
       Yajl::Encoder.encode(hash).encoding.should eql(Encoding.find('utf-8'))
     end
   end
+
+  it "should be able to escape / characters if html_safe is enabled" do
+    unsafe_encoder = Yajl::Encoder.new(:html_safe => false)
+    safe_encoder   = Yajl::Encoder.new(:html_safe => true)
+
+    unsafe_encoder.encode("</script>").should_not eql("\"<\\/script>\"")
+    safe_encoder.encode("</script>").should eql("\"<\\/script>\"")
+  end
+
+  it "should default to *not* escaping / characters" do
+    unsafe_encoder = Yajl::Encoder.new
+    unsafe_encoder.encode("</script>").should_not eql("\"<\\/script>\"")
+  end
 end

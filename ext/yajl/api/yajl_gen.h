@@ -82,6 +82,8 @@ extern "C" {
          *  some number of spaces.  default is four spaces '    '.  This
          *  member is only relevant when beautify is true */
         const char * indentString;
+        /** escape the '/' character */
+        unsigned int htmlSafe;
     } yajl_gen_config;
 
     /** allocate a generator handle
