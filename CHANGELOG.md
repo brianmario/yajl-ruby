@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.0 (February 2nd, 2011)
+* added a new html_safe option to Yajl::Encoder to escape '/' characters for use in the DOM
+* moved away from Jeweler to a Bundler/manual gemfile management setup
+
 ## 0.7.9 (January 11th, 2011)
 * moved to rspec2
 * fixed some compilation warnings on 1.9.3
