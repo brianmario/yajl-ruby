@@ -197,6 +197,16 @@ a string when it's finished. In that case, just don't provide and IO or block (o
 
 You can also use Yajl::Bzip2::StreamWriter and Yajl::Deflate::StreamWriter. So you can pick whichever fits your CPU/bandwidth sweet-spot.
 
+=== HTML Safety
+
+If you plan on embedding the output from the encoder in the DOM, you'll want to make sure you use the html_safe option on the encoder. This will escape all '/' characters to ensure no closing tags can be injected, preventing XSS.
+
+Meaning the following should be perfectly safe:
+
+ <script type="text/javascript">
+   escaped_str = <%= Yajl::Encoder.encode("</script><script>alert('hi!');</script>", :html_safe => true) %>;
+ </script>
+
 == JSON gem Compatibility API
 
 The JSON gem compatibility API isn't enabled by default. You have to explicitly require it like so:
