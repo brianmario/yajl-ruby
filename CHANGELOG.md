@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.8.1 (February 11th, 2011)
+* fixed a retart bug where Yajl::VERSION wasn't defined when explicitly requiring yajl/http_stream
+
 ## 0.8.0 (February 2nd, 2011)
 * added a new html_safe option to Yajl::Encoder to escape '/' characters for use in the DOM
 * moved away from Jeweler to a Bundler/manual gemfile management setup
