@@ -1,7 +1,8 @@
 # encoding: UTF-8
-require 'socket' unless defined?(Socket)
-require 'yajl' unless defined?(Yajl::Parser)
-require 'uri' unless defined?(URI)
+require 'socket'
+require 'yajl'
+require 'yajl/version' unless defined? Yajl::VERSION
+require 'uri'
 
 module Yajl
   # This module is for making HTTP requests to which the response bodies (and possibly requests in the near future)
