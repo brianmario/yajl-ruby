@@ -204,7 +204,7 @@ If you plan on embedding the output from the encoder in the DOM, you'll want to 
 Meaning the following should be perfectly safe:
 
  <script type="text/javascript">
-   escaped_str = <%= Yajl::Encoder.encode("</script><script>alert('hi!');</script>", :html_safe => true) %>;
+   var escaped_str = <%= Yajl::Encoder.encode("</script><script>alert('hi!');</script>", :html_safe => true) %>;
  </script>
 
 == JSON gem Compatibility API
