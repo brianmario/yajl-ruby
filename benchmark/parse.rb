@@ -4,9 +4,14 @@ $LOAD_PATH.unshift File.expand_path(File.dirname(__FILE__) + '/../lib')
 
 require 'rubygems'
 require 'benchmark'
+require 'yaml'
 require 'yajl'
 begin
   require 'json'
+rescue LoadError
+end
+begin
+  require 'psych'
 rescue LoadError
 end
 begin
@@ -14,10 +19,10 @@ begin
 rescue LoadError
 end
 
-filename = ARGV[0] || 'benchmark/subjects/twitter_search.json'
+filename = ARGV[0] || 'benchmark/subjects/item.json'
 json = File.new(filename, 'r')
 
-times = ARGV[1] ? ARGV[1].to_i : 1000
+times = ARGV[1] ? ARGV[1].to_i : 10_000
 puts "Starting benchmark parsing #{File.size(filename)} bytes of JSON data #{times} times\n\n"
 Benchmark.bmbm { |x|
   io_parser = Yajl::Parser.new
@@ -53,6 +58,36 @@ Benchmark.bmbm { |x|
       times.times {
         json.rewind
         ActiveSupport::JSON.decode(json.read)
+      }
+    }
+  end
+  x.report {
+    puts "YAML.load (from an IO)"
+    times.times {
+      json.rewind
+      YAML.load(json)
+    }
+  }
+  x.report {
+    puts "YAML.load (from a String)"
+    times.times {
+      json.rewind
+      YAML.load(json.read)
+    }
+  }
+  if defined?(Psych)
+    x.report {
+      puts "Psych.load (from an IO)"
+      times.times {
+        json.rewind
+        Psych.load(json)
+      }
+    }
+    x.report {
+      puts "Psych.load (from a String)"
+      times.times {
+        json.rewind
+        Psych.load(json.read)
       }
     }
   end

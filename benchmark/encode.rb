@@ -10,11 +10,14 @@ begin
   require 'json'
 rescue LoadError
 end
-# Can't use ActiveSuport::JSON.encode with the JSON gem loaded
-# begin
-#   require 'active_support'
-# rescue LoadError
-# end
+begin
+  require 'psych'
+rescue LoadError
+end
+begin
+  require 'active_support'
+rescue LoadError
+end
 
 filename = ARGV[0] || 'benchmark/subjects/ohai.json'
 json = File.new(filename, 'r')
@@ -46,14 +49,20 @@ Benchmark.bmbm { |x|
       }
     }
   end
-  # Can't use ActiveSuport::JSON.encode with the JSON gem loaded
-  #
-  # if defined?(ActiveSupport::JSON)
-  #   x.report {
-  #     puts "ActiveSupport::JSON.encode"
-  #     times.times {
-  #       ActiveSupport::JSON.encode(hash)
-  #     }
-  #   }
-  # end
+  if defined?(Psych)
+    x.report {
+      puts "Psych.to_json"
+      times.times {
+        Psych.to_json(hash)
+      }
+    }
+  end
+  if defined?(ActiveSupport::JSON)
+    x.report {
+      puts "ActiveSupport::JSON.encode"
+      times.times {
+        ActiveSupport::JSON.encode(hash)
+      }
+    }
+  end
 }
