@@ -51,15 +51,17 @@ Benchmark.bmbm { |x|
         Psych.to_json(hash)
       }
     }
-    x.report("Psych::JSON::Stream") {
-      times.times {
-        io = StringIO.new
-        stream = Psych::JSON::Stream.new io
-        stream.start
-        stream.push hash
-        stream.finish
+    if defined?(Psych::JSON::Stream)
+      x.report("Psych::JSON::Stream") {
+        times.times {
+          io = StringIO.new
+          stream = Psych::JSON::Stream.new io
+          stream.start
+          stream.push hash
+          stream.finish
+        }
       }
-    }
+    end
   end
   if defined?(ActiveSupport::JSON)
     x.report("ActiveSupport::JSON.encode") {
