@@ -52,7 +52,7 @@ Benchmark.bmbm { |x|
       }
     }
     x.report("Psych::JSON::Stream") {
-        times.times {
+      times.times {
         io = StringIO.new
         stream = Psych::JSON::Stream.new io
         stream.start
