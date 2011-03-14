@@ -36,7 +36,22 @@
 inline void yajl_check_and_fire_callback(void * ctx) {
     yajl_parser_wrapper * wrapper;
     GetParser((VALUE)ctx, wrapper);
-
+    
+    int depth = wrapper->nestedArrayLevel + wrapper->nestedHashLevel;
+    
+    /* Fire nested callback if it is set */
+    if (RARRAY_LEN(wrapper->builderStack) != 1 &&
+        wrapper->processNestedCallback && 
+        (depth <= wrapper->nestedCallbackDepth || 
+         wrapper->nestedCallbackDepth == 0)) {
+        if ( wrapper->parse_nested_callback != Qnil) {
+            rb_funcall(wrapper->parse_nested_callback, intern_call, 2, rb_ary_pop(wrapper->builderStack), 
+                       INT2NUM(depth));
+        } else {
+            rb_ary_pop(wrapper->builderStack);
+        }
+    }
+    
     /* No need to do any of this if the callback isn't even setup */
     if (wrapper->parse_complete_callback != Qnil) {
         int len = RARRAY_LEN(wrapper->builderStack);
@@ -52,6 +67,8 @@ inline void yajl_check_and_fire_callback(void * ctx) {
             }
         }
     }
+    
+    
 }
 
 inline void yajl_set_static_value(void * ctx, VALUE val) {
@@ -313,7 +330,10 @@ static int yajl_found_end_hash(void * ctx) {
     yajl_parser_wrapper * wrapper;
     GetParser((VALUE)ctx, wrapper);
     wrapper->nestedHashLevel--;
-    if (RARRAY_LEN(wrapper->builderStack) > 1) {
+    if (RARRAY_LEN(wrapper->builderStack) > 1 && 
+        (!wrapper->processNestedCallback || 
+        (wrapper->nestedCallbackDepth != 0 && 
+         RARRAY_LEN(wrapper->builderStack) > !wrapper->nestedCallbackDepth + 1))) {
         rb_ary_pop(wrapper->builderStack);
     }
     yajl_check_and_fire_callback(ctx);
@@ -332,7 +352,10 @@ static int yajl_found_end_array(void * ctx) {
     yajl_parser_wrapper * wrapper;
     GetParser((VALUE)ctx, wrapper);
     wrapper->nestedArrayLevel--;
-    if (RARRAY_LEN(wrapper->builderStack) > 1) {
+    if (RARRAY_LEN(wrapper->builderStack) > 1 && 
+        (!wrapper->processNestedCallback || 
+        (wrapper->nestedCallbackDepth != 0 && 
+         RARRAY_LEN(wrapper->builderStack) > !wrapper->nestedCallbackDepth + 1))) {
         rb_ary_pop(wrapper->builderStack);
     }
     yajl_check_and_fire_callback(ctx);
@@ -360,12 +383,17 @@ static int yajl_found_end_array(void * ctx) {
  * :allow_comments will turn on/off the check for comments inside the JSON stream, defaults to true.
  *
  * :check_utf8 will validate UTF8 characters found in the JSON stream, defaults to true.
+ *
+ * :process_nested will attempt to call the nested object callback on every nested object parsed, defaults to false.
+ *
+ * :nested_depth sets the maximum depth of objects that will fire the nested object callback when parsed.
+ * Defaults to 0, which is infinite depth.
  */
 static VALUE rb_yajl_parser_new(int argc, VALUE * argv, VALUE klass) {
     yajl_parser_wrapper * wrapper;
     yajl_parser_config cfg;
     VALUE opts, obj;
-    int allowComments = 1, checkUTF8 = 1, symbolizeKeys = 0;
+    int allowComments = 1, checkUTF8 = 1, symbolizeKeys = 0, processNestedCallback = 0, nestedCallbackDepth = 0;
 
     /* Scan off config vars */
     if (rb_scan_args(argc, argv, "01", &opts) == 1) {
@@ -380,6 +408,12 @@ static VALUE rb_yajl_parser_new(int argc, VALUE * argv, VALUE klass) {
         if (rb_hash_aref(opts, sym_symbolize_keys) == Qtrue) {
             symbolizeKeys = 1;
         }
+        if (rb_hash_aref(opts, sym_process_nested_callback) == Qtrue) {
+            processNestedCallback = 1;
+        }
+        if (rb_hash_aref(opts, sym_nested_callback_depth) != Qnil) {
+            nestedCallbackDepth = NUM2INT(rb_funcall(rb_hash_aref(opts, sym_nested_callback_depth), intern_to_i, 0));
+        }
     }
     cfg = (yajl_parser_config){allowComments, checkUTF8};
 
@@ -389,8 +423,11 @@ static VALUE rb_yajl_parser_new(int argc, VALUE * argv, VALUE klass) {
     wrapper->nestedHashLevel = 0;
     wrapper->objectsFound = 0;
     wrapper->symbolizeKeys = symbolizeKeys;
+    wrapper->processNestedCallback = processNestedCallback;
+    wrapper->nestedCallbackDepth = nestedCallbackDepth;
     wrapper->builderStack = rb_ary_new();
     wrapper->parse_complete_callback = Qnil;
+    wrapper->parse_nested_callback = Qnil;
     rb_obj_call_init(obj, 0, 0);
     return obj;
 }
@@ -521,6 +558,23 @@ static VALUE rb_yajl_parser_set_complete_cb(VALUE self, VALUE callback) {
     yajl_parser_wrapper * wrapper;
     GetParser(self, wrapper);
     wrapper->parse_complete_callback = callback;
+    return Qnil;
+}
+
+/*
+ * Document-method: on_parse_nested=
+ *
+ * call-seq: on_parse_nested = Proc.new { |obj,depth| ... }
+ *
+ * This callback setter allows you to pass a Proc/lambda or any other object that responds to #call. The callback is only 
+ * fired when the +process_nested+ option is set to +true+.
+ *
+ * It will pass two parameters, the ruby object built from the last parsed JSON object and the nested depth of the object
+ */
+static VALUE rb_yajl_parser_set_nested_cb(VALUE self, VALUE callback) {
+    yajl_parser_wrapper * wrapper;
+    GetParser(self, wrapper);
+    wrapper->parse_nested_callback = callback;
     return Qnil;
 }
 
@@ -866,6 +920,7 @@ void Init_yajl() {
     rb_define_method(cParser, "parse_chunk", rb_yajl_parser_parse_chunk, 1);
     rb_define_method(cParser, "<<", rb_yajl_parser_parse_chunk, 1);
     rb_define_method(cParser, "on_parse_complete=", rb_yajl_parser_set_complete_cb, 1);
+    rb_define_method(cParser, "on_parse_nested=", rb_yajl_parser_set_nested_cb, 1);
 
     cEncoder = rb_define_class_under(mYajl, "Encoder", rb_cObject);
     rb_define_singleton_method(cEncoder, "new", rb_yajl_encoder_new, -1);
@@ -879,6 +934,7 @@ void Init_yajl() {
     intern_call = rb_intern("call");
     intern_keys = rb_intern("keys");
     intern_to_s = rb_intern("to_s");
+    intern_to_i = rb_intern("to_i");
     intern_to_json = rb_intern("to_json");
     intern_to_sym = rb_intern("to_sym");
     intern_has_key = rb_intern("has_key?");
@@ -891,6 +947,8 @@ void Init_yajl() {
     sym_html_safe = ID2SYM(rb_intern("html_safe"));
     sym_terminator = ID2SYM(rb_intern("terminator"));
     sym_symbolize_keys = ID2SYM(rb_intern("symbolize_keys"));
+    sym_process_nested_callback = ID2SYM(rb_intern("process_nested"));
+    sym_nested_callback_depth = ID2SYM(rb_intern("nested_depth"));
 
 #ifdef HAVE_RUBY_ENCODING_H
     utf8Encoding = rb_utf8_encoding();
