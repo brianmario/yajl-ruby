@@ -37,21 +37,6 @@ inline void yajl_check_and_fire_callback(void * ctx) {
     yajl_parser_wrapper * wrapper;
     GetParser((VALUE)ctx, wrapper);
     
-    int depth = wrapper->nestedArrayLevel + wrapper->nestedHashLevel;
-    
-    /* Fire nested callback if it is set */
-    if (RARRAY_LEN(wrapper->builderStack) != 1 &&
-        wrapper->processNestedCallback && 
-        (depth <= wrapper->nestedCallbackDepth || 
-         wrapper->nestedCallbackDepth == 0)) {
-        if ( wrapper->parse_nested_callback != Qnil) {
-            rb_funcall(wrapper->parse_nested_callback, intern_call, 2, rb_ary_pop(wrapper->builderStack), 
-                       INT2NUM(depth));
-        } else {
-            rb_ary_pop(wrapper->builderStack);
-        }
-    }
-    
     /* No need to do any of this if the callback isn't even setup */
     if (wrapper->parse_complete_callback != Qnil) {
         int len = RARRAY_LEN(wrapper->builderStack);
@@ -67,8 +52,6 @@ inline void yajl_check_and_fire_callback(void * ctx) {
             }
         }
     }
-    
-    
 }
 
 inline void yajl_set_static_value(void * ctx, VALUE val) {
@@ -330,11 +313,14 @@ static int yajl_found_end_hash(void * ctx) {
     yajl_parser_wrapper * wrapper;
     GetParser((VALUE)ctx, wrapper);
     wrapper->nestedHashLevel--;
-    if (RARRAY_LEN(wrapper->builderStack) > 1 && 
-        (!wrapper->processNestedCallback || 
-        (wrapper->nestedCallbackDepth != 0 && 
-         RARRAY_LEN(wrapper->builderStack) > !wrapper->nestedCallbackDepth + 1))) {
-        rb_ary_pop(wrapper->builderStack);
+    if (RARRAY_LEN(wrapper->builderStack) > 1) {
+        VALUE popped = rb_ary_pop(wrapper->builderStack);
+
+        if (wrapper->processNestedCallback && (wrapper->nestedArrayLevel + wrapper->nestedHashLevel <= wrapper->nestedCallbackDepth || wrapper->nestedCallbackDepth == 0)) {
+            if ( wrapper->parse_nested_callback != Qnil) {
+                rb_funcall(wrapper->parse_nested_callback, intern_call, 2, popped, INT2NUM(wrapper->nestedArrayLevel + wrapper->nestedHashLevel));
+            } 
+        }
     }
     yajl_check_and_fire_callback(ctx);
     return 1;
@@ -352,11 +338,14 @@ static int yajl_found_end_array(void * ctx) {
     yajl_parser_wrapper * wrapper;
     GetParser((VALUE)ctx, wrapper);
     wrapper->nestedArrayLevel--;
-    if (RARRAY_LEN(wrapper->builderStack) > 1 && 
-        (!wrapper->processNestedCallback || 
-        (wrapper->nestedCallbackDepth != 0 && 
-         RARRAY_LEN(wrapper->builderStack) > !wrapper->nestedCallbackDepth + 1))) {
-        rb_ary_pop(wrapper->builderStack);
+    if (RARRAY_LEN(wrapper->builderStack) > 1) {
+        VALUE popped = rb_ary_pop(wrapper->builderStack);
+        
+        if (wrapper->processNestedCallback && (wrapper->nestedArrayLevel + wrapper->nestedHashLevel <= wrapper->nestedCallbackDepth || wrapper->nestedCallbackDepth == 0)) {
+            if ( wrapper->parse_nested_callback != Qnil) {
+                rb_funcall(wrapper->parse_nested_callback, intern_call, 2, popped, INT2NUM(wrapper->nestedArrayLevel + wrapper->nestedHashLevel));
+            }
+        }
     }
     yajl_check_and_fire_callback(ctx);
     return 1;
@@ -534,12 +523,12 @@ static VALUE rb_yajl_parser_parse_chunk(VALUE self, VALUE chunk) {
         rb_raise(cParseError, "Can't parse a nil string.");
     }
 
-    if (wrapper->parse_complete_callback != Qnil) {
+    if (wrapper->parse_complete_callback != Qnil || wrapper->parse_nested_callback) {
         const char * cptr = RSTRING_PTR(chunk);
         len = RSTRING_LEN(chunk);
         yajl_parse_chunk((const unsigned char*)cptr, len, wrapper->parser);
     } else {
-        rb_raise(cParseError, "The on_parse_complete callback isn't setup, parsing useless.");
+        rb_raise(cParseError, "The on_parse_complete and on_parse_nested callbacks aren't setup, parsing useless.");
     }
 
     return Qnil;
