@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.8.2 (March 22nd, 2011)
+* define RSTRING_NOT_MODIFIED for rbx to prevent string caching, making things A LOT faster (100x)
+
 ## 0.8.1 (February 11th, 2011)
 * fixed a retart bug where Yajl::VERSION wasn't defined when explicitly requiring yajl/http_stream
 
