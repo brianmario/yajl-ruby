@@ -23,6 +23,12 @@
 
 #include "api/yajl_parse.h"
 #include "api/yajl_gen.h"
+
+// tell rbx not to use it's caching compat layer
+// by doing this we're making a promize to RBX that
+// we'll never modify the pointers we get back from RSTRING_PTR
+#define RSTRING_NOT_MODIFIED
+
 #include <ruby.h>
 
 #ifdef HAVE_RUBY_ENCODING_H
@@ -32,11 +38,6 @@ static rb_encoding *utf8Encoding;
 
 #define READ_BUFSIZE 8192
 #define WRITE_BUFSIZE 8192
-
-// tell rbx not to use it's caching compat layer
-// by doing this we're making a promize to RBX that
-// we'll never modify the pointers we get back from RSTRING_PTR
-#define RSTRING_NOT_MODIFIED
 
 /* Older versions of Ruby (< 1.8.6) need these */
 #ifndef RSTRING_PTR
