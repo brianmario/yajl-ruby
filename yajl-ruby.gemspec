@@ -10,7 +10,7 @@ Gem::Specification.new do |s|
   s.extra_rdoc_files = [
     "README.rdoc"
   ]
-  s.files = `git ls-files`.split("\n")
+  s.files = `/usr/local/bin/git ls-files`.split("\n")
   s.homepage = %q{http://github.com/brianmario/yajl-ruby}
   s.require_paths = ["lib", "ext"]
   s.rubygems_version = %q{1.4.2}
