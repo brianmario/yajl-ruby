@@ -132,4 +132,4 @@ static VALUE rb_yajl_json_ext_false_to_json(int argc, VALUE * argv, VALUE self);
 static VALUE rb_yajl_json_ext_nil_to_json(int argc, VALUE * argv, VALUE self);
 static VALUE rb_yajl_encoder_enable_json_gem_ext(VALUE klass);
 
-void Init_yajl_ext();
+void Init_yajl();
