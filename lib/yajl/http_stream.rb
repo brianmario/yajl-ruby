@@ -190,6 +190,8 @@ module Yajl
   private
     # Initialize socket and add it to the opts
     def initialize_socket(uri, opts = {})
+      return if opts[:socket]
+
       @socket = TCPSocket.new(uri.host, uri.port)
       opts.merge!({:socket => @socket})
       @intentional_termination = false
