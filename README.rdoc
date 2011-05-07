@@ -19,13 +19,9 @@ You can read more info at the project's website http://lloyd.github.com/yajl or 
 
 == How to install
 
-First make sure you've got Gemcutter in your sources list:
+Go ahead and install it as usual:
 
- gem sources -a http://gemcutter.org
-
-Then go ahead and install it as usual:
-
- sudo gem install yajl-ruby
+ gem install yajl-ruby
 
 == Example of use
 
