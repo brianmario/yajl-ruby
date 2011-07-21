@@ -89,7 +89,7 @@ yajl_string_encode2(const yajl_print_t print,
         }
         if (escaped != NULL) {
             print(ctx, (const char *) (str + beg), end - beg);
-            print(ctx, escaped, strlen(escaped));
+            print(ctx, escaped, (unsigned int)strlen(escaped));
             beg = ++end;
         } else {
             ++end;
@@ -179,12 +179,19 @@ void yajl_string_decode(yajl_buf buf, const unsigned char * str,
                     
                     Utf32toUtf8(codepoint, utf8Buf);
                     unescaped = utf8Buf;
+
+                    if (codepoint == 0) {
+                        yajl_buf_append(buf, unescaped, 1);
+                        beg = ++end;
+                        continue;
+                    }
+
                     break;
                 }
                 default:
                     assert("this should never happen" == NULL);
             }
-            yajl_buf_append(buf, unescaped, strlen(unescaped));
+            yajl_buf_append(buf, unescaped, (unsigned int)strlen(unescaped));
             beg = ++end;
         } else {
             end++;
