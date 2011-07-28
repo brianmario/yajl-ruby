@@ -474,6 +474,16 @@ static VALUE rb_yajl_parser_parse(int argc, VALUE * argv, VALUE self) {
         return Qnil;
     }
 
+    // Because we've overridden the yajl_parse_complete state of the parser to allow
+    // us to parse multiple objects out of one stream; we can't use it to determine
+    // whether we've parsed a single object. Instead we'll check whether we've successfully
+    // parsed a single token.
+    if (!RARRAY_LEN(wrapper->builderStack) ||
+            wrapper->nestedHashLevel ||
+            wrapper->nestedArrayLevel) {
+        rb_raise(cParseError, "unexpected end of JSON string");
+    }
+
     return rb_ary_pop(wrapper->builderStack);
 }
 
