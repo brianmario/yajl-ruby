@@ -286,7 +286,11 @@ static int yajl_found_hash_key(void * ctx, const unsigned char * stringVal, unsi
         char buf[stringLen+1];
         memcpy(buf, stringVal, stringLen);
         buf[stringLen] = 0;
-        yajl_set_static_value(ctx, ID2SYM(rb_intern(buf)));
+        VALUE stringEncoded = rb_str_new2(buf);
+        int enc = rb_enc_find_index("UTF-8");
+        rb_enc_associate_index(stringEncoded, enc);
+
+        yajl_set_static_value(ctx, ID2SYM(rb_to_id(stringEncoded)));
     } else {
         keyStr = rb_str_new((const char *)stringVal, stringLen);
 #ifdef HAVE_RUBY_ENCODING_H
