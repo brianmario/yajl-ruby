@@ -45,7 +45,7 @@ describe "One-off JSON examples" do
   end
 
   it "should parse using it's class method, from a utf-8 string with multibyte characters, with symbolized keys" do
-    Yajl::Parser.parse('{"日本語": 1234}', :symbolize_keys => true).should == {:日本語 => 1234}
+    Yajl::Parser.parse('{"日本語": 1234}', :symbolize_keys => true).should == {:"日本語" => 1234}
   end
 
   it "should parse using it's class method, from a string" do

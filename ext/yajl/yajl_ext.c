@@ -287,8 +287,9 @@ static int yajl_found_hash_key(void * ctx, const unsigned char * stringVal, unsi
         memcpy(buf, stringVal, stringLen);
         buf[stringLen] = 0;
         VALUE stringEncoded = rb_str_new2(buf);
-        int enc = rb_enc_find_index("UTF-8");
-        rb_enc_associate_index(stringEncoded, enc);
+#ifdef HAVE_RUBY_ENCODING_H
+        rb_enc_associate(stringEncoded, rb_utf8_encoding());
+#endif
 
         yajl_set_static_value(ctx, ID2SYM(rb_to_id(stringEncoded)));
     } else {
