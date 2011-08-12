@@ -30,6 +30,7 @@
 #define RSTRING_NOT_MODIFIED
 
 #include <ruby.h>
+VALUE rb_ary_last(int argc, VALUE *argv, VALUE ary);
 
 #ifdef HAVE_RUBY_ENCODING_H
 #include <ruby/encoding.h>
@@ -90,14 +91,24 @@ static yajl_callbacks callbacks = {
     yajl_found_end_array
 };
 
+typedef enum {
+   YPE_FOUND_HASH_KEY,
+   YPE_FOUND_END_HASH,
+   YPE_FOUND_END_ARRAY
+} yajl_parser_event;
+
 typedef struct {
     VALUE builderStack;
     VALUE parse_complete_callback;
+    VALUE hash_key_found_callback;
+    VALUE end_hash_found_callback;
+    VALUE end_array_found_callback;
     int nestedArrayLevel;
     int nestedHashLevel;
     int objectsFound;
     int symbolizeKeys;
     yajl_handle parser;
+    yajl_parser_event event;
 } yajl_parser_wrapper;
 
 typedef struct {
