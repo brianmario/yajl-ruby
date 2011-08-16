@@ -119,7 +119,7 @@ module Yajl
 
         headers = default_headers.merge(opts[:headers] || {})
 
-        socket = opts.has_key?(:socket) ? opts.delete(:socket) : TCPSocket.new(uri.host, uri.port)
+        socket = opts.delete(:socket) || TCPSocket.new(uri.host, uri.port)
         request = "#{method} #{uri.path}#{uri.query ? "?"+uri.query : nil} HTTP/1.1\r\n"
         request << "Host: #{uri.host}\r\n"
         headers.each do |k, v|
