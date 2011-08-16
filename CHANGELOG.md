@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.8.3 (August 16th, 2011)
+* fix bug where Yajl::HttpStream wouldn't pass through a user-specified socket
+* fix incorrect Ruby initialization hook method name
+* Bump bundled YAJL version to 1.0.12
+* fix to correctly symbolize multibyte characters on 1.9
+* add `:headers` option to Yajl::HttpStream for user-specified arbitrary headers
+
 ## 0.8.2 (March 22nd, 2011)
 * define RSTRING_NOT_MODIFIED for rbx to prevent string caching, making things A LOT faster (100x)
 
