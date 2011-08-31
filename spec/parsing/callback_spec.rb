@@ -8,7 +8,7 @@ describe "Parser with callbacks" do
     }
     @parser = Yajl::Parser.new
   end
-  
+
   it 'should notify when reading a key' do
     @parser.on_key = @callback
     keys = ['abc', 'def']
@@ -17,7 +17,7 @@ describe "Parser with callbacks" do
     end
     @parser.parse '[{"abc": 123},{"def": 456},{}]'
   end
-  
+
   it 'should notify when reading a value' do
     @parser.on_value = @callback
     values = [123, 456, 'ghi', 7.89]

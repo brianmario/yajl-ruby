@@ -32,6 +32,11 @@
  }                                                        \
  return rb_yajl_encoder_encode(1, &self, rb_encoder);     \
 
+#define YAJL_FIRE_CALLBACK(callback, argc, argv)    \
+ if (callback != Qnil) {                            \
+     rb_funcall(callback, intern_call, argc, argv); \
+ }                                                  \
+
 /* Helpers for building objects */
 inline void yajl_check_and_fire_callback(void * ctx) {
     yajl_parser_wrapper * wrapper;
@@ -69,16 +74,14 @@ inline void yajl_set_static_value(void * ctx, VALUE val) {
                 rb_ary_push(lastEntry, val);
                 if (TYPE(val) == T_HASH || TYPE(val) == T_ARRAY) {
                     rb_ary_push(wrapper->builderStack, val);
-                } else if (wrapper->parse_value_callback != Qnil) {
-                    rb_funcall(wrapper->parse_value_callback, intern_call, 1, val);
+                } else {
+                    YAJL_FIRE_CALLBACK(wrapper->parse_value_callback, 1, val);
                 }
                 break;
             case T_HASH:
                 rb_hash_aset(lastEntry, val, Qnil);
                 rb_ary_push(wrapper->builderStack, val);
-                if (wrapper->parse_key_callback != Qnil) {
-                    rb_funcall(wrapper->parse_key_callback, intern_call, 1, val);
-                }
+                YAJL_FIRE_CALLBACK(wrapper->parse_key_callback, 1, val);
                 break;
             case T_STRING:
             case T_SYMBOL:
@@ -88,8 +91,8 @@ inline void yajl_set_static_value(void * ctx, VALUE val) {
                     rb_ary_pop(wrapper->builderStack);
                     if (TYPE(val) == T_HASH || TYPE(val) == T_ARRAY) {
                         rb_ary_push(wrapper->builderStack, val);
-                    } else if (wrapper->parse_value_callback != Qnil) {
-                        rb_funcall(wrapper->parse_value_callback, intern_call, 1, val);
+                    } else {
+                        YAJL_FIRE_CALLBACK(wrapper->parse_value_callback, 1, val);
                     }
                 }
                 break;
