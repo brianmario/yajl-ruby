@@ -11,16 +11,19 @@ describe "Parser with callbacks" do
   
   it 'should notify when reading a key' do
     @parser.on_key = @callback
-    times_called = 0
-    @callback.should_receive(:call).twice do |arg|
-      case times_called
-      when 0
-        arg.should == 'abc'
-      when 1
-        arg.should == 'def'
-      end
-      times_called += 1
+    keys = ['abc', 'def']
+    @callback.should_receive(:call).exactly(keys.count).times do |key|
+      key.should == keys.shift
     end
-    @parser.parse '[{"abc": 123},{"def": 456}]'
+    @parser.parse '[{"abc": 123},{"def": 456},{}]'
+  end
+  
+  it 'should notify when reading a value' do
+    @parser.on_value = @callback
+    values = [123, 456, 'ghi', 7.89]
+    @callback.should_receive(:call).exactly(values.count).times do |value|
+      value.should == values.shift
+    end
+    @parser.parse '[{"abc": 123},{"def": [456, "ghi", 7.89]},{"jkl":{}}]'
   end
 end

@@ -69,13 +69,15 @@ inline void yajl_set_static_value(void * ctx, VALUE val) {
                 rb_ary_push(lastEntry, val);
                 if (TYPE(val) == T_HASH || TYPE(val) == T_ARRAY) {
                     rb_ary_push(wrapper->builderStack, val);
+                } else if (wrapper->parse_value_callback != Qnil) {
+                    rb_funcall(wrapper->parse_value_callback, intern_call, 1, val);
                 }
                 break;
             case T_HASH:
                 rb_hash_aset(lastEntry, val, Qnil);
                 rb_ary_push(wrapper->builderStack, val);
                 if (wrapper->parse_key_callback != Qnil) {
-                  rb_funcall(wrapper->parse_key_callback, intern_call, 1, val);
+                    rb_funcall(wrapper->parse_key_callback, intern_call, 1, val);
                 }
                 break;
             case T_STRING:
@@ -86,6 +88,8 @@ inline void yajl_set_static_value(void * ctx, VALUE val) {
                     rb_ary_pop(wrapper->builderStack);
                     if (TYPE(val) == T_HASH || TYPE(val) == T_ARRAY) {
                         rb_ary_push(wrapper->builderStack, val);
+                    } else if (wrapper->parse_value_callback != Qnil) {
+                        rb_funcall(wrapper->parse_value_callback, intern_call, 1, val);
                     }
                 }
                 break;
@@ -217,6 +221,7 @@ void yajl_parser_wrapper_mark(void * wrapper) {
         rb_gc_mark(w->builderStack);
         rb_gc_mark(w->parse_complete_callback);
         rb_gc_mark(w->parse_key_callback);
+        rb_gc_mark(w->parse_value_callback);
     }
 }
 
@@ -401,6 +406,7 @@ static VALUE rb_yajl_parser_new(int argc, VALUE * argv, VALUE klass) {
     wrapper->builderStack = rb_ary_new();
     wrapper->parse_complete_callback = Qnil;
     wrapper->parse_key_callback = Qnil;
+    wrapper->parse_value_callback = Qnil;
     rb_obj_call_init(obj, 0, 0);
     return obj;
 }
@@ -547,6 +553,23 @@ static VALUE rb_yajl_parser_set_key_cb(VALUE self, VALUE callback) {
     yajl_parser_wrapper * wrapper;
     GetParser(self, wrapper);
     wrapper->parse_key_callback = callback;
+    return Qnil;
+}
+
+/*
+ * Document-method: on_value=
+ *
+ * call-seq: on_value = Proc.new { |obj| ... }
+ *
+ * This callback setter allows you to pass a Proc/lambda or any other object that responds to #call.
+ *
+ * It will pass a single parameter, the ruby object built from the last parsed JSON value.
+ * This will only be called for primitives (Numbers & Strings) not Arrays and Objects.
+ */
+static VALUE rb_yajl_parser_set_value_cb(VALUE self, VALUE callback) {
+    yajl_parser_wrapper * wrapper;
+    GetParser(self, wrapper);
+    wrapper->parse_value_callback = callback;
     return Qnil;
 }
 
@@ -893,6 +916,7 @@ void Init_yajl() {
     rb_define_method(cParser, "<<", rb_yajl_parser_parse_chunk, 1);
     rb_define_method(cParser, "on_parse_complete=", rb_yajl_parser_set_complete_cb, 1);
     rb_define_method(cParser, "on_key=", rb_yajl_parser_set_key_cb, 1);
+    rb_define_method(cParser, "on_value=", rb_yajl_parser_set_value_cb, 1);
 
     cEncoder = rb_define_class_under(mYajl, "Encoder", rb_cObject);
     rb_define_singleton_method(cEncoder, "new", rb_yajl_encoder_new, -1);
