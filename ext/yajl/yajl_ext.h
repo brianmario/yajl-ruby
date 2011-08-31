@@ -93,6 +93,7 @@ static yajl_callbacks callbacks = {
 typedef struct {
     VALUE builderStack;
     VALUE parse_complete_callback;
+    VALUE parse_key_callback;
     int nestedArrayLevel;
     int nestedHashLevel;
     int objectsFound;
@@ -112,6 +113,7 @@ static VALUE rb_yajl_parser_init(int argc, VALUE * argv, VALUE self);
 static VALUE rb_yajl_parser_parse(int argc, VALUE * argv, VALUE self);
 static VALUE rb_yajl_parser_parse_chunk(VALUE self, VALUE chunk);
 static VALUE rb_yajl_parser_set_complete_cb(VALUE self, VALUE callback);
+static VALUE rb_yajl_parser_set_key_cb(VALUE self, VALUE callback);
 static void yajl_parser_wrapper_free(void * wrapper);
 static void yajl_parser_wrapper_mark(void * wrapper);
 
