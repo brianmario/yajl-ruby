@@ -86,7 +86,6 @@ inline void yajl_set_static_value(void * ctx, VALUE val) {
             case T_HASH:
                 rb_hash_aset(lastEntry, val, Qnil);
                 rb_ary_push(wrapper->builderStack, val);
-                YAJL_FIRE_CALLBACK_WITH_ARGS(wrapper->parse_key_callback, 1, val);
                 break;
             case T_STRING:
             case T_SYMBOL:
@@ -294,35 +293,26 @@ static int yajl_found_string(void * ctx, const unsigned char * stringVal, unsign
 
 static int yajl_found_hash_key(void * ctx, const unsigned char * stringVal, unsigned int stringLen) {
     yajl_parser_wrapper * wrapper;
-    VALUE keyStr;
+    VALUE key;
 #ifdef HAVE_RUBY_ENCODING_H
-    rb_encoding *default_internal_enc;
+    rb_encoding *default_internal_enc = rb_default_internal_encoding();
 #endif
-    GetParser((VALUE)ctx, wrapper);
+    key = rb_str_new((const char *)stringVal, stringLen);
 #ifdef HAVE_RUBY_ENCODING_H
-    default_internal_enc = rb_default_internal_encoding();
-#endif
-
-    if (wrapper->symbolizeKeys) {
-        char buf[stringLen+1];
-        memcpy(buf, stringVal, stringLen);
-        buf[stringLen] = 0;
-        VALUE stringEncoded = rb_str_new2(buf);
-#ifdef HAVE_RUBY_ENCODING_H
-        rb_enc_associate(stringEncoded, rb_utf8_encoding());
-#endif
-
-        yajl_set_static_value(ctx, ID2SYM(rb_to_id(stringEncoded)));
-    } else {
-        keyStr = rb_str_new((const char *)stringVal, stringLen);
-#ifdef HAVE_RUBY_ENCODING_H
-        rb_enc_associate(keyStr, utf8Encoding);
-        if (default_internal_enc) {
-          keyStr = rb_str_export_to_enc(keyStr, default_internal_enc);
-        }
-#endif
-        yajl_set_static_value(ctx, keyStr);
+    rb_enc_associate(key, utf8Encoding);
+    if (default_internal_enc) {
+      key = rb_str_export_to_enc(key, default_internal_enc);
     }
+#endif
+
+    GetParser((VALUE)ctx, wrapper);
+    if (wrapper->symbolizeKeys) {
+        key = ID2SYM(rb_to_id(key));
+    }
+    if (wrapper->parse_key_callback != Qnil) {
+        rb_funcall(wrapper->parse_key_callback, intern_call, 1, key);
+    }
+    yajl_set_static_value(ctx, key);
     yajl_check_and_fire_callback(ctx);
     return 1;
 }
