@@ -95,6 +95,8 @@ typedef struct {
     VALUE parse_complete_callback;
     VALUE parse_key_callback;
     VALUE parse_value_callback;
+    VALUE start_hash_callback;
+    VALUE end_hash_callback;
     int nestedArrayLevel;
     int nestedHashLevel;
     int objectsFound;
