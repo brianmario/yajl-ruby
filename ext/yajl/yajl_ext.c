@@ -32,16 +32,6 @@
  }                                                        \
  return rb_yajl_encoder_encode(1, &self, rb_encoder);     \
 
-#define YAJL_FIRE_CALLBACK(callback)       \
- if (callback != Qnil) {                   \
-     rb_funcall(callback, intern_call, 0); \
- }                                         \
-
-#define YAJL_FIRE_CALLBACK_WITH_ARGS(callback, argc, argv) \
- if (callback != Qnil) {                                   \
-     rb_funcall(callback, intern_call, argc, argv);        \
- }                                                         \
-
 /* Helpers for building objects */
 inline void yajl_check_and_fire_callback(void * ctx) {
     yajl_parser_wrapper * wrapper;
@@ -79,8 +69,6 @@ inline void yajl_set_static_value(void * ctx, VALUE val) {
                 rb_ary_push(lastEntry, val);
                 if (TYPE(val) == T_HASH || TYPE(val) == T_ARRAY) {
                     rb_ary_push(wrapper->builderStack, val);
-                } else {
-                    YAJL_FIRE_CALLBACK_WITH_ARGS(wrapper->parse_value_callback, 1, val);
                 }
                 break;
             case T_HASH:
@@ -95,8 +83,6 @@ inline void yajl_set_static_value(void * ctx, VALUE val) {
                     rb_ary_pop(wrapper->builderStack);
                     if (TYPE(val) == T_HASH || TYPE(val) == T_ARRAY) {
                         rb_ary_push(wrapper->builderStack, val);
-                    } else {
-                        YAJL_FIRE_CALLBACK_WITH_ARGS(wrapper->parse_value_callback, 1, val);
                     }
                 }
                 break;
@@ -104,6 +90,23 @@ inline void yajl_set_static_value(void * ctx, VALUE val) {
     } else {
         rb_ary_push(wrapper->builderStack, val);
     }
+}
+
+inline void yajl_fire_callback(VALUE cb) {
+    if (cb != Qnil) {
+        rb_funcall(cb, intern_call, 0);
+    }
+}
+
+inline int yajl_found_value(void * ctx, VALUE val) {
+    yajl_parser_wrapper * wrapper;
+    GetParser((VALUE)ctx, wrapper);
+    if (wrapper->parse_value_callback != Qnil) {
+         rb_funcall(wrapper->parse_value_callback, intern_call, 1, val);
+    }
+    yajl_set_static_value(ctx, val);
+    yajl_check_and_fire_callback(ctx);
+    return 1;
 }
 
 static void yajl_encoder_wrapper_free(void * wrapper) {
@@ -251,18 +254,15 @@ void yajl_parse_chunk(const unsigned char * chunk, unsigned int len, yajl_handle
 
 /* YAJL Callbacks */
 static int yajl_found_null(void * ctx) {
-    yajl_set_static_value(ctx, Qnil);
-    yajl_check_and_fire_callback(ctx);
-    return 1;
+    return yajl_found_value(ctx, Qnil);
 }
 
 static int yajl_found_boolean(void * ctx, int boolean) {
-    yajl_set_static_value(ctx, boolean ? Qtrue : Qfalse);
-    yajl_check_and_fire_callback(ctx);
-    return 1;
+    return yajl_found_value(ctx, boolean ? Qtrue : Qfalse);
 }
 
 static int yajl_found_number(void * ctx, const char * numberVal, unsigned int numberLen) {
+    VALUE val;
     char buf[numberLen+1];
     buf[numberLen] = 0;
     memcpy(buf, numberVal, numberLen);
@@ -270,11 +270,11 @@ static int yajl_found_number(void * ctx, const char * numberVal, unsigned int nu
     if (memchr(buf, '.', numberLen) ||
         memchr(buf, 'e', numberLen) ||
         memchr(buf, 'E', numberLen)) {
-        yajl_set_static_value(ctx, rb_float_new(strtod(buf, NULL)));
+        val = rb_float_new(strtod(buf, NULL));
     } else {
-        yajl_set_static_value(ctx, rb_cstr2inum(buf, 10));
+        val = rb_cstr2inum(buf, 10);
     }
-    return 1;
+    return yajl_found_value(ctx, val);
 }
 
 static int yajl_found_string(void * ctx, const unsigned char * stringVal, unsigned int stringLen) {
@@ -286,9 +286,7 @@ static int yajl_found_string(void * ctx, const unsigned char * stringVal, unsign
       str = rb_str_export_to_enc(str, default_internal_enc);
     }
 #endif
-    yajl_set_static_value(ctx, str);
-    yajl_check_and_fire_callback(ctx);
-    return 1;
+    return yajl_found_value(ctx, str);
 }
 
 static int yajl_found_hash_key(void * ctx, const unsigned char * stringVal, unsigned int stringLen) {
@@ -320,7 +318,7 @@ static int yajl_found_hash_key(void * ctx, const unsigned char * stringVal, unsi
 static int yajl_found_start_hash(void * ctx) {
     yajl_parser_wrapper * wrapper;
     GetParser((VALUE)ctx, wrapper);
-    YAJL_FIRE_CALLBACK(wrapper->object_begin_callback);
+    yajl_fire_callback(wrapper->object_begin_callback);
     wrapper->nestedHashLevel++;
     yajl_set_static_value(ctx, rb_hash_new());
     return 1;
@@ -329,7 +327,7 @@ static int yajl_found_start_hash(void * ctx) {
 static int yajl_found_end_hash(void * ctx) {
     yajl_parser_wrapper * wrapper;
     GetParser((VALUE)ctx, wrapper);
-    YAJL_FIRE_CALLBACK(wrapper->object_end_callback);
+    yajl_fire_callback(wrapper->object_end_callback);
     wrapper->nestedHashLevel--;
     if (RARRAY_LEN(wrapper->builderStack) > 1) {
         rb_ary_pop(wrapper->builderStack);
@@ -341,7 +339,7 @@ static int yajl_found_end_hash(void * ctx) {
 static int yajl_found_start_array(void * ctx) {
     yajl_parser_wrapper * wrapper;
     GetParser((VALUE)ctx, wrapper);
-    YAJL_FIRE_CALLBACK(wrapper->array_begin_callback);
+    yajl_fire_callback(wrapper->array_begin_callback);
     wrapper->nestedArrayLevel++;
     yajl_set_static_value(ctx, rb_ary_new());
     return 1;
@@ -350,7 +348,7 @@ static int yajl_found_start_array(void * ctx) {
 static int yajl_found_end_array(void * ctx) {
     yajl_parser_wrapper * wrapper;
     GetParser((VALUE)ctx, wrapper);
-    YAJL_FIRE_CALLBACK(wrapper->array_end_callback);
+    yajl_fire_callback(wrapper->array_end_callback);
     wrapper->nestedArrayLevel--;
     if (RARRAY_LEN(wrapper->builderStack) > 1) {
         rb_ary_pop(wrapper->builderStack);
