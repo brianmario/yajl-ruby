@@ -38,16 +38,32 @@ describe "Parser with callbacks" do
     @parser.parse '[{"abc": 123},{"def": [456, "ghi", 7.89]},{"jkl":{}}]'
   end
 
+  it 'should notify when reading a new array' do
+    @parser.on_array_begin = @callback0
+    @callback0.should_receive(:call).exactly(3).times
+    @parser.parse '[{"abc": 123},{"def": [456, "ghi", 7.89]},{"jkl":[]}]'
+  end
+
+  it 'should notify when having parsed a new object' do
+    @parser.on_array_end = @callback0
+    @callback0.should_receive(:call).exactly(3).times
+    @parser.parse '[{"abc": 123},{"def": [456, "ghi", 7.89]},{"jkl":[]}]'
+  end
+
   it 'should notify in the correct order' do
+    @parser.on_array_begin = @array_begin = lambda { }
     @parser.on_object_begin = @object_begin = lambda { }
     @parser.on_key = @key = lambda { |k| }
     @parser.on_value = @value = lambda { |v| }
     @parser.on_object_end = @object_end = lambda { }
+    @parser.on_array_end = @array_end = lambda { }
 
+    @array_begin.should_receive(:call).ordered
     @object_begin.should_receive(:call).ordered
     @key.should_receive(:call).ordered
     @value.should_receive(:call).ordered
     @object_end.should_receive(:call).ordered
+    @array_end.should_receive(:call).ordered
 
     @parser.parse '[{"key": "value"}]'
   end

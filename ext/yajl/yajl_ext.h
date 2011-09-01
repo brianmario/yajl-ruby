@@ -95,8 +95,10 @@ typedef struct {
     VALUE parse_complete_callback;
     VALUE parse_key_callback;
     VALUE parse_value_callback;
-    VALUE start_hash_callback;
-    VALUE end_hash_callback;
+    VALUE object_begin_callback;
+    VALUE object_end_callback;
+    VALUE array_begin_callback;
+    VALUE array_end_callback;
     int nestedArrayLevel;
     int nestedHashLevel;
     int objectsFound;
@@ -118,6 +120,10 @@ static VALUE rb_yajl_parser_parse_chunk(VALUE self, VALUE chunk);
 static VALUE rb_yajl_parser_set_complete_cb(VALUE self, VALUE callback);
 static VALUE rb_yajl_parser_set_key_cb(VALUE self, VALUE callback);
 static VALUE rb_yajl_parser_set_value_cb(VALUE self, VALUE callback);
+static VALUE rb_yajl_parser_set_object_begin_cb(VALUE self, VALUE callback);
+static VALUE rb_yajl_parser_set_object_end_cb(VALUE self, VALUE callback);
+static VALUE rb_yajl_parser_set_array_begin_cb(VALUE self, VALUE callback);
+static VALUE rb_yajl_parser_set_array_end_cb(VALUE self, VALUE callback);
 static void yajl_parser_wrapper_free(void * wrapper);
 static void yajl_parser_wrapper_mark(void * wrapper);
 
