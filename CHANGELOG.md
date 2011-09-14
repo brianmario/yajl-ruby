@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.0.0 (September 13th, 2011)
+* add deprecation notice for Yajl's Bzip2 support
+* add deprecation notice for Yajl's Deflate support
+* add deprecation notice for Yajl's Gzip support
+* add deprecation notice for Yajl's JSON gem compatibility API
+* add deprecation notice for Yajl::HttpStream
+* change the path the extension is copied into to be 'lib/yajl'
+* remove 'ext' from the loadpath
+
 ## 0.8.3 (August 16th, 2011)
 * fix bug where Yajl::HttpStream wouldn't pass through a user-specified socket
 * fix incorrect Ruby initialization hook method name
