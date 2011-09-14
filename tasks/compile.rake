@@ -1,11 +1,10 @@
-gem 'rake-compiler', '>= 0.7.5'
-require "rake/extensiontask"
+require 'rake/extensiontask'
 
 def gemspec
   @clean_gemspec ||= eval(File.read(File.expand_path('../../yajl-ruby.gemspec', __FILE__)))
 end
 
-Rake::ExtensionTask.new("yajl", gemspec) do |ext|
+Rake::ExtensionTask.new('yajl', gemspec) do |ext|
   # automatically add build options to avoid need of manual input
   ext.cross_compile = true
   ext.cross_platform = ['x86-mingw32', 'x86-mswin32-60']
@@ -33,5 +32,5 @@ require "#{name}/\#{$1}/#{name}"
 end
 
 if Rake::Task.task_defined?(:cross)
-  Rake::Task[:cross].prerequisites << "lib/yajl/yajl.rb"
+  Rake::Task[:cross].prerequisites << 'lib/yajl/yajl.rb'
 end
