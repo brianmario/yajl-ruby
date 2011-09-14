@@ -12,7 +12,7 @@ Gem::Specification.new do |s|
   ]
   s.files = `git ls-files`.split("\n")
   s.homepage = %q{http://github.com/brianmario/yajl-ruby}
-  s.require_paths = ["lib", "ext"]
+  s.require_paths = ["lib"]
   s.rubygems_version = %q{1.4.2}
   s.summary = %q{Ruby C bindings to the excellent Yajl JSON stream-based parser library.}
   s.test_files = `git ls-files spec examples`.split("\n")
