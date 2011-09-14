@@ -259,10 +259,11 @@ Once the compatibility API is enabled, your existing or new project should work 
 There are a lot more possibilities that I'd love to see other gems/plugins for someday.
 
 Some ideas:
+
 * parsing logs in JSON format
 * a Rails plugin - DONE! (http://github.com/technoweenie/yajl-rails)
 * official support in Rails 3 - DONE (http://github.com/rails/rails/commit/a96bf4ab5e73fccdafb78b99e8a122cc2172b505)
-** and is the default (if installed) - http://github.com/rails/rails/commit/63bb955a99eb46e257655c93dd64e86ebbf05651
+ * and is the default (if installed) - http://github.com/rails/rails/commit/63bb955a99eb46e257655c93dd64e86ebbf05651
 * Rack middleware (ideally the JSON body could be handed to the parser while it's still being received, this is apparently possible with Unicorn)
 * JSON API clients (http://github.com/brianmario/freckle-api)
 
