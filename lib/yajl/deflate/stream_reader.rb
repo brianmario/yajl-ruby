@@ -1,4 +1,3 @@
-# encoding: UTF-8
 module Yajl
   module Deflate
     # This is a wrapper around Zlib::Inflate, creating a #read method that adheres

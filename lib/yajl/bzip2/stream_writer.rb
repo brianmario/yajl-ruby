@@ -1,4 +1,3 @@
-# encoding: UTF-8
 module Yajl
   module Bzip2
     # A wrapper around the Bzip2::Writer class for easier JSON stream encoding

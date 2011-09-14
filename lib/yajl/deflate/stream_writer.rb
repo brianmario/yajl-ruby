@@ -1,4 +1,3 @@
-# encoding: UTF-8
 module Yajl
   module Deflate
     # A wrapper around the Zlib::Deflate class for easier JSON stream parsing

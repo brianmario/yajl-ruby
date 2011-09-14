@@ -1,4 +1,3 @@
-# encoding: UTF-8
 require 'yajl' unless defined?(Yajl::Parser)
 
 module JSON

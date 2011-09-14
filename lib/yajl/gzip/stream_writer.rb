@@ -1,4 +1,3 @@
-# encoding: UTF-8
 module Yajl
   module Gzip
     # Wraper around the Zlib::GzipWriter class

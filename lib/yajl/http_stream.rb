@@ -1,4 +1,3 @@
-# encoding: UTF-8
 require 'socket'
 require 'yajl'
 require 'yajl/version' unless defined? Yajl::VERSION

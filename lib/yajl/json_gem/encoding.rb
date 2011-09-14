@@ -1,4 +1,3 @@
-# encoding: UTF-8
 require 'yajl' unless defined?(Yajl::Parser)
 
 # NOTE: this is probably temporary until I can split out the JSON compat C code into it's own

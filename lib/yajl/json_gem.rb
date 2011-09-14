@@ -1,4 +1,3 @@
-# encoding: UTF-8
 require 'yajl' unless defined?(Yajl::Parser)
 require 'yajl/json_gem/parsing'
 require 'yajl/json_gem/encoding'
