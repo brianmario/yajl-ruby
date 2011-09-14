@@ -1,3 +1,5 @@
+puts "DEPRECATION WARNING: Yajl::HttpStream is going to be removed in 2.0"
+
 require 'socket'
 require 'yajl'
 require 'yajl/version' unless defined? Yajl::VERSION
