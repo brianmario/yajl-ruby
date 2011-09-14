@@ -31,7 +31,7 @@ NOTE: I'm building up a collection of small examples in the examples (http://git
 
 First, you're probably gonna want to require it:
 
-```
+``` ruby
 require 'yajl'
 ```
 
