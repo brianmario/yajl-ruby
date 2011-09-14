@@ -17,7 +17,7 @@ Gem::Specification.new do |s|
   # tests
   s.add_development_dependency 'rake-compiler', ">= 0.7.5"
   s.add_development_dependency 'rspec', ">= 2.0.0"
-  s.add_development_dependency 'bzip2-ruby'
+  s.add_development_dependency 'bzip2-ruby' unless RUBY_ENGINE =~ /rbx/
   # benchmarks
   s.add_development_dependency 'activesupport'
   s.add_development_dependency 'json'
