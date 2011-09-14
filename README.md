@@ -21,7 +21,9 @@ You can read more info at the project's website http://lloyd.github.com/yajl or 
 
 Go ahead and install it as usual:
 
-`gem install yajl-ruby`
+```
+gem install yajl-ruby
+```
 
 ## Example of use
 
@@ -29,7 +31,9 @@ NOTE: I'm building up a collection of small examples in the examples (http://git
 
 First, you're probably gonna want to require it:
 
-`require 'yajl'`
+```
+require 'yajl'
+```
 
 ### Parsing
 
@@ -53,7 +57,9 @@ hash = parser.parse(json)
 
 or maybe STDIN
 
-`cat someJsonFile.json | ruby -ryajl -e "puts Yajl::Parser.parse(STDIN).inspect"`
+```
+cat someJsonFile.json | ruby -ryajl -e "puts Yajl::Parser.parse(STDIN).inspect"
+```
 
 Or lets say you didn't have access to the IO object that contained JSON data, but instead
 only had access to chunks of it at a time. No problem!
