@@ -63,6 +63,8 @@ static ID sym_allow_comments, sym_check_utf8, sym_pretty, sym_indent, sym_termin
 
 inline void yajl_check_and_fire_callback(void * ctx);
 inline void yajl_set_static_value(void * ctx, VALUE val);
+inline void yajl_fire_callback(VALUE cb);
+inline int yajl_found_value(void * ctx, VALUE val);
 void yajl_encode_part(void * wrapper, VALUE obj, VALUE io);
 void yajl_parse_chunk(const unsigned char * chunk, unsigned int len, yajl_handle parser);
 
@@ -93,6 +95,12 @@ static yajl_callbacks callbacks = {
 typedef struct {
     VALUE builderStack;
     VALUE parse_complete_callback;
+    VALUE parse_key_callback;
+    VALUE parse_value_callback;
+    VALUE object_begin_callback;
+    VALUE object_end_callback;
+    VALUE array_begin_callback;
+    VALUE array_end_callback;
     int nestedArrayLevel;
     int nestedHashLevel;
     int objectsFound;
@@ -112,6 +120,12 @@ static VALUE rb_yajl_parser_init(int argc, VALUE * argv, VALUE self);
 static VALUE rb_yajl_parser_parse(int argc, VALUE * argv, VALUE self);
 static VALUE rb_yajl_parser_parse_chunk(VALUE self, VALUE chunk);
 static VALUE rb_yajl_parser_set_complete_cb(VALUE self, VALUE callback);
+static VALUE rb_yajl_parser_set_key_cb(VALUE self, VALUE callback);
+static VALUE rb_yajl_parser_set_value_cb(VALUE self, VALUE callback);
+static VALUE rb_yajl_parser_set_object_begin_cb(VALUE self, VALUE callback);
+static VALUE rb_yajl_parser_set_object_end_cb(VALUE self, VALUE callback);
+static VALUE rb_yajl_parser_set_array_begin_cb(VALUE self, VALUE callback);
+static VALUE rb_yajl_parser_set_array_end_cb(VALUE self, VALUE callback);
 static void yajl_parser_wrapper_free(void * wrapper);
 static void yajl_parser_wrapper_mark(void * wrapper);
 

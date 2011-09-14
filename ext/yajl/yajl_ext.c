@@ -92,6 +92,23 @@ inline void yajl_set_static_value(void * ctx, VALUE val) {
     }
 }
 
+inline void yajl_fire_callback(VALUE cb) {
+    if (cb != Qnil) {
+        rb_funcall(cb, intern_call, 0);
+    }
+}
+
+inline int yajl_found_value(void * ctx, VALUE val) {
+    yajl_parser_wrapper * wrapper;
+    GetParser((VALUE)ctx, wrapper);
+    if (wrapper->parse_value_callback != Qnil) {
+         rb_funcall(wrapper->parse_value_callback, intern_call, 1, val);
+    }
+    yajl_set_static_value(ctx, val);
+    yajl_check_and_fire_callback(ctx);
+    return 1;
+}
+
 static void yajl_encoder_wrapper_free(void * wrapper) {
     yajl_encoder_wrapper * w = wrapper;
     if (w) {
@@ -213,6 +230,12 @@ void yajl_parser_wrapper_mark(void * wrapper) {
     if (w) {
         rb_gc_mark(w->builderStack);
         rb_gc_mark(w->parse_complete_callback);
+        rb_gc_mark(w->parse_key_callback);
+        rb_gc_mark(w->parse_value_callback);
+        rb_gc_mark(w->object_begin_callback);
+        rb_gc_mark(w->object_end_callback);
+        rb_gc_mark(w->array_begin_callback);
+        rb_gc_mark(w->array_end_callback);
     }
 }
 
@@ -231,18 +254,15 @@ void yajl_parse_chunk(const unsigned char * chunk, unsigned int len, yajl_handle
 
 /* YAJL Callbacks */
 static int yajl_found_null(void * ctx) {
-    yajl_set_static_value(ctx, Qnil);
-    yajl_check_and_fire_callback(ctx);
-    return 1;
+    return yajl_found_value(ctx, Qnil);
 }
 
 static int yajl_found_boolean(void * ctx, int boolean) {
-    yajl_set_static_value(ctx, boolean ? Qtrue : Qfalse);
-    yajl_check_and_fire_callback(ctx);
-    return 1;
+    return yajl_found_value(ctx, boolean ? Qtrue : Qfalse);
 }
 
 static int yajl_found_number(void * ctx, const char * numberVal, unsigned int numberLen) {
+    VALUE val;
     char buf[numberLen+1];
     buf[numberLen] = 0;
     memcpy(buf, numberVal, numberLen);
@@ -250,11 +270,11 @@ static int yajl_found_number(void * ctx, const char * numberVal, unsigned int nu
     if (memchr(buf, '.', numberLen) ||
         memchr(buf, 'e', numberLen) ||
         memchr(buf, 'E', numberLen)) {
-        yajl_set_static_value(ctx, rb_float_new(strtod(buf, NULL)));
+        val = rb_float_new(strtod(buf, NULL));
     } else {
-        yajl_set_static_value(ctx, rb_cstr2inum(buf, 10));
+        val = rb_cstr2inum(buf, 10);
     }
-    return 1;
+    return yajl_found_value(ctx, val);
 }
 
 static int yajl_found_string(void * ctx, const unsigned char * stringVal, unsigned int stringLen) {
@@ -266,42 +286,31 @@ static int yajl_found_string(void * ctx, const unsigned char * stringVal, unsign
       str = rb_str_export_to_enc(str, default_internal_enc);
     }
 #endif
-    yajl_set_static_value(ctx, str);
-    yajl_check_and_fire_callback(ctx);
-    return 1;
+    return yajl_found_value(ctx, str);
 }
 
 static int yajl_found_hash_key(void * ctx, const unsigned char * stringVal, unsigned int stringLen) {
     yajl_parser_wrapper * wrapper;
-    VALUE keyStr;
+    VALUE key;
 #ifdef HAVE_RUBY_ENCODING_H
-    rb_encoding *default_internal_enc;
+    rb_encoding *default_internal_enc = rb_default_internal_encoding();
 #endif
-    GetParser((VALUE)ctx, wrapper);
+    key = rb_str_new((const char *)stringVal, stringLen);
 #ifdef HAVE_RUBY_ENCODING_H
-    default_internal_enc = rb_default_internal_encoding();
-#endif
-
-    if (wrapper->symbolizeKeys) {
-        char buf[stringLen+1];
-        memcpy(buf, stringVal, stringLen);
-        buf[stringLen] = 0;
-        VALUE stringEncoded = rb_str_new2(buf);
-#ifdef HAVE_RUBY_ENCODING_H
-        rb_enc_associate(stringEncoded, rb_utf8_encoding());
-#endif
-
-        yajl_set_static_value(ctx, ID2SYM(rb_to_id(stringEncoded)));
-    } else {
-        keyStr = rb_str_new((const char *)stringVal, stringLen);
-#ifdef HAVE_RUBY_ENCODING_H
-        rb_enc_associate(keyStr, utf8Encoding);
-        if (default_internal_enc) {
-          keyStr = rb_str_export_to_enc(keyStr, default_internal_enc);
-        }
-#endif
-        yajl_set_static_value(ctx, keyStr);
+    rb_enc_associate(key, utf8Encoding);
+    if (default_internal_enc) {
+      key = rb_str_export_to_enc(key, default_internal_enc);
     }
+#endif
+
+    GetParser((VALUE)ctx, wrapper);
+    if (wrapper->symbolizeKeys) {
+        key = ID2SYM(rb_to_id(key));
+    }
+    if (wrapper->parse_key_callback != Qnil) {
+        rb_funcall(wrapper->parse_key_callback, intern_call, 1, key);
+    }
+    yajl_set_static_value(ctx, key);
     yajl_check_and_fire_callback(ctx);
     return 1;
 }
@@ -309,6 +318,7 @@ static int yajl_found_hash_key(void * ctx, const unsigned char * stringVal, unsi
 static int yajl_found_start_hash(void * ctx) {
     yajl_parser_wrapper * wrapper;
     GetParser((VALUE)ctx, wrapper);
+    yajl_fire_callback(wrapper->object_begin_callback);
     wrapper->nestedHashLevel++;
     yajl_set_static_value(ctx, rb_hash_new());
     return 1;
@@ -317,6 +327,7 @@ static int yajl_found_start_hash(void * ctx) {
 static int yajl_found_end_hash(void * ctx) {
     yajl_parser_wrapper * wrapper;
     GetParser((VALUE)ctx, wrapper);
+    yajl_fire_callback(wrapper->object_end_callback);
     wrapper->nestedHashLevel--;
     if (RARRAY_LEN(wrapper->builderStack) > 1) {
         rb_ary_pop(wrapper->builderStack);
@@ -328,6 +339,7 @@ static int yajl_found_end_hash(void * ctx) {
 static int yajl_found_start_array(void * ctx) {
     yajl_parser_wrapper * wrapper;
     GetParser((VALUE)ctx, wrapper);
+    yajl_fire_callback(wrapper->array_begin_callback);
     wrapper->nestedArrayLevel++;
     yajl_set_static_value(ctx, rb_ary_new());
     return 1;
@@ -336,6 +348,7 @@ static int yajl_found_start_array(void * ctx) {
 static int yajl_found_end_array(void * ctx) {
     yajl_parser_wrapper * wrapper;
     GetParser((VALUE)ctx, wrapper);
+    yajl_fire_callback(wrapper->array_end_callback);
     wrapper->nestedArrayLevel--;
     if (RARRAY_LEN(wrapper->builderStack) > 1) {
         rb_ary_pop(wrapper->builderStack);
@@ -396,6 +409,12 @@ static VALUE rb_yajl_parser_new(int argc, VALUE * argv, VALUE klass) {
     wrapper->symbolizeKeys = symbolizeKeys;
     wrapper->builderStack = rb_ary_new();
     wrapper->parse_complete_callback = Qnil;
+    wrapper->parse_key_callback = Qnil;
+    wrapper->parse_value_callback = Qnil;
+    wrapper->object_begin_callback = Qnil;
+    wrapper->object_end_callback = Qnil;
+    wrapper->array_begin_callback = Qnil;
+    wrapper->array_end_callback = Qnil;
     rb_obj_call_init(obj, 0, 0);
     return obj;
 }
@@ -526,6 +545,103 @@ static VALUE rb_yajl_parser_set_complete_cb(VALUE self, VALUE callback) {
     yajl_parser_wrapper * wrapper;
     GetParser(self, wrapper);
     wrapper->parse_complete_callback = callback;
+    return Qnil;
+}
+
+/*
+ * Document-method: on_key=
+ *
+ * call-seq: on_key = Proc.new { |obj| ... }
+ *
+ * This callback setter allows you to pass a Proc/lambda or any other object that responds to #call.
+ *
+ * It will pass a single parameter, the ruby object built from the last parsed JSON key
+ */
+static VALUE rb_yajl_parser_set_key_cb(VALUE self, VALUE callback) {
+    yajl_parser_wrapper * wrapper;
+    GetParser(self, wrapper);
+    wrapper->parse_key_callback = callback;
+    return Qnil;
+}
+
+/*
+ * Document-method: on_value=
+ *
+ * call-seq: on_value = Proc.new { |obj| ... }
+ *
+ * This callback setter allows you to pass a Proc/lambda or any other object that responds to #call.
+ *
+ * It will pass a single parameter, the ruby object built from the last parsed JSON value.
+ * This will only be called for primitives (Numbers & Strings) not Arrays and Objects.
+ */
+static VALUE rb_yajl_parser_set_value_cb(VALUE self, VALUE callback) {
+    yajl_parser_wrapper * wrapper;
+    GetParser(self, wrapper);
+    wrapper->parse_value_callback = callback;
+    return Qnil;
+}
+
+/*
+ * Document-method: on_object_begin=
+ *
+ * call-seq: on_object_begin = Proc.new { ... }
+ *
+ * This callback setter allows you to pass a Proc/lambda or any other object that responds to #call.
+ *
+ * It will pass no parameter.
+ */
+static VALUE rb_yajl_parser_set_object_begin_cb(VALUE self, VALUE callback) {
+    yajl_parser_wrapper * wrapper;
+    GetParser(self, wrapper);
+    wrapper->object_begin_callback = callback;
+    return Qnil;
+}
+
+/*
+ * Document-method: on_object_end=
+ *
+ * call-seq: on_object_end = Proc.new { ... }
+ *
+ * This callback setter allows you to pass a Proc/lambda or any other object that responds to #call.
+ *
+ * It will pass no parameter.
+ */
+static VALUE rb_yajl_parser_set_object_end_cb(VALUE self, VALUE callback) {
+    yajl_parser_wrapper * wrapper;
+    GetParser(self, wrapper);
+    wrapper->object_end_callback = callback;
+    return Qnil;
+}
+
+/*
+ * Document-method: on_array_begin=
+ *
+ * call-seq: on_array_begin = Proc.new { ... }
+ *
+ * This callback setter allows you to pass a Proc/lambda or any other object that responds to #call.
+ *
+ * It will pass no parameter.
+ */
+static VALUE rb_yajl_parser_set_array_begin_cb(VALUE self, VALUE callback) {
+    yajl_parser_wrapper * wrapper;
+    GetParser(self, wrapper);
+    wrapper->array_begin_callback = callback;
+    return Qnil;
+}
+
+/*
+ * Document-method: on_array_end=
+ *
+ * call-seq: on_array_end = Proc.new { ... }
+ *
+ * This callback setter allows you to pass a Proc/lambda or any other object that responds to #call.
+ *
+ * It will pass no parameter.
+ */
+static VALUE rb_yajl_parser_set_array_end_cb(VALUE self, VALUE callback) {
+    yajl_parser_wrapper * wrapper;
+    GetParser(self, wrapper);
+    wrapper->array_end_callback = callback;
     return Qnil;
 }
 
@@ -871,6 +987,12 @@ void Init_yajl() {
     rb_define_method(cParser, "parse_chunk", rb_yajl_parser_parse_chunk, 1);
     rb_define_method(cParser, "<<", rb_yajl_parser_parse_chunk, 1);
     rb_define_method(cParser, "on_parse_complete=", rb_yajl_parser_set_complete_cb, 1);
+    rb_define_method(cParser, "on_key=", rb_yajl_parser_set_key_cb, 1);
+    rb_define_method(cParser, "on_value=", rb_yajl_parser_set_value_cb, 1);
+    rb_define_method(cParser, "on_object_begin=", rb_yajl_parser_set_object_begin_cb, 1);
+    rb_define_method(cParser, "on_object_end=", rb_yajl_parser_set_object_end_cb, 1);
+    rb_define_method(cParser, "on_array_begin=", rb_yajl_parser_set_array_begin_cb, 1);
+    rb_define_method(cParser, "on_array_end=", rb_yajl_parser_set_array_end_cb, 1);
 
     cEncoder = rb_define_class_under(mYajl, "Encoder", rb_cObject);
     rb_define_singleton_method(cEncoder, "new", rb_yajl_encoder_new, -1);
