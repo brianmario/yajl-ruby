@@ -22,11 +22,10 @@ end
 Rake::Task[:spec].prerequisites << :compile
 
 file 'lib/yajl/yajl.rb' do |t|
-  name = gemspec.name
   File.open(t.name, 'wb') do |f|
     f.write <<-eoruby
 RUBY_VERSION =~ /(\\d+.\\d+)/
-require "#{name}/\#{$1}/#{name}"
+require "yajl/\#{$1}/yajl"
     eoruby
   end
 end
