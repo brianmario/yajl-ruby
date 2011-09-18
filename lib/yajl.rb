@@ -1,13 +1,5 @@
 require 'yajl/yajl'
 
-# = Extras
-# We're not going to load these auotmatically, because you might not need them ;)
-#
-# require 'yajl/http_stream.rb' unless defined?(Yajl::HttpStream)
-# require 'yajl/gzip.rb' unless defined?(Yajl::Gzip)
-# require 'yajl/deflate.rb' unless defined?(Yajl::Deflate)
-# require 'yajl/bzip2.rb' unless defined?(Yajl::Bzip2)
-
 # = Yajl
 #
 # Ruby bindings to the excellent Yajl (Yet Another JSON Parser) ANSI C library.
