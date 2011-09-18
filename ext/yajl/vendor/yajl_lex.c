@@ -1,34 +1,18 @@
 /*
- * Copyright 2010, Lloyd Hilaiel.
- * 
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- * 
- *  1. Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- * 
- *  2. Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in
- *     the documentation and/or other materials provided with the
- *     distribution.
- * 
- *  3. Neither the name of Lloyd Hilaiel nor the names of its
- *     contributors may be used to endorse or promote products derived
- *     from this software without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
- * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
- * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- */ 
+ * Copyright (c) 2007-2011, Lloyd Hilaiel <lloyd@hilaiel.com>
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ */
 
 #include "yajl_lex.h"
 #include "yajl_buf.h"
@@ -83,8 +67,8 @@ tokToStr(yajl_tok tok)
 
 struct yajl_lexer_t {
     /* the overal line and char offset into the data */
-    unsigned int lineOff;
-    unsigned int charOff;
+    size_t lineOff;
+    size_t charOff;
 
     /* error */
     yajl_lex_error error;
@@ -95,7 +79,7 @@ struct yajl_lexer_t {
 
     /* in the case where we have data in the lexBuf, bufOff holds
      * the current offset into the lexBuf. */
-    unsigned int bufOff;
+    size_t bufOff;
 
     /* are we using the lex buf? */
     unsigned int bufInUse;
@@ -129,17 +113,6 @@ yajl_lex_alloc(yajl_alloc_funcs * alloc,
     return lxr;
 }
 
-yajl_lexer
-yajl_lex_realloc(yajl_lexer orig) {
-    orig->lineOff = 0;
-    orig->charOff = 0;
-    orig->error = yajl_lex_e_ok;
-    yajl_buf_clear(orig->buf);
-    orig->bufOff = 0;
-    orig->bufInUse = 0;
-    return orig;
-}
-
 void
 yajl_lex_free(yajl_lexer lxr)
 {
@@ -149,15 +122,19 @@ yajl_lex_free(yajl_lexer lxr)
 }
 
 /* a lookup table which lets us quickly determine three things:
- * VEC - valid escaped conrol char
+ * VEC - valid escaped control char
+ * note.  the solidus '/' may be escaped or not.
  * IJC - invalid json char
  * VHC - valid hex char
- * note.  the solidus '/' may be escaped or not.
- * note.  the
+ * NFP - needs further processing (from a string scanning perspective)
+ * NUC - needs utf8 checking when enabled (from a string scanning perspective)
  */
-#define VEC 1
-#define IJC 2
-#define VHC 4
+#define VEC 0x01
+#define IJC 0x02
+#define VHC 0x04
+#define NFP 0x08
+#define NUC 0x10
+
 static const char charLookupTable[256] =
 {
 /*00*/ IJC    , IJC    , IJC    , IJC    , IJC    , IJC    , IJC    , IJC    ,
@@ -165,7 +142,7 @@ static const char charLookupTable[256] =
 /*10*/ IJC    , IJC    , IJC    , IJC    , IJC    , IJC    , IJC    , IJC    ,
 /*18*/ IJC    , IJC    , IJC    , IJC    , IJC    , IJC    , IJC    , IJC    ,
 
-/*20*/ 0      , 0      , VEC|IJC, 0      , 0      , 0      , 0      , 0      ,
+/*20*/ 0      , 0      , NFP|VEC|IJC, 0      , 0      , 0      , 0      , 0      ,
 /*28*/ 0      , 0      , 0      , 0      , 0      , 0      , 0      , VEC    ,
 /*30*/ VHC    , VHC    , VHC    , VHC    , VHC    , VHC    , VHC    , VHC    ,
 /*38*/ VHC    , VHC    , 0      , 0      , 0      , 0      , 0      , 0      ,
@@ -173,33 +150,32 @@ static const char charLookupTable[256] =
 /*40*/ 0      , VHC    , VHC    , VHC    , VHC    , VHC    , VHC    , 0      ,
 /*48*/ 0      , 0      , 0      , 0      , 0      , 0      , 0      , 0      ,
 /*50*/ 0      , 0      , 0      , 0      , 0      , 0      , 0      , 0      ,
-/*58*/ 0      , 0      , 0      , 0      , VEC|IJC, 0      , 0      , 0      ,
+/*58*/ 0      , 0      , 0      , 0      , NFP|VEC|IJC, 0      , 0      , 0      ,
 
 /*60*/ 0      , VHC    , VEC|VHC, VHC    , VHC    , VHC    , VEC|VHC, 0      ,
 /*68*/ 0      , 0      , 0      , 0      , 0      , 0      , VEC    , 0      ,
 /*70*/ 0      , 0      , VEC    , 0      , VEC    , 0      , 0      , 0      ,
 /*78*/ 0      , 0      , 0      , 0      , 0      , 0      , 0      , 0      ,
 
-/* include these so we don't have to always check the range of the char */
-       0      , 0      , 0      , 0      , 0      , 0      , 0      , 0      , 
-       0      , 0      , 0      , 0      , 0      , 0      , 0      , 0      , 
-       0      , 0      , 0      , 0      , 0      , 0      , 0      , 0      , 
-       0      , 0      , 0      , 0      , 0      , 0      , 0      , 0      , 
+       NUC    , NUC    , NUC    , NUC    , NUC    , NUC    , NUC    , NUC    ,
+       NUC    , NUC    , NUC    , NUC    , NUC    , NUC    , NUC    , NUC    ,
+       NUC    , NUC    , NUC    , NUC    , NUC    , NUC    , NUC    , NUC    ,
+       NUC    , NUC    , NUC    , NUC    , NUC    , NUC    , NUC    , NUC    ,
 
-       0      , 0      , 0      , 0      , 0      , 0      , 0      , 0      , 
-       0      , 0      , 0      , 0      , 0      , 0      , 0      , 0      , 
-       0      , 0      , 0      , 0      , 0      , 0      , 0      , 0      , 
-       0      , 0      , 0      , 0      , 0      , 0      , 0      , 0      , 
+       NUC    , NUC    , NUC    , NUC    , NUC    , NUC    , NUC    , NUC    ,
+       NUC    , NUC    , NUC    , NUC    , NUC    , NUC    , NUC    , NUC    ,
+       NUC    , NUC    , NUC    , NUC    , NUC    , NUC    , NUC    , NUC    ,
+       NUC    , NUC    , NUC    , NUC    , NUC    , NUC    , NUC    , NUC    ,
 
-       0      , 0      , 0      , 0      , 0      , 0      , 0      , 0      , 
-       0      , 0      , 0      , 0      , 0      , 0      , 0      , 0      , 
-       0      , 0      , 0      , 0      , 0      , 0      , 0      , 0      , 
-       0      , 0      , 0      , 0      , 0      , 0      , 0      , 0      , 
+       NUC    , NUC    , NUC    , NUC    , NUC    , NUC    , NUC    , NUC    ,
+       NUC    , NUC    , NUC    , NUC    , NUC    , NUC    , NUC    , NUC    ,
+       NUC    , NUC    , NUC    , NUC    , NUC    , NUC    , NUC    , NUC    ,
+       NUC    , NUC    , NUC    , NUC    , NUC    , NUC    , NUC    , NUC    ,
 
-       0      , 0      , 0      , 0      , 0      , 0      , 0      , 0      , 
-       0      , 0      , 0      , 0      , 0      , 0      , 0      , 0      , 
-       0      , 0      , 0      , 0      , 0      , 0      , 0      , 0      , 
-       0      , 0      , 0      , 0      , 0      , 0      , 0      , 0
+       NUC    , NUC    , NUC    , NUC    , NUC    , NUC    , NUC    , NUC    ,
+       NUC    , NUC    , NUC    , NUC    , NUC    , NUC    , NUC    , NUC    ,
+       NUC    , NUC    , NUC    , NUC    , NUC    , NUC    , NUC    , NUC    ,
+       NUC    , NUC    , NUC    , NUC    , NUC    , NUC    , NUC    , NUC
 };
 
 /** process a variable length utf8 encoded codepoint.
@@ -217,7 +193,7 @@ static const char charLookupTable[256] =
 
 static yajl_tok
 yajl_lex_utf8_char(yajl_lexer lexer, const unsigned char * jsonText,
-                   unsigned int jsonTextLen, unsigned int * offset,
+                   size_t jsonTextLen, size_t * offset,
                    unsigned char curChar)
 {
     if (curChar <= 0x7f) {
@@ -271,17 +247,56 @@ if (*offset >= jsonTextLen) { \
    goto finish_string_lex; \
 }
 
+/** scan a string for interesting characters that might need further
+ *  review.  return the number of chars that are uninteresting and can
+ *  be skipped.
+ * (lth) hi world, any thoughts on how to make this routine faster? */
+static size_t
+yajl_string_scan(const unsigned char * buf, size_t len, int utf8check)
+{
+    unsigned char mask = IJC|NFP|(utf8check ? NUC : 0);
+    size_t skip = 0;
+    while (skip < len && !(charLookupTable[*buf] & mask))
+    {
+        skip++;
+        buf++;
+    }
+    return skip;
+}
+
 static yajl_tok
 yajl_lex_string(yajl_lexer lexer, const unsigned char * jsonText,
-                unsigned int jsonTextLen, unsigned int * offset)
+                size_t jsonTextLen, size_t * offset)
 {
     yajl_tok tok = yajl_tok_error;
     int hasEscapes = 0;
 
     for (;;) {
-		unsigned char curChar;
+        unsigned char curChar;
 
-		STR_CHECK_EOF;
+        /* now jump into a faster scanning routine to skip as much
+         * of the buffers as possible */
+        {
+            const unsigned char * p;
+            size_t len;
+            
+            if ((lexer->bufInUse && yajl_buf_len(lexer->buf) &&
+                 lexer->bufOff < yajl_buf_len(lexer->buf)))
+            {
+                p = ((const unsigned char *) yajl_buf_data(lexer->buf) +
+                     (lexer->bufOff));
+                len = yajl_buf_len(lexer->buf) - lexer->bufOff;
+                lexer->bufOff += yajl_string_scan(p, len, lexer->validateUTF8);
+            }                
+            else if (*offset < jsonTextLen) 
+            {
+                p = jsonText + *offset;
+                len = jsonTextLen - *offset;
+                *offset += yajl_string_scan(p, len, lexer->validateUTF8);
+            }
+        }
+
+        STR_CHECK_EOF;
 
         curChar = readChar(lexer, jsonText, offset);
 
@@ -354,7 +369,7 @@ yajl_lex_string(yajl_lexer lexer, const unsigned char * jsonText,
 
 static yajl_tok
 yajl_lex_number(yajl_lexer lexer, const unsigned char * jsonText,
-                unsigned int jsonTextLen, unsigned int * offset)
+                size_t jsonTextLen, size_t * offset)
 {
     /** XXX: numbers are the only entities in json that we must lex
      *       _beyond_ in order to know that they are complete.  There
@@ -441,7 +456,7 @@ yajl_lex_number(yajl_lexer lexer, const unsigned char * jsonText,
 
 static yajl_tok
 yajl_lex_comment(yajl_lexer lexer, const unsigned char * jsonText,
-                 unsigned int jsonTextLen, unsigned int * offset)
+                 size_t jsonTextLen, size_t * offset)
 {
     unsigned char c;
 
@@ -482,12 +497,12 @@ yajl_lex_comment(yajl_lexer lexer, const unsigned char * jsonText,
 
 yajl_tok
 yajl_lex_lex(yajl_lexer lexer, const unsigned char * jsonText,
-             unsigned int jsonTextLen, unsigned int * offset,
-             const unsigned char ** outBuf, unsigned int * outLen)
+             size_t jsonTextLen, size_t * offset,
+             const unsigned char ** outBuf, size_t * outLen)
 {
     yajl_tok tok = yajl_tok_error;
     unsigned char c;
-    unsigned int startOffset = *offset;
+    size_t startOffset = *offset;
 
     *outBuf = NULL;
     *outLen = 0;
@@ -717,23 +732,23 @@ yajl_lex_get_error(yajl_lexer lexer)
     return lexer->error;
 }
 
-unsigned int yajl_lex_current_line(yajl_lexer lexer)
+size_t yajl_lex_current_line(yajl_lexer lexer)
 {
     return lexer->lineOff;
 }
 
-unsigned int yajl_lex_current_char(yajl_lexer lexer)
+size_t yajl_lex_current_char(yajl_lexer lexer)
 {
     return lexer->charOff;
 }
 
 yajl_tok yajl_lex_peek(yajl_lexer lexer, const unsigned char * jsonText,
-                       unsigned int jsonTextLen, unsigned int offset)
+                       size_t jsonTextLen, size_t offset)
 {
     const unsigned char * outBuf;
-    unsigned int outLen;
-    unsigned int bufLen = yajl_buf_len(lexer->buf);
-    unsigned int bufOff = lexer->bufOff;
+    size_t outLen;
+    size_t bufLen = yajl_buf_len(lexer->buf);
+    size_t bufOff = lexer->bufOff;
     unsigned int bufInUse = lexer->bufInUse;
     yajl_tok tok;
     
