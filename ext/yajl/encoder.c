@@ -5,8 +5,9 @@
 #define GetEncoder(obj, sval) (sval = (yajl_encoder_wrapper*)DATA_PTR(obj));
 
 extern VALUE mYajl;
-extern ID intern_call, intern_has_key, intern_keys, intern_to_s, intern_to_json;
-extern ID sym_pretty, sym_indent, sym_terminator, sym_html_safe;
+extern ID intern_call;
+static ID sym_pretty, sym_indent, sym_terminator, sym_html_safe;
+static ID intern_as_json, intern_has_key, intern_keys, intern_to_s, intern_to_json;
 static VALUE cEncodeError, cEncoder;
 
 static unsigned char *defaultIndentString = (unsigned char *)"  ";
@@ -295,7 +296,7 @@ static VALUE rb_yajl_encoder_set_progress_cb(VALUE self, VALUE callback) {
     return Qnil;
 }
 
-void _yajl_init_encoder() {
+void _yajl_ruby_init_encoder() {
 	cEncodeError = rb_define_class_under(mYajl, "EncodeError", rb_eStandardError);
 
 	cEncoder = rb_define_class_under(mYajl, "Encoder", rb_cObject);
@@ -303,4 +304,15 @@ void _yajl_init_encoder() {
 	rb_define_method(cEncoder, "initialize", rb_yajl_encoder_init, -1);
 	rb_define_method(cEncoder, "encode", rb_yajl_encoder_encode, -1);
 	rb_define_method(cEncoder, "on_progress=", rb_yajl_encoder_set_progress_cb, 1);
+
+	intern_as_json = rb_intern("as_json");
+	intern_keys = rb_intern("keys");
+	intern_to_s = rb_intern("to_s");
+	intern_to_json = rb_intern("to_json");
+	intern_has_key = rb_intern("has_key?");
+
+	sym_pretty = ID2SYM(rb_intern("pretty"));
+	sym_indent = ID2SYM(rb_intern("indent"));
+	sym_html_safe = ID2SYM(rb_intern("html_safe"));
+	sym_terminator = ID2SYM(rb_intern("terminator"));
 }

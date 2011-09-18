@@ -1,5 +1,7 @@
-#ifndef YAJL_COMMON_H
-#define YAJL_COMMON_H
+#ifndef YAJL_RUBY_COMMON_H
+#define YAJL_RUBY_COMMON_H
+
+#include "common.h"
 
 // tell rbx not to use it's caching compat layer
 // by doing this we're making a promize to RBX that
