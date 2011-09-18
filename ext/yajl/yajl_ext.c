@@ -9,14 +9,14 @@ extern void _yajl_ruby_init_parser();
 
 /* Ruby Extension initializer */
 void Init_yajl() {
-    mYajl = rb_define_module("Yajl");
+	mYajl = rb_define_module("Yajl");
 
-    _yajl_ruby_init_encoder();
-    _yajl_ruby_init_parser();
+	_yajl_ruby_init_encoder();
+	_yajl_ruby_init_parser();
 
-    intern_call = rb_intern("call");
+	intern_call = rb_intern("call");
 
 #ifdef HAVE_RUBY_ENCODING_H
-    utf8Encoding = rb_utf8_encoding();
+	utf8Encoding = rb_utf8_encoding();
 #endif
 }
