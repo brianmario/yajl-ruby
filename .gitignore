@@ -8,5 +8,6 @@ TODO.txt
 tmp/*
 pkg/*
 vendor/gems
+vendor/yajl
 Gemfile.lock
 .rbx
