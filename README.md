@@ -6,10 +6,8 @@ You can read more info at the project's website http://lloyd.github.com/yajl or 
 
 ## Features
 
-* JSON parsing and encoding directly to and from an IO stream (file, socket, etc) or String. Compressed stream parsing and encoding supported for Bzip2, Gzip and Deflate.
+* JSON parsing and encoding directly to and from an IO stream (file, socket, etc) or String.
 * Parse and encode *multiple* JSON objects to and from streams or strings continuously.
-* JSON gem compatibility API - allows yajl-ruby to be used as a drop-in replacement for the JSON gem
-* Basic HTTP client (only GET requests supported for now) which parses JSON directly off the response body *as it's being received*
 * ~3.5x faster than JSON.generate
 * ~1.9x faster than JSON.parse
 * ~4.5x faster than YAML.load
@@ -96,58 +94,6 @@ is how yajl-ruby will hand you (the caller) each object as it's parsed off the i
 obj = Yajl::Parser.parse(str_or_io)
 ```
 
-Or how about a JSON API HTTP request?
-This actually makes a request using a raw TCPSocket, then parses the JSON body right off the socket. While it's being received over the wire!
-
-``` ruby
-require 'uri'
-require 'yajl/http_stream'
-
-url = URI.parse("http://search.twitter.com/search.json?q=engineyard")
-results = Yajl::HttpStream.get(url)
-```
-
-Or do the same request, with Gzip and Deflate output compression support (also supports Bzip2, if loaded):
-(this does the same raw socket Request, but transparently parses the compressed response body)
-
-``` ruby
-require 'uri'
-require 'yajl/gzip'
-require 'yajl/deflate'
-require 'yajl/http_stream'
-
-url = URI.parse("http://search.twitter.com/search.json?q=engineyard")
-results = Yajl::HttpStream.get(url)
-```
-
-Since yajl-ruby parses JSON as a stream, supporting API's like Twitter's Streaming API are a piece-of-cake.
-You can simply supply a block to `Yajl::HttpStream.get`, which is used as the callback for when a JSON object has been
-unserialized off the stream. For the case of this Twitter Streaming API call, the callback gets fired a few times a second (depending on your connection speed).
-The code below is all that's needed to make the request and stream unserialized Ruby hashes off the response, continuously.
-You'll note that I've enabled the :symbolize_keys parser option as well. Doing so is much more efficient for parsing JSON streams with
-lots of repetitive keys - for things like result sets or multiple API requests - than the same parse with string keys.
-This is because Ruby will reuse (and never GC) its symbol table. Be that as it may, if you want to parse JSON strings with random key names
-it's much better to leave string keys enabled (the default), so they can get GC'd later.
-
-``` ruby
-require 'uri'
-require 'yajl/http_stream'
-
-uri = URI.parse("http://#{username}:#{password}@stream.twitter.com/spritzer.json")
-Yajl::HttpStream.get(uri, :symbolize_keys => true) do |hash|
-  puts hash.inspect
-end
-```
-
-Or how about parsing directly from a compressed file?
-
-``` ruby
-require 'yajl/bzip2'
-
-file = File.new('some.json.bz2', 'r')
-result = Yajl::Bzip2::StreamReader.parse(file)
-```
-
 ### Encoding
 
 Since yajl-ruby does everything using streams, you simply need to pass the object to encode, and the IO to write the stream to (this happens in chunks).
@@ -159,15 +105,6 @@ socket = TCPSocket.new('192.168.1.101', 9000)
 hash = {:foo => 12425125, :bar => "some string", ... }
 encoder = Yajl::Encoder.new
 Yajl::Encoder.encode(hash, socket)
-```
-
-Or what if you wanted to compress the stream over the wire?
-
-``` ruby
-require 'yajl/gzip'
-socket = TCPSocket.new('192.168.1.101', 9000)
-hash = {:foo => 12425125, :bar => "some string", ... }
-Yajl::Gzip::StreamWriter.encode(hash, socket)
 ```
 
 Or what about encoding multiple objects to JSON over the same stream?
@@ -222,8 +159,6 @@ a string when it's finished. In that case, just don't provide and IO or block (o
 str = Yajl::Encoder.encode(obj)
 ```
 
-You can also use `Yajl::Bzip2::StreamWriter` and `Yajl::Deflate::StreamWriter`. So you can pick whichever fits your CPU/bandwidth sweet-spot.
-
 === HTML Safety
 
 If you plan on embedding the output from the encoder in the DOM, you'll want to make sure you use the html_safe option on the encoder. This will escape all '/' characters to ensure no closing tags can be injected, preventing XSS.
@@ -235,37 +170,6 @@ Meaning the following should be perfectly safe:
   var escaped_str = <%= Yajl::Encoder.encode("</script><script>alert('hi!');</script>", :html_safe => true) %>;
 </script>
 ```
-
-== JSON gem Compatibility API
-
-The JSON gem compatibility API isn't enabled by default. You have to explicitly require it like so:
-
-``` ruby
-require 'yajl/json_gem'
-```
-
-That's right, you can just replace `"require 'json'"` with the line above and you're done!
-
-This will require yajl-ruby itself, as well as enable its JSON gem compatibility API.
-
-This includes the following API:
-
-JSON.parse, JSON.generate, JSON.pretty_generate, JSON.load, JSON.dump
-and all of the #to_json instance method overrides for Ruby's primitive objects
-
-
-Once the compatibility API is enabled, your existing or new project should work as if the JSON gem itself were being used. Only you'll be using Yajl ;)
-
-There are a lot more possibilities that I'd love to see other gems/plugins for someday.
-
-Some ideas:
-
-* parsing logs in JSON format
-* a Rails plugin - DONE! (http://github.com/technoweenie/yajl-rails)
-* official support in Rails 3 - DONE (http://github.com/rails/rails/commit/a96bf4ab5e73fccdafb78b99e8a122cc2172b505)
- * and is the default (if installed) - http://github.com/rails/rails/commit/63bb955a99eb46e257655c93dd64e86ebbf05651
-* Rack middleware (ideally the JSON body could be handed to the parser while it's still being received, this is apparently possible with Unicorn)
-* JSON API clients (http://github.com/brianmario/freckle-api)
 
 ## Benchmarks
 
