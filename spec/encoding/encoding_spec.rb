@@ -9,13 +9,13 @@ end
 
 class TheMindKiller
   def to_json
-    @wait_i_dont_exist_this_is_a_horrible_mistake_dont_do_it_aiiiiiiiiieeeeeee
+    nil
   end
 end
 
 class TheMindKillerDuce
   def to_s
-    @wait_i_dont_exist_this_is_a_horrible_mistake_dont_do_it_aiiiiiiiiieeeeeee
+    nil
   end
 end
 
