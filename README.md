@@ -159,7 +159,7 @@ a string when it's finished. In that case, just don't provide and IO or block (o
 str = Yajl::Encoder.encode(obj)
 ```
 
-=== HTML Safety
+### HTML Safety
 
 If you plan on embedding the output from the encoder in the DOM, you'll want to make sure you use the html_safe option on the encoder. This will escape all '/' characters to ensure no closing tags can be injected, preventing XSS.
 
