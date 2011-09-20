@@ -224,7 +224,7 @@ str = Yajl::Encoder.encode(obj)
 
 You can also use `Yajl::Bzip2::StreamWriter` and `Yajl::Deflate::StreamWriter`. So you can pick whichever fits your CPU/bandwidth sweet-spot.
 
-=== HTML Safety
+### HTML Safety
 
 If you plan on embedding the output from the encoder in the DOM, you'll want to make sure you use the html_safe option on the encoder. This will escape all '/' characters to ensure no closing tags can be injected, preventing XSS.
 
@@ -236,7 +236,7 @@ Meaning the following should be perfectly safe:
 </script>
 ```
 
-== JSON gem Compatibility API
+## JSON gem Compatibility API
 
 The JSON gem compatibility API isn't enabled by default. You have to explicitly require it like so:
 
