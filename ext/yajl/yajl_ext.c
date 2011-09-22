@@ -193,6 +193,7 @@ void yajl_encode_part(void * wrapper, VALUE obj, VALUE io) {
                 status = yajl_gen_number(w->encoder, cptr, len);
             } else {
                 str = rb_funcall(obj, intern_to_s, 0);
+								rb_p(str);
                 Check_Type(str, T_STRING);
                 cptr = RSTRING_PTR(str);
                 len = RSTRING_LEN(str);
