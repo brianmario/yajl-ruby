@@ -418,6 +418,6 @@ void _yajl_ruby_init_parser() {
 
 	intern_io_read = rb_intern("read");
 	sym_allow_comments = ID2SYM(rb_intern("allow_comments"));
- 	sym_check_utf8 = ID2SYM(rb_intern("check_utf8"));
+	sym_check_utf8 = ID2SYM(rb_intern("check_utf8"));
 	sym_symbolize_keys = ID2SYM(rb_intern("symbolize_keys"));
 }
