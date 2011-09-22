@@ -265,7 +265,7 @@ describe "Yajl JSON encoder" do
 
   it "return value of #to_s must be a string" do
     lambda {
-      if TheMindKillerDuce.send(:method_defined?, :abc)
+      if TheMindKillerDuce.send(:method_defined?, :to_json)
         TheMindKillerDuce.send(:undef_method, :to_json)
       end
       Yajl::Encoder.encode(TheMindKillerDuce.new)
