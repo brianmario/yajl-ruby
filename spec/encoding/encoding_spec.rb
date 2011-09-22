@@ -265,6 +265,8 @@ describe "Yajl JSON encoder" do
 
   it "return value of #to_s must be a string" do
     lambda {
+      val = TheMindKillerDuce.new.to_s
+      puts "Value is: #{val.inspect}"
       Yajl::Encoder.encode(TheMindKillerDuce.new)
     }.should raise_error(TypeError)
   end
