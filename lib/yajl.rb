@@ -1,4 +1,6 @@
 require 'yajl/yajl'
+require 'yajl/encoder'
+require 'yajl/parser'
 
 # = Yajl
 #
@@ -12,56 +14,5 @@ module Yajl
   # For compatibility, has the same signature of Yajl::Encoder.encode
   def self.dump(obj, *args, &block)
     Encoder.encode(obj, args, &block)
-  end
-
-  class Parser
-    # A helper method for parse-and-forget use-cases
-    #
-    # +io+ is the stream to parse JSON from
-    #
-    # The +options+ hash allows you to set two parsing options - :allow_comments and :check_utf8
-    #
-    # :allow_comments accepts a boolean will enable/disable checks for in-line comments in the JSON stream
-    #
-    # :check_utf8 accepts a boolean will enable/disable UTF8 validation for the JSON stream
-    def self.parse(str_or_io, options={}, read_bufsize=nil, &block)
-      new(options).parse(str_or_io, read_bufsize, &block)
-    end
-  end
-
-  class Encoder
-    # A helper method for encode-and-forget use-cases
-    #
-    # Examples:
-    #   Yajl::Encoder.encode(obj[, io, :pretty => true, :indent => "\t", &block])
-    #
-    #   output = Yajl::Encoder.encode(obj[, :pretty => true, :indent => "\t", &block])
-    #
-    # +obj+ is a ruby object to encode to JSON format
-    #
-    # +io+ is the optional IO stream to encode the ruby object to.
-    # If +io+ isn't passed, the resulting JSON string is returned. If +io+ is passed, nil is returned.
-    #
-    # The +options+ hash allows you to set two encoding options - :pretty and :indent
-    #
-    # :pretty accepts a boolean and will enable/disable "pretty printing" the resulting output
-    #
-    # :indent accepts a string and will be used as the indent character(s) during the pretty print process
-    #
-    # If a block is passed, it will be used as (and work the same as) the +on_progress+ callback
-    def self.encode(obj, *args, &block)
-      # TODO: this code smells, any ideas?
-      args.flatten!
-      options = {}
-      io = nil
-      args.each do |arg|
-        if arg.is_a?(Hash)
-          options = arg
-        elsif arg.respond_to?(:read)
-          io = arg
-        end
-      end if args.any?
-      new(options).encode(obj, io, &block)
-    end
   end
 end
