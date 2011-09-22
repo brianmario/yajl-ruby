@@ -20,5 +20,6 @@ Gem::Specification.new do |s|
   # benchmarks
   s.add_development_dependency 'activesupport'
   s.add_development_dependency 'json'
+  s.add_development_dependency 'psych'
 end
 

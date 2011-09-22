@@ -1,21 +1,11 @@
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 
-require 'rubygems'
 require 'benchmark'
 require 'yajl'
 require 'stringio'
-begin
-  require 'json'
-rescue LoadError
-end
-begin
-  require 'psych'
-rescue LoadError
-end
-begin
-  require 'active_support'
-rescue LoadError
-end
+require 'json'
+require 'psych'
+require 'active_support'
 
 filename = ARGV[0] || 'benchmark/subjects/ohai.json'
 hash = File.open(filename, 'rb') { |f| Yajl::Parser.new.parse(f.read) }

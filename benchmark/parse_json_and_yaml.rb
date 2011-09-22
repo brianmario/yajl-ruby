@@ -1,12 +1,8 @@
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 
-require 'rubygems'
 require 'benchmark'
 require 'yajl'
-begin
-  require 'json'
-rescue LoadError
-end
+require 'json'
 require 'yaml'
 
 # JSON section

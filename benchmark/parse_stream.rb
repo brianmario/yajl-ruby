@@ -1,16 +1,9 @@
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 
-require 'rubygems'
 require 'benchmark'
 require 'yajl'
-begin
-  require 'json'
-rescue LoadError
-end
-begin
-  require 'active_support'
-rescue LoadError
-end
+require 'json'
+require 'active_support'
 
 filename = 'benchmark/subjects/twitter_stream.json'
 json = File.new(filename, 'r')

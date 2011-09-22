@@ -1,13 +1,9 @@
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 
-require 'rubygems'
 require 'benchmark'
 require 'yajl'
 require 'stringio'
-begin
-  require 'json'
-rescue LoadError
-end
+require 'json'
 
 times = ARGV[0] ? ARGV[0].to_i : 1000
 filename = 'benchmark/subjects/ohai.json'
