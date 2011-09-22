@@ -1,4 +1,4 @@
-require './lib/yajl/version'
+require File.expand_path('../lib/yajl/version')
 
 Gem::Specification.new do |s|
   s.name = %q{yajl-ruby}
