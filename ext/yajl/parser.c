@@ -77,7 +77,7 @@ inline void yajl_set_static_value(void * ctx, VALUE val) {
 		rb_ary_push(wrapper->builderStack, val);
 	}
 }
-static void yajl_parse_chunk(const unsigned char * chunk, unsigned int len, yajl_handle parser) {
+static void yajl_parse_chunk(const unsigned char * chunk, size_t len, yajl_handle parser) {
 	yajl_status stat;
 
 	stat = yajl_parse(parser, chunk, len);
@@ -331,7 +331,7 @@ static VALUE rb_yajl_parser_parse(int argc, VALUE * argv, VALUE self) {
 	yajl_status stat;
 	yajl_parser_wrapper * wrapper;
 	VALUE rbufsize, input, blk;
-	unsigned int len;
+	size_t len;
 	const char * cptr;
 
 	GetParser(self, wrapper);
