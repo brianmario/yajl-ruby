@@ -23,58 +23,58 @@ describe "Yajl JSON encoder" do
   FILES = Dir[File.dirname(__FILE__)+'/../../benchmark/subjects/*.json']
 
   FILES.each do |file|
-     it "should encode #{File.basename(file)} to an IO" do
-       # we don't care about testing the stream subject as it has multiple JSON strings in it
-       if File.basename(file) != 'twitter_stream.json'
-         input = File.new(File.expand_path(file), 'r')
-         io = StringIO.new
-         encoder = Yajl::Encoder.new
-         hash = Yajl::Parser.parse(input)
-         encoder.encode(hash, io)
-         io.rewind
-         hash2 = Yajl::Parser.parse(io)
-         io.close
-         input.close
-         hash.should == hash2
-       end
-     end
-   end
+    it "should encode #{File.basename(file)} to an IO" do
+      # we don't care about testing the stream subject as it has multiple JSON strings in it
+      if File.basename(file) != 'twitter_stream.json'
+        input = File.new(File.expand_path(file), 'r')
+        io = StringIO.new
+        encoder = Yajl::Encoder.new
+        hash = Yajl::Parser.parse(input)
+        encoder.encode(hash, io)
+        io.rewind
+        hash2 = Yajl::Parser.parse(io)
+        io.close
+        input.close
+        hash.should == hash2
+      end
+    end
+  end
 
-   FILES.each do |file|
-     it "should encode #{File.basename(file)} and return a String" do
-       # we don't care about testing the stream subject as it has multiple JSON strings in it
-       if File.basename(file) != 'twitter_stream.json'
-         input = File.new(File.expand_path(file), 'r')
-         encoder = Yajl::Encoder.new
-         hash = Yajl::Parser.parse(input)
-         output = encoder.encode(hash)
-         hash2 = Yajl::Parser.parse(output)
-         input.close
-         hash.should == hash2
-       end
-     end
-   end
+  FILES.each do |file|
+    it "should encode #{File.basename(file)} and return a String" do
+      # we don't care about testing the stream subject as it has multiple JSON strings in it
+      if File.basename(file) != 'twitter_stream.json'
+        input = File.new(File.expand_path(file), 'r')
+        encoder = Yajl::Encoder.new
+        hash = Yajl::Parser.parse(input)
+        output = encoder.encode(hash)
+        hash2 = Yajl::Parser.parse(output)
+        input.close
+        hash.should == hash2
+      end
+    end
+  end
 
-   FILES.each do |file|
-     it "should encode #{File.basename(file)} call the passed block, passing it a String" do
-       # we don't care about testing the stream subject as it has multiple JSON strings in it
-       if File.basename(file) != 'twitter_stream.json'
-         input = File.new(File.expand_path(file), 'r')
-         encoder = Yajl::Encoder.new
-         hash = Yajl::Parser.parse(input)
-         output = ''
-         encoder.encode(hash) do |json_str|
-           output << json_str
-         end
-         hash2 = Yajl::Parser.parse(output)
-         input.close
-         hash.should == hash2
-       end
-     end
-   end
+  FILES.each do |file|
+    it "should encode #{File.basename(file)} call the passed block, passing it a String" do
+      # we don't care about testing the stream subject as it has multiple JSON strings in it
+      if File.basename(file) != 'twitter_stream.json'
+        input = File.new(File.expand_path(file), 'r')
+        encoder = Yajl::Encoder.new
+        hash = Yajl::Parser.parse(input)
+        output = ''
+        encoder.encode(hash) do |json_str|
+          output << json_str
+        end
+        hash2 = Yajl::Parser.parse(output)
+        input.close
+        hash.should == hash2
+      end
+    end
+  end
 
   it "should encode with :pretty turned on and a single space indent, to an IO" do
-    output = "{\n \"foo\": 1234\n}"
+    output = "{\n \"foo\": 1234\n}\n"
     obj = {:foo => 1234}
     io = StringIO.new
     encoder = Yajl::Encoder.new(:pretty => true, :indent => ' ')
@@ -84,7 +84,7 @@ describe "Yajl JSON encoder" do
   end
 
   it "should encode with :pretty turned on and a single space indent, and return a String" do
-    output = "{\n \"foo\": 1234\n}"
+    output = "{\n \"foo\": 1234\n}\n"
     obj = {:foo => 1234}
     encoder = Yajl::Encoder.new(:pretty => true, :indent => ' ')
     output = encoder.encode(obj)
@@ -92,7 +92,7 @@ describe "Yajl JSON encoder" do
   end
 
   it "should encode with :pretty turned on and a tab character indent, to an IO" do
-    output = "{\n\t\"foo\": 1234\n}"
+    output = "{\n\t\"foo\": 1234\n}\n"
     obj = {:foo => 1234}
     io = StringIO.new
     encoder = Yajl::Encoder.new(:pretty => true, :indent => "\t")
@@ -102,7 +102,7 @@ describe "Yajl JSON encoder" do
   end
 
   it "should encode with :pretty turned on and a tab character indent, and return a String" do
-    output = "{\n\t\"foo\": 1234\n}"
+    output = "{\n\t\"foo\": 1234\n}\n"
     obj = {:foo => 1234}
     encoder = Yajl::Encoder.new(:pretty => true, :indent => "\t")
     output = encoder.encode(obj)
@@ -110,7 +110,7 @@ describe "Yajl JSON encoder" do
   end
 
   it "should encode with it's class method with :pretty and a tab character indent options set, to an IO" do
-    output = "{\n\t\"foo\": 1234\n}"
+    output = "{\n\t\"foo\": 1234\n}\n"
     obj = {:foo => 1234}
     io = StringIO.new
     Yajl::Encoder.encode(obj, io, :pretty => true, :indent => "\t")
@@ -119,14 +119,14 @@ describe "Yajl JSON encoder" do
   end
 
   it "should encode with it's class method with :pretty and a tab character indent options set, and return a String" do
-    output = "{\n\t\"foo\": 1234\n}"
+    output = "{\n\t\"foo\": 1234\n}\n"
     obj = {:foo => 1234}
     output = Yajl::Encoder.encode(obj, :pretty => true, :indent => "\t")
     output.should == output
   end
 
   it "should encode with it's class method with :pretty and a tab character indent options set, to a block" do
-    output = "{\n\t\"foo\": 1234\n}"
+    output = "{\n\t\"foo\": 1234\n}\n"
     obj = {:foo => 1234}
     output = ''
     Yajl::Encoder.encode(obj, :pretty => true, :indent => "\t") do |json_str|
