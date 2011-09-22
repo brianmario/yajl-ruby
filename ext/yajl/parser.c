@@ -5,7 +5,7 @@
 #define GetParser(obj, sval) (sval = (yajl_parser_wrapper*)DATA_PTR(obj));
 
 static VALUE cParseError, cParser;
-static ID intern_io_read, intern_to_sym;
+static ID intern_io_read;
 static ID sym_allow_comments, sym_check_utf8, sym_symbolize_keys;
 extern ID intern_call;
 extern VALUE mYajl;
@@ -416,7 +416,6 @@ void _yajl_ruby_init_parser() {
 	rb_define_method(cParser, "<<", rb_yajl_parser_parse_chunk, 1);
 	rb_define_method(cParser, "on_parse_complete=", rb_yajl_parser_set_complete_cb, 1);
 
-	intern_to_sym = rb_intern("to_sym");
 	intern_io_read = rb_intern("read");
 	sym_allow_comments = ID2SYM(rb_intern("allow_comments"));
  	sym_check_utf8 = ID2SYM(rb_intern("check_utf8"));
