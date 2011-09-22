@@ -192,7 +192,6 @@ void yajl_encode_part(void * wrapper, VALUE obj, VALUE io) {
                 len = RSTRING_LEN(str);
                 status = yajl_gen_number(w->encoder, cptr, len);
             } else {
-								rb_p(rb_funcall(obj, rb_intern("method"), 1, ID2SYM(intern_to_s)));
                 str = rb_funcall(obj, intern_to_s, 0);
                 Check_Type(str, T_STRING);
                 cptr = RSTRING_PTR(str);
