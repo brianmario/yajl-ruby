@@ -77,26 +77,12 @@ inline void yajl_set_static_value(void * ctx, VALUE val) {
 		rb_ary_push(wrapper->builderStack, val);
 	}
 }
-static void yajl_parser_wrapper_free(void * wrapper) {
-	yajl_parser_wrapper * w = wrapper;
-	if (w) {
-		yajl_free(w->parser);
-		free(w);
-	}
-}
-static void yajl_parser_wrapper_mark(void * wrapper) {
-	yajl_parser_wrapper * w = wrapper;
-	if (w) {
-		rb_gc_mark(w->builderStack);
-		rb_gc_mark(w->parse_complete_callback);
-	}
-}
 static void yajl_parse_chunk(const unsigned char * chunk, unsigned int len, yajl_handle parser) {
 	yajl_status stat;
 
 	stat = yajl_parse(parser, chunk, len);
 
-	if (stat != yajl_status_ok && stat != yajl_status_insufficient_data) {
+	if (stat != yajl_status_ok) {
 		unsigned char * str = yajl_get_error(parser, 1, chunk, len);
 		VALUE errobj = rb_exc_new2(cParseError, (const char*) str);
 		yajl_free_error(parser, str);
@@ -114,7 +100,7 @@ static int yajl_found_boolean(void * ctx, int boolean) {
 	yajl_check_and_fire_callback(ctx);
 	return 1;
 }
-static int yajl_found_number(void * ctx, const char * numberVal, unsigned int numberLen) {
+static int yajl_found_number(void * ctx, const char * numberVal, size_t numberLen) {
 	char buf[numberLen+1];
 	buf[numberLen] = 0;
 	memcpy(buf, numberVal, numberLen);
@@ -128,7 +114,7 @@ static int yajl_found_number(void * ctx, const char * numberVal, unsigned int nu
 	}
 	return 1;
 }
-static int yajl_found_string(void * ctx, const unsigned char * stringVal, unsigned int stringLen) {
+static int yajl_found_string(void * ctx, const unsigned char * stringVal, size_t stringLen) {
 	VALUE str = rb_str_new((const char *)stringVal, stringLen);
 #ifdef HAVE_RUBY_ENCODING_H
 	rb_encoding *default_internal_enc = rb_default_internal_encoding();
@@ -141,7 +127,7 @@ static int yajl_found_string(void * ctx, const unsigned char * stringVal, unsign
 	yajl_check_and_fire_callback(ctx);
 	return 1;
 }
-static int yajl_found_hash_key(void * ctx, const unsigned char * stringVal, unsigned int stringLen) {
+static int yajl_found_hash_key(void * ctx, const unsigned char * stringVal, size_t stringLen) {
 	yajl_parser_wrapper * wrapper;
 	VALUE keyStr;
 #ifdef HAVE_RUBY_ENCODING_H
@@ -223,6 +209,33 @@ static yajl_callbacks callbacks = {
 	yajl_found_end_array
 };
 
+static void yajl_parser_wrapper_free(void *wrapper) {
+	yajl_parser_wrapper *w = wrapper;
+	if (w) {
+		yajl_free(w->parser);
+		free(w);
+	}
+}
+static void yajl_parser_wrapper_mark(void *wrapper) {
+	yajl_parser_wrapper *w = wrapper;
+	if (w) {
+		rb_gc_mark(w->builderStack);
+		rb_gc_mark(w->parse_complete_callback);
+	}
+}
+static VALUE allocate(VALUE klass) {
+	yajl_parser_wrapper *wrapper;
+	VALUE obj;
+
+	wrapper = malloc(sizeof(yajl_parser_wrapper));
+
+	obj = Data_Wrap_Struct(klass, yajl_parser_wrapper_mark, yajl_parser_wrapper_free, wrapper);
+
+	wrapper->parser = yajl_alloc(&callbacks, NULL, (void *)obj);
+
+	return obj;
+}
+
 /*
 * Document-class: Yajl::Parser
 *
@@ -230,51 +243,6 @@ static yajl_callbacks callbacks = {
 * The only basic requirment currently is that the IO object respond to #read(len) and #eof?
 * The IO is parsed until a complete JSON object has been read and a ruby object will be returned.
 */
-/*
-* Document-method: new
-*
-* call-seq: new([:symbolize_keys => true, [:allow_comments => false[, :check_utf8 => false]]])
-*
-* :symbolize_keys will turn hash keys into Ruby symbols, defaults to false.
-*
-* :allow_comments will turn on/off the check for comments inside the JSON stream, defaults to true.
-*
-* :check_utf8 will validate UTF8 characters found in the JSON stream, defaults to true.
-*/
-static VALUE rb_yajl_parser_new(int argc, VALUE * argv, VALUE klass) {
-	yajl_parser_wrapper * wrapper;
-	yajl_parser_config cfg;
-	VALUE opts, obj;
-	int allowComments = 1, checkUTF8 = 1, symbolizeKeys = 0;
-
-		/* Scan off config vars */
-	if (rb_scan_args(argc, argv, "01", &opts) == 1) {
-		Check_Type(opts, T_HASH);
-
-		if (rb_hash_aref(opts, sym_allow_comments) == Qfalse) {
-			allowComments = 0;
-		}
-		if (rb_hash_aref(opts, sym_check_utf8) == Qfalse) {
-			checkUTF8 = 0;
-		}
-		if (rb_hash_aref(opts, sym_symbolize_keys) == Qtrue) {
-			symbolizeKeys = 1;
-		}
-	}
-	cfg = (yajl_parser_config){allowComments, checkUTF8};
-
-	obj = Data_Make_Struct(klass, yajl_parser_wrapper, yajl_parser_wrapper_mark, yajl_parser_wrapper_free, wrapper);
-	wrapper->parser = yajl_alloc(&callbacks, &cfg, NULL, (void *)obj);
-	wrapper->nestedArrayLevel = 0;
-	wrapper->nestedHashLevel = 0;
-	wrapper->objectsFound = 0;
-	wrapper->symbolizeKeys = symbolizeKeys;
-	wrapper->builderStack = rb_ary_new();
-	wrapper->parse_complete_callback = Qnil;
-	rb_obj_call_init(obj, 0, 0);
-	return obj;
-}
-
 /*
 * Document-method: initialize
 *
@@ -284,9 +252,42 @@ static VALUE rb_yajl_parser_new(int argc, VALUE * argv, VALUE klass) {
 *
 * :allow_comments will turn on/off the check for comments inside the JSON stream, defaults to true.
 *
-* :check_utf8 will validate UTF8 characters found in the JSON stream, defaults to true.
+* :check_utf8 will validate UTF-8 characters found in the JSON stream, defaults to true.
 */
 static VALUE rb_yajl_parser_init(int argc, VALUE * argv, VALUE self) {
+	yajl_parser_wrapper * wrapper;
+	VALUE opts;
+	int allowComments = 1, check_utf8 = 1, symbolizeKeys = 0;
+
+	GetParser(self, wrapper);
+
+	/* Scan off config vars */
+	if (rb_scan_args(argc, argv, "01", &opts) == 1) {
+		Check_Type(opts, T_HASH);
+
+		if (rb_hash_aref(opts, sym_allow_comments) == Qfalse) {
+			allowComments = 0;
+		}
+		if (rb_hash_aref(opts, sym_check_utf8) == Qfalse) {
+			check_utf8 = 0;
+		}
+		if (rb_hash_aref(opts, sym_symbolize_keys) == Qtrue) {
+			symbolizeKeys = 1;
+		}
+	}
+
+	yajl_config(wrapper->parser, yajl_allow_comments, allowComments);
+	yajl_config(wrapper->parser, yajl_dont_validate_strings, !check_utf8);
+	yajl_config(wrapper->parser, yajl_allow_trailing_garbage, 1);
+	yajl_config(wrapper->parser, yajl_allow_multiple_values, 1);
+
+	wrapper->nestedArrayLevel = 0;
+	wrapper->nestedHashLevel = 0;
+	wrapper->objectsFound = 0;
+	wrapper->symbolizeKeys = symbolizeKeys;
+	wrapper->builderStack = rb_ary_new();
+	wrapper->parse_complete_callback = Qnil;
+
 	return self;
 }
 /*
@@ -362,7 +363,7 @@ static VALUE rb_yajl_parser_parse(int argc, VALUE * argv, VALUE self) {
 	}
 
 		/* parse any remaining buffered data */
-	stat = yajl_parse_complete(wrapper->parser);
+	stat = yajl_complete_parse(wrapper->parser);
 
 	if (wrapper->parse_complete_callback != Qnil) {
 		yajl_check_and_fire_callback((void *)self);
@@ -406,7 +407,9 @@ void _yajl_ruby_init_parser() {
 	cParseError = rb_define_class_under(mYajl, "ParseError", rb_eStandardError);
 
 	cParser = rb_define_class_under(mYajl, "Parser", rb_cObject);
-	rb_define_singleton_method(cParser, "new", rb_yajl_parser_new, -1);
+
+	rb_define_alloc_func(cParser, allocate);
+
 	rb_define_method(cParser, "initialize", rb_yajl_parser_init, -1);
 	rb_define_method(cParser, "parse", rb_yajl_parser_parse, -1);
 	rb_define_method(cParser, "parse_chunk", rb_yajl_parser_parse_chunk, 1);
