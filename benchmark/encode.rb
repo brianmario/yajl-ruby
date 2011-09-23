@@ -4,7 +4,7 @@ require 'benchmark'
 require 'yajl'
 require 'stringio'
 require 'json'
-require 'psych'
+require 'psych' if RUBY_VERSION =~ /1.9.2/
 require 'active_support'
 
 filename = ARGV[0] || 'benchmark/subjects/ohai.json'
@@ -26,13 +26,11 @@ Benchmark.bmbm { |x|
       output = string_encoder.encode(hash)
     }
   }
-  if defined?(JSON)
-    x.report("JSON.generate") {
-      times.times {
-        JSON.generate(hash)
-      }
+  x.report("JSON.generate") {
+    times.times {
+      JSON.generate(hash)
     }
-  end
+  }
   if defined?(Psych)
     x.report("Psych.to_json") {
       times.times {

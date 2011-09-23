@@ -4,7 +4,7 @@ require 'benchmark'
 require 'yaml'
 require 'yajl'
 require 'json'
-require 'psych'
+require 'psych' if RUBY_VERSION =~ /1.9.2/
 require 'active_support'
 
 filename = ARGV[0] || 'benchmark/subjects/item.json'
@@ -31,24 +31,20 @@ Benchmark.bmbm { |x|
       string_parser.parse(json.read)
     }
   }
-  if defined?(JSON)
-    x.report {
-      puts "JSON.parse"
-      times.times {
-        json.rewind
-        JSON.parse(json.read, :max_nesting => false)
-      }
+  x.report {
+    puts "JSON.parse"
+    times.times {
+      json.rewind
+      JSON.parse(json.read, :max_nesting => false)
     }
-  end
-  if defined?(ActiveSupport::JSON)
-    x.report {
-      puts "ActiveSupport::JSON.decode"
-      times.times {
-        json.rewind
-        ActiveSupport::JSON.decode(json.read)
-      }
+  }
+  x.report {
+    puts "ActiveSupport::JSON.decode"
+    times.times {
+      json.rewind
+      ActiveSupport::JSON.decode(json.read)
     }
-  end
+  }
   x.report {
     puts "YAML.load (from an IO)"
     times.times {
