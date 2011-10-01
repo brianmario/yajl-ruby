@@ -76,7 +76,7 @@ def object_parsed(obj)
 
 def connection_completed
   # once a full JSON object has been parsed from the stream
-  # on_parse_complete will be called, and passed the constructed object
+  # object_parsed will be called, and passed the constructed object
   @parser.on_parse_complete = method(:object_parsed)
 end
 
