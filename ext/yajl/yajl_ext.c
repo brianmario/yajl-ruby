@@ -15,8 +15,4 @@ void Init_yajl() {
 	_yajl_ruby_init_parser();
 
 	intern_call = rb_intern("call");
-
-#ifdef HAVE_RUBY_ENCODING_H
-	utf8Encoding = rb_utf8_encoding();
-#endif
 }

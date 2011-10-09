@@ -118,7 +118,7 @@ static int yajl_found_string(void * ctx, const unsigned char * stringVal, size_t
 	VALUE str = rb_str_new((const char *)stringVal, stringLen);
 #ifdef HAVE_RUBY_ENCODING_H
 	rb_encoding *default_internal_enc = rb_default_internal_encoding();
-	rb_enc_associate(str, utf8Encoding);
+	rb_enc_associate(str, rb_utf8_encoding());
 	if (default_internal_enc) {
 		str = rb_str_export_to_enc(str, default_internal_enc);
 	}
@@ -151,7 +151,7 @@ static int yajl_found_hash_key(void * ctx, const unsigned char * stringVal, size
 	} else {
 		keyStr = rb_str_new((const char *)stringVal, stringLen);
 #ifdef HAVE_RUBY_ENCODING_H
-		rb_enc_associate(keyStr, utf8Encoding);
+		rb_enc_associate(keyStr, rb_utf8_encoding());
 		if (default_internal_enc) {
 			keyStr = rb_str_export_to_enc(keyStr, default_internal_enc);
 		}

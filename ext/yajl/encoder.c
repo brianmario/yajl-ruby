@@ -178,7 +178,7 @@ static VALUE rb_yajl_encoder_init(int argc, VALUE * argv, VALUE self) {
 			indent = rb_hash_aref(opts, sym_indent);
 			if (indent != Qnil) {
 #ifdef HAVE_RUBY_ENCODING_H
-				indent = rb_str_export_to_enc(indent, utf8Encoding);
+				indent = rb_str_export_to_enc(indent, rb_utf8_encoding());
 #endif
 				Check_Type(indent, T_STRING);
 				indentString = (unsigned char*)malloc(RSTRING_LEN(indent)+1);
@@ -205,7 +205,7 @@ static VALUE rb_yajl_encoder_init(int argc, VALUE * argv, VALUE self) {
 		wrapper->terminator = rb_hash_aref(opts, sym_terminator);
 #ifdef HAVE_RUBY_ENCODING_H
 		if (TYPE(wrapper->terminator) == T_STRING) {
-			wrapper->terminator = rb_str_export_to_enc(wrapper->terminator, utf8Encoding);
+			wrapper->terminator = rb_str_export_to_enc(wrapper->terminator, rb_utf8_encoding());
 		}
 #endif
 	} else {
@@ -251,7 +251,7 @@ static VALUE rb_yajl_encoder_encode(int argc, VALUE * argv, VALUE self) {
 	yajl_gen_get_buf(wrapper->encoder, &buffer, &len);
 	outBuff = rb_str_new((const char *)buffer, len);
 #ifdef HAVE_RUBY_ENCODING_H
-	rb_enc_associate(outBuff, utf8Encoding);
+	rb_enc_associate(outBuff, rb_utf8_encoding());
 #endif
 	yajl_gen_clear(wrapper->encoder);
 

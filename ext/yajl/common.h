@@ -12,7 +12,6 @@
 
 #ifdef HAVE_RUBY_ENCODING_H
 #include <ruby/encoding.h>
-static rb_encoding *utf8Encoding;
 #endif
 
 /* Older versions of Ruby (< 1.8.6) need these */
