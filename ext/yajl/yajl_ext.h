@@ -61,8 +61,8 @@ static ID sym_allow_comments, sym_check_utf8, sym_pretty, sym_indent, sym_termin
 #define GetParser(obj, sval) (sval = (yajl_parser_wrapper*)DATA_PTR(obj));
 #define GetEncoder(obj, sval) (sval = (yajl_encoder_wrapper*)DATA_PTR(obj));
 
-inline void yajl_check_and_fire_callback(void * ctx);
-inline void yajl_set_static_value(void * ctx, VALUE val);
+static void yajl_check_and_fire_callback(void * ctx);
+static void yajl_set_static_value(void * ctx, VALUE val);
 void yajl_encode_part(void * wrapper, VALUE obj, VALUE io);
 void yajl_parse_chunk(const unsigned char * chunk, unsigned int len, yajl_handle parser);
 
