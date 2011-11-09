@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.1.0 (November 9th, 2011)
+* fix compilation due to a "bug" in gcc-llvm on 10.7.2
+* fix gemspec so ruby 1.8.6 or later is required
+*
+
 ## 1.0.0 (September 13th, 2011)
 * add deprecation notice for Yajl's Bzip2 support
 * add deprecation notice for Yajl's Deflate support
