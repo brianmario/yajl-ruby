@@ -1,5 +1,3 @@
-puts "DEPRECATION WARNING: Yajl's JSON gem compatibility API is going to be removed in 2.0"
-
 require 'yajl' unless defined?(Yajl::Parser)
 require 'yajl/json_gem/parsing'
 require 'yajl/json_gem/encoding'
