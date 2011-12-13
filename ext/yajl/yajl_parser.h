@@ -70,10 +70,12 @@ struct yajl_handle_t {
     yajl_alloc_funcs alloc;
 };
 
+YAJL_API
 yajl_status
 yajl_do_parse(yajl_handle handle, const unsigned char * jsonText,
               unsigned int jsonTextLen);
 
+YAJL_API
 unsigned char *
 yajl_render_error_string(yajl_handle hand, const unsigned char * jsonText,
                          unsigned int jsonTextLen, int verbose);

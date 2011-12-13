@@ -50,24 +50,31 @@
 typedef struct yajl_buf_t * yajl_buf;
 
 /* allocate a new buffer */
+YAJL_API
 yajl_buf yajl_buf_alloc(yajl_alloc_funcs * alloc);
 
 /* free the buffer */
+YAJL_API
 void yajl_buf_free(yajl_buf buf);
 
 /* append a number of bytes to the buffer */
+YAJL_API
 void yajl_buf_append(yajl_buf buf, const void * data, unsigned int len);
 
 /* empty the buffer */
+YAJL_API
 void yajl_buf_clear(yajl_buf buf);
 
 /* get a pointer to the beginning of the buffer */
+YAJL_API
 const unsigned char * yajl_buf_data(yajl_buf buf);
 
 /* get the length of the buffer */
+YAJL_API
 unsigned int yajl_buf_len(yajl_buf buf);
 
 /* truncate the buffer */
+YAJL_API
 void yajl_buf_truncate(yajl_buf buf, unsigned int len);
 
 #endif
