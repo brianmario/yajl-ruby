@@ -50,7 +50,7 @@ extern "C" {
 #  endif
 #else
 #  if defined(__GNUC__) && (__GNUC__ * 100 + __GNUC_MINOR__) >= 303
-#    define YAJL_API __attribute__ ((visibility("default")))
+#    define YAJL_API __attribute__ ((visibility("hidden")))
 #  else
 #    define YAJL_API
 #  endif

@@ -63,12 +63,16 @@ typedef enum {
 
 typedef struct yajl_lexer_t * yajl_lexer;
 
+
+YAJL_API
 yajl_lexer yajl_lex_alloc(yajl_alloc_funcs * alloc,
                           unsigned int allowComments,
                           unsigned int validateUTF8);
 
+YAJL_API
 yajl_lexer yajl_lex_realloc(yajl_lexer orig);
 
+YAJL_API
 void yajl_lex_free(yajl_lexer lexer);
 
 /**
@@ -93,11 +97,13 @@ n * error messages.
  * implications which require that the client choose a reasonable chunk
  * size to get adequate performance.
  */
+YAJL_API
 yajl_tok yajl_lex_lex(yajl_lexer lexer, const unsigned char * jsonText,
                       unsigned int jsonTextLen, unsigned int * offset,
                       const unsigned char ** outBuf, unsigned int * outLen);
 
 /** have a peek at the next token, but don't move the lexer forward */
+YAJL_API
 yajl_tok yajl_lex_peek(yajl_lexer lexer, const unsigned char * jsonText,
                        unsigned int jsonTextLen, unsigned int offset);
 
@@ -116,20 +122,25 @@ typedef enum {
     yajl_lex_unallowed_comment
 } yajl_lex_error;
 
+YAJL_API
 const char * yajl_lex_error_to_string(yajl_lex_error error);
 
 /** allows access to more specific information about the lexical
  *  error when yajl_lex_lex returns yajl_tok_error. */
+YAJL_API
 yajl_lex_error yajl_lex_get_error(yajl_lexer lexer);
 
 /** get the current offset into the most recently lexed json string. */
+YAJL_API
 unsigned int yajl_lex_current_offset(yajl_lexer lexer);
 
 /** get the number of lines lexed by this lexer instance */
+YAJL_API
 unsigned int yajl_lex_current_line(yajl_lexer lexer);
 
 /** get the number of chars lexed by this lexer instance since the last
  *  \n or \r */
+YAJL_API
 unsigned int yajl_lex_current_char(yajl_lexer lexer);
 
 #endif
