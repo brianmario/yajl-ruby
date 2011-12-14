@@ -45,6 +45,7 @@
 #define YA_FREE(afs, ptr) (afs)->free((afs)->ctx, (ptr))
 #define YA_REALLOC(afs, ptr, sz) (afs)->realloc((afs)->ctx, (ptr), (sz))
 
+YAJL_API
 void yajl_set_default_alloc_funcs(yajl_alloc_funcs * yaf);
 
 #endif

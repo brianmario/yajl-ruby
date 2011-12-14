@@ -133,7 +133,7 @@ extern "C" {
                                     void * ctx);
     
     /** allow resetting of the lexer without the need to realloc a new parser */
-    void yajl_reset_parser(yajl_handle hand);
+    YAJL_API void yajl_reset_parser(yajl_handle hand);
 
     /** free a parser handle */    
     YAJL_API void yajl_free(yajl_handle handle);
