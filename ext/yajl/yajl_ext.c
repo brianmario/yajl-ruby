@@ -96,10 +96,10 @@ static void yajl_encoder_wrapper_free(void * wrapper) {
     yajl_encoder_wrapper * w = wrapper;
     if (w) {
         if (w->indentString) {
-          free(w->indentString);
+          xfree(w->indentString);
         }
         yajl_gen_free(w->encoder);
-        free(w);
+        xfree(w);
     }
 }
 
@@ -206,7 +206,7 @@ void yajl_parser_wrapper_free(void * wrapper) {
     yajl_parser_wrapper * w = wrapper;
     if (w) {
         yajl_free(w->parser);
-        free(w);
+        xfree(w);
     }
 }
 
@@ -574,7 +574,7 @@ static VALUE rb_yajl_encoder_new(int argc, VALUE * argv, VALUE klass) {
                 indent = rb_str_export_to_enc(indent, utf8Encoding);
 #endif
                 Check_Type(indent, T_STRING);
-                indentString = (unsigned char*)malloc(RSTRING_LEN(indent)+1);
+                indentString = (unsigned char*)xmalloc(RSTRING_LEN(indent)+1);
                 memcpy(indentString, RSTRING_PTR(indent), RSTRING_LEN(indent));
                 indentString[RSTRING_LEN(indent)] = '\0';
                 actualIndent = indentString;
