@@ -55,8 +55,11 @@ static rb_encoding *utf8Encoding;
 
 static VALUE cParseError, cEncodeError, mYajl, cParser, cEncoder;
 static ID intern_io_read, intern_call, intern_keys, intern_to_s,
-            intern_to_json, intern_has_key, intern_to_sym, intern_as_json;
-static ID sym_allow_comments, sym_check_utf8, sym_pretty, sym_indent, sym_terminator, sym_symbolize_keys, sym_html_safe;
+            intern_to_json, intern_has_key, intern_to_sym, intern_as_json, 
+            intern_to_i;
+static ID sym_allow_comments, sym_check_utf8, sym_pretty, sym_indent, 
+            sym_terminator, sym_symbolize_keys, sym_html_safe, 
+            sym_process_nested_callback, sym_nested_callback_depth;
 
 #define GetParser(obj, sval) (sval = (yajl_parser_wrapper*)DATA_PTR(obj));
 #define GetEncoder(obj, sval) (sval = (yajl_encoder_wrapper*)DATA_PTR(obj));
@@ -93,10 +96,13 @@ static yajl_callbacks callbacks = {
 typedef struct {
     VALUE builderStack;
     VALUE parse_complete_callback;
+    VALUE parse_nested_callback;
     int nestedArrayLevel;
     int nestedHashLevel;
     int objectsFound;
     int symbolizeKeys;
+    int processNestedCallback;
+    int nestedCallbackDepth;
     yajl_handle parser;
 } yajl_parser_wrapper;
 
@@ -112,6 +118,7 @@ static VALUE rb_yajl_parser_init(int argc, VALUE * argv, VALUE self);
 static VALUE rb_yajl_parser_parse(int argc, VALUE * argv, VALUE self);
 static VALUE rb_yajl_parser_parse_chunk(VALUE self, VALUE chunk);
 static VALUE rb_yajl_parser_set_complete_cb(VALUE self, VALUE callback);
+static VALUE rb_yajl_parser_set_nested_cb(VALUE self, VALUE callback);
 static void yajl_parser_wrapper_free(void * wrapper);
 static void yajl_parser_wrapper_mark(void * wrapper);
 
