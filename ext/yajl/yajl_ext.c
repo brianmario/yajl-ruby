@@ -384,7 +384,7 @@ static VALUE rb_yajl_parser_new(int argc, VALUE * argv, VALUE klass) {
         if (rb_hash_aref(opts, sym_check_utf8) == Qfalse) {
             checkUTF8 = 0;
         }
-        if (rb_hash_aref(opts, sym_symbolize_keys) == Qtrue) {
+        if (rb_hash_aref(opts, sym_symbolize_keys) == Qtrue || rb_hash_aref(opts, sym_symbolize_names) == Qtrue) {
             symbolizeKeys = 1;
         }
     }
@@ -898,6 +898,7 @@ void Init_yajl() {
     sym_html_safe = ID2SYM(rb_intern("html_safe"));
     sym_terminator = ID2SYM(rb_intern("terminator"));
     sym_symbolize_keys = ID2SYM(rb_intern("symbolize_keys"));
+    sym_symbolize_names = ID2SYM(rb_intern("symbolize_names"));
 
 #ifdef HAVE_RUBY_ENCODING_H
     utf8Encoding = rb_utf8_encoding();
