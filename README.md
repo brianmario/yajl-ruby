@@ -157,7 +157,6 @@ This allows you to encode JSON as a stream, writing directly to a socket
 ``` ruby
 socket = TCPSocket.new('192.168.1.101', 9000)
 hash = {:foo => 12425125, :bar => "some string", ... }
-encoder = Yajl::Encoder.new
 Yajl::Encoder.encode(hash, socket)
 ```
 
