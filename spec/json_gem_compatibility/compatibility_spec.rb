@@ -51,6 +51,10 @@ describe "JSON Gem compatability API" do
     JSON.default_options[:symbolize_keys] = default # ensure the rest of the test cases expect the default
   end
 
+  it "should also allow the json gem's symbolize_names key" do
+    JSON.parse('{"foo": 1234}', :symbolize_names => true).should === {:foo => 1234}
+  end
+
   it "should encode arbitrary classes via their default to_json method" do
     d = Dummy.new
     d.to_json.should == "\"#{d.to_s}\""
