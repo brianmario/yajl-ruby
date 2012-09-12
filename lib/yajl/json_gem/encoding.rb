@@ -17,17 +17,16 @@ module JSON
   class JSONError < StandardError; end unless defined?(JSON::JSONError)
   class GeneratorError < JSONError; end unless defined?(JSON::GeneratorError)
 
-  def self.generate(obj, opts={})
-    begin
-      options_map = {}
-      if opts.has_key?(:indent)
-        options_map[:pretty] = true
-        options_map[:indent] = opts[:indent]
-      end
-      Yajl::Encoder.encode(obj, options_map)
-    rescue Yajl::EncodeError => e
-      raise JSON::GeneratorError, e.message
+  def self.generate(obj, opts=nil)
+    opts ||= {}
+    options_map = {}
+    if opts.has_key?(:indent)
+      options_map[:pretty] = true
+      options_map[:indent] = opts[:indent]
     end
+    Yajl::Encoder.encode(obj, options_map)
+  rescue Yajl::EncodeError => e
+    raise JSON::GeneratorError, e.message
   end
 
   def self.pretty_generate(obj, opts={})
