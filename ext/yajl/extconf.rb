@@ -4,8 +4,14 @@ require 'mkmf'
 $CFLAGS << " -Wall"
 $CFLAGS << ' -Wextra -O0 -ggdb3' if ENV['DEBUG']
 
+def find_yajl_headers(path)
+  ['yajl_gen.h', 'yajl_parse.h'].each do |header|
+    find_header(header, path)
+  end
+end
+
 if have_library("yajl", nil, 'yajl/yajl_common.h')
-  find_header("yajl_common.h", File.join($hdrdir, 'yajl'))
+  find_yajl_headers(File.join($hdrdir, 'yajl'))
 else
   yajl_dir = File.join($srcdir, 'vendor')
 
@@ -15,7 +21,7 @@ else
   $INCFLAGS << " -I#{yajl_dir}"
   $VPATH << "$(srcdir)/vendor"
 
-  find_header("yajl_common.h", File.join(yajl_dir, 'api'))
+  find_yajl_headers(File.join(yajl_dir, 'api'))
 end
 
 create_makefile('yajl/yajl')
