@@ -1,5 +1,5 @@
 #include "common.h"
-#include "api/yajl_gen.h"
+#include "yajl_gen.h"
 
 #define WRITE_BUFSIZE 8192
 #define GetEncoder(obj, sval) (sval = (yajl_encoder_wrapper*)DATA_PTR(obj));

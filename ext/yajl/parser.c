@@ -1,5 +1,5 @@
 #include "common.h"
-#include "api/yajl_parse.h"
+#include "yajl_parse.h"
 
 #define READ_BUFSIZE 8192
 #define GetParser(obj, sval) (sval = (yajl_parser_wrapper*)DATA_PTR(obj));
