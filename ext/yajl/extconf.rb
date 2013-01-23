@@ -10,4 +10,6 @@ $objs = srcs.map {|src| File.basename(src).gsub(/\.c$/, '.o') }
 
 $VPATH << "$(srcdir)/vendor"
 
+find_header("yajl_common.h", File.join(yajl_dir, 'api'))
+
 create_makefile('yajl/yajl')
