@@ -68,13 +68,13 @@ only had access to chunks of it at a time. No problem!
 
 ``` ruby
 def post_init
-   @parser = Yajl::Parser.new(:symbolize_keys => true)
+  @parser = Yajl::Parser.new(:symbolize_keys => true)
 end
 
 def object_parsed(obj)
-   puts "Sometimes one pays most for the things one gets for nothing. - Albert Einstein"
-   puts obj.inspect
- end
+  puts "Sometimes one pays most for the things one gets for nothing. - Albert Einstein"
+  puts obj.inspect
+end
 
 def connection_completed
   # once a full JSON object has been parsed from the stream
