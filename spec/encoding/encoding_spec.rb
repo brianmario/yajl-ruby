@@ -1,5 +1,7 @@
 # encoding: UTF-8
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+require 'tmpdir'
+require 'zlib'
 
 class Dummy2
   def to_json
@@ -23,7 +25,7 @@ describe "Yajl JSON encoder" do
   FILES = Dir[File.dirname(__FILE__)+'/../../benchmark/subjects/*.json']
 
   FILES.each do |file|
-     it "should encode #{File.basename(file)} to an IO" do
+     it "should encode #{File.basename(file)} to an StringIO" do
        # we don't care about testing the stream subject as it has multiple JSON strings in it
        if File.basename(file) != 'twitter_stream.json'
          input = File.new(File.expand_path(file), 'r')
@@ -37,6 +39,27 @@ describe "Yajl JSON encoder" do
          input.close
          hash.should == hash2
        end
+     end
+   end
+
+   FILES.each do |file|
+     it "should encode #{File.basename(file)} to a Zlib::GzipWriter" do
+      # we don't care about testing the stream subject as it has multiple JSON strings in it
+      if File.basename(file) != 'twitter_stream.json'
+         hash = File.open(File.expand_path(file), 'r') do |input|
+            Yajl::Parser.parse(input)
+         end
+         hash2 = Dir.mktmpdir do |tmp_dir|
+            output_filename = File.join(tmp_dir, 'output.json')
+            Zlib::GzipWriter.open(output_filename) do |writer|
+               Yajl::Encoder.encode(hash, writer)
+            end
+            Zlib::GzipReader.open(output_filename) do |reader|
+               Yajl::Parser.parse(reader.read)
+            end
+         end
+         hash.should == hash2
+      end
      end
    end
 

@@ -65,7 +65,7 @@ module Yajl
       args.each do |arg|
         if arg.is_a?(Hash)
           options = arg
-        elsif arg.respond_to?(:read)
+        elsif arg.respond_to?(:write)
           io = arg
         end
       end if args.any?
