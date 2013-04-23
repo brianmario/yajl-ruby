@@ -245,7 +245,7 @@ static int yajl_found_boolean(void * ctx, int boolean) {
 }
 
 static int yajl_found_number(void * ctx, const char * numberVal, unsigned int numberLen) {
-    char buf[numberLen+1];
+    char *buf = ruby_xmalloc(numberLen+1);
     buf[numberLen] = 0;
     memcpy(buf, numberVal, numberLen);
 
@@ -256,6 +256,7 @@ static int yajl_found_number(void * ctx, const char * numberVal, unsigned int nu
     } else {
         yajl_set_static_value(ctx, rb_cstr2inum(buf, 10));
     }
+    ruby_xfree(buf);
     return 1;
 }
 
@@ -285,15 +286,17 @@ static int yajl_found_hash_key(void * ctx, const unsigned char * stringVal, unsi
 #endif
 
     if (wrapper->symbolizeKeys) {
-        char buf[stringLen+1];
+        VALUE stringEncoded;
+        char *buf = ruby_xmalloc(stringLen+1);
         memcpy(buf, stringVal, stringLen);
         buf[stringLen] = 0;
-        VALUE stringEncoded = rb_str_new2(buf);
+        stringEncoded = rb_str_new2(buf);
 #ifdef HAVE_RUBY_ENCODING_H
         rb_enc_associate(stringEncoded, rb_utf8_encoding());
 #endif
 
         yajl_set_static_value(ctx, ID2SYM(rb_to_id(stringEncoded)));
+        ruby_xfree(buf);
     } else {
         keyStr = rb_str_new((const char *)stringVal, stringLen);
 #ifdef HAVE_RUBY_ENCODING_H
@@ -388,7 +391,8 @@ static VALUE rb_yajl_parser_new(int argc, VALUE * argv, VALUE klass) {
             symbolizeKeys = 1;
         }
     }
-    cfg = (yajl_parser_config){allowComments, checkUTF8};
+    cfg.allowComments = allowComments;
+    cfg.checkUTF8 = checkUTF8;
 
     obj = Data_Make_Struct(klass, yajl_parser_wrapper, yajl_parser_wrapper_mark, yajl_parser_wrapper_free, wrapper);
     wrapper->parser = yajl_alloc(&callbacks, &cfg, NULL, (void *)obj);
@@ -587,7 +591,9 @@ static VALUE rb_yajl_encoder_new(int argc, VALUE * argv, VALUE klass) {
     if (!indentString) {
       indentString = defaultIndentString;
     }
-    cfg = (yajl_gen_config){beautify, (const char *)indentString, htmlSafe};
+    cfg.beautify = beautify;
+    cfg.indentString = (const char *)indentString;
+    cfg.htmlSafe = htmlSafe;
 
     obj = Data_Make_Struct(klass, yajl_encoder_wrapper, yajl_encoder_wrapper_mark, yajl_encoder_wrapper_free, wrapper);
     wrapper->indentString = actualIndent;
