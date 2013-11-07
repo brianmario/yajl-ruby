@@ -37,7 +37,7 @@
 extern "C" {
 #endif    
 
-#define YAJL_MAX_DEPTH 128
+#define YAJL_MAX_DEPTH 256
 
 /* msft dll export gunk.  To build a DLL on windows, you
  * must define WIN32, YAJL_SHARED, and YAJL_BUILD.  To use a shared
