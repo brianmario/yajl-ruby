@@ -294,4 +294,22 @@ describe "Yajl JSON encoder" do
       Yajl::Encoder.encode(TheMindKillerDuce.new)
     }.should raise_error(TypeError)
   end
+
+  it "should raise an exception for deeply nested arrays" do
+    root = []
+    a = root
+    (Yajl::MAX_DEPTH + 1).times { |_| a << []; a = a[0] }
+    lambda {
+      Yajl::Encoder.encode(root)
+    }.should raise_error(Yajl::EncodeError)
+  end
+
+  it "should raise an exception for deeply nested hashes" do
+    root = {}
+    a = root
+    (Yajl::MAX_DEPTH + 1).times { |_| a["a"] = {}; a = a["a"] }
+    lambda {
+      Yajl::Encoder.encode(root)
+    }.should raise_error(Yajl::EncodeError)
+  end
 end

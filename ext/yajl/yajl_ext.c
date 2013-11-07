@@ -54,6 +54,25 @@ static void yajl_check_and_fire_callback(void * ctx) {
     }
 }
 
+static char *yajl_raise_encode_error_for_status(yajl_gen_status status, VALUE obj) {
+    switch (status) {
+        case yajl_gen_keys_must_be_strings:
+            rb_raise(cEncodeError, "YAJL internal error: attempted use of non-string object as key");
+        case yajl_max_depth_exceeded:
+            rb_raise(cEncodeError, "Max nesting depth of %d exceeded", YAJL_MAX_DEPTH);
+        case yajl_gen_in_error_state:
+            rb_raise(cEncodeError, "YAJL internal error: a generator function (yajl_gen_XXX) was called while in an error state");
+        case yajl_gen_generation_complete:
+            rb_raise(cEncodeError, "YAJL internal error: attempted to encode to an already-complete document");
+        case yajl_gen_invalid_number:
+            rb_raise(cEncodeError, "Invalid number: cannot encode Infinity, -Infinity, or NaN");
+        case yajl_gen_no_buf:
+            rb_raise(cEncodeError, "YAJL internal error: yajl_gen_get_buf was called, but a print callback was specified, so no internal buffer is available");
+        default:
+            return NULL;
+    }
+}
+
 static void yajl_set_static_value(void * ctx, VALUE val) {
     yajl_parser_wrapper * wrapper;
     VALUE lastEntry, hash;
@@ -111,6 +130,9 @@ static void yajl_encoder_wrapper_mark(void * wrapper) {
     }
 }
 
+#define CHECK_STATUS(call) \
+    if ((status = (call)) != yajl_gen_status_ok) { break; }
+
 void yajl_encode_part(void * wrapper, VALUE obj, VALUE io) {
     VALUE str, outBuff, otherObj;
     yajl_encoder_wrapper * w = wrapper;
@@ -123,6 +145,9 @@ void yajl_encode_part(void * wrapper, VALUE obj, VALUE io) {
 
     if (io != Qnil || w->on_progress_callback != Qnil) {
         status = yajl_gen_get_buf(w->encoder, &buffer, &len);
+        if (status != yajl_gen_status_ok) {
+            yajl_raise_encode_error_for_status(status, obj);
+        }
         if (len >= WRITE_BUFSIZE) {
             outBuff = rb_str_new((const char *)buffer, len);
             if (io != Qnil) {
@@ -136,7 +161,7 @@ void yajl_encode_part(void * wrapper, VALUE obj, VALUE io) {
 
     switch (TYPE(obj)) {
         case T_HASH:
-            status = yajl_gen_map_open(w->encoder);
+            CHECK_STATUS(yajl_gen_map_open(w->encoder));
 
             /* TODO: itterate through keys in the hash */
             keys = rb_funcall(obj, intern_keys, 0);
@@ -149,24 +174,24 @@ void yajl_encode_part(void * wrapper, VALUE obj, VALUE io) {
                 yajl_encode_part(w, rb_hash_aref(obj, entry), io);
             }
 
-            status = yajl_gen_map_close(w->encoder);
+            CHECK_STATUS(yajl_gen_map_close(w->encoder));
             break;
         case T_ARRAY:
-            status = yajl_gen_array_open(w->encoder);
+            CHECK_STATUS(yajl_gen_array_open(w->encoder));
             for(idx=0; idx<RARRAY_LEN(obj); idx++) {
                 otherObj = rb_ary_entry(obj, idx);
                 yajl_encode_part(w, otherObj, io);
             }
-            status = yajl_gen_array_close(w->encoder);
+            CHECK_STATUS(yajl_gen_array_close(w->encoder));
             break;
         case T_NIL:
-            status = yajl_gen_null(w->encoder);
+            CHECK_STATUS(yajl_gen_null(w->encoder));
             break;
         case T_TRUE:
-            status = yajl_gen_bool(w->encoder, 1);
+            CHECK_STATUS(yajl_gen_bool(w->encoder, 1));
             break;
         case T_FALSE:
-            status = yajl_gen_bool(w->encoder, 0);
+            CHECK_STATUS(yajl_gen_bool(w->encoder, 0));
             break;
         case T_FIXNUM:
         case T_FLOAT:
@@ -177,12 +202,12 @@ void yajl_encode_part(void * wrapper, VALUE obj, VALUE io) {
             if (memcmp(cptr, "NaN", 3) == 0 || memcmp(cptr, "Infinity", 8) == 0 || memcmp(cptr, "-Infinity", 9) == 0) {
                 rb_raise(cEncodeError, "'%s' is an invalid number", cptr);
             }
-            status = yajl_gen_number(w->encoder, cptr, len);
+            CHECK_STATUS(yajl_gen_number(w->encoder, cptr, len));
             break;
         case T_STRING:
             cptr = RSTRING_PTR(obj);
             len = RSTRING_LEN(obj);
-            status = yajl_gen_string(w->encoder, (const unsigned char *)cptr, len);
+            CHECK_STATUS(yajl_gen_string(w->encoder, (const unsigned char *)cptr, len));
             break;
         default:
             if (rb_respond_to(obj, intern_to_json)) {
@@ -190,15 +215,20 @@ void yajl_encode_part(void * wrapper, VALUE obj, VALUE io) {
                 Check_Type(str, T_STRING);
                 cptr = RSTRING_PTR(str);
                 len = RSTRING_LEN(str);
-                status = yajl_gen_number(w->encoder, cptr, len);
+                CHECK_STATUS(yajl_gen_number(w->encoder, cptr, len));
             } else {
                 str = rb_funcall(obj, intern_to_s, 0);
                 Check_Type(str, T_STRING);
                 cptr = RSTRING_PTR(str);
                 len = RSTRING_LEN(str);
-                status = yajl_gen_string(w->encoder, (const unsigned char *)cptr, len);
+                CHECK_STATUS(yajl_gen_string(w->encoder, (const unsigned char *)cptr, len));
             }
             break;
+    }
+
+    if (status != yajl_gen_status_ok) {
+        yajl_raise_encode_error_for_status(status, obj);
+        rb_raise(cEncodeError, "Encountered unknown YAJL status %d during JSON generation", status);
     }
 }
 
@@ -862,6 +892,8 @@ static VALUE rb_yajl_encoder_enable_json_gem_ext(VALUE klass) {
 /* Ruby Extension initializer */
 void Init_yajl() {
     mYajl = rb_define_module("Yajl");
+
+    rb_define_const(mYajl, "MAX_DEPTH", INT2NUM(YAJL_MAX_DEPTH));
 
     cParseError = rb_define_class_under(mYajl, "ParseError", rb_eStandardError);
     cEncodeError = rb_define_class_under(mYajl, "EncodeError", rb_eStandardError);
