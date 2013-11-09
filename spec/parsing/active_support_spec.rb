@@ -38,7 +38,7 @@ describe "ActiveSupport test cases" do
     it "should be able to parse #{json} as an IO" do
       lambda {
         Yajl::Parser.parse(StringIO.new(json)).should == expected
-      }.should_not raise_error(Yajl::ParseError)
+      }.should_not raise_error
     end
   end
 
@@ -46,7 +46,7 @@ describe "ActiveSupport test cases" do
     it "should be able to parse #{json} as a string" do
       lambda {
         Yajl::Parser.parse(json).should == expected
-      }.should_not raise_error(Yajl::ParseError)
+      }.should_not raise_error
     end
   end
 

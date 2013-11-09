@@ -20,7 +20,7 @@ describe "One-off JSON examples" do
     json = StringIO.new('{"key": /* this is a comment */ "value"}')
     lambda {
       Yajl::Parser.parse(json, :allow_comments => true)
-    }.should_not raise_error(Yajl::ParseError)
+    }.should_not raise_error
   end
 
   it "should not parse invalid UTF8 with :check_utf8 set to true" do

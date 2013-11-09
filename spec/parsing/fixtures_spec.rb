@@ -26,7 +26,7 @@ describe "Parsing JSON Fixtures" do
     it "should be able to parse #{File.basename(name)} as an IO" do
         lambda {
           Yajl::Parser.parse(StringIO.new(source))
-        }.should_not raise_error(Yajl::ParseError)
+        }.should_not raise_error
     end
   end
 
@@ -34,7 +34,7 @@ describe "Parsing JSON Fixtures" do
     it "should be able to parse #{File.basename(name)} as a string" do
         lambda {
           Yajl::Parser.parse(source)
-        }.should_not raise_error(Yajl::ParseError)
+        }.should_not raise_error
     end
   end
 end

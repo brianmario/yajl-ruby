@@ -67,7 +67,7 @@ describe "Chunked parser" do
     @callback.should_receive(:call).exactly(430).times
     lambda {
       @parser.parse(json)
-    }.should_not raise_error(Yajl::ParseError)
+    }.should_not raise_error
   end
 
   it "should parse twitter_stream.json and fire callback 430 times, with a block as the callback" do
@@ -81,7 +81,7 @@ describe "Chunked parser" do
         times += 1
       end
       times.should eql(430)
-    }.should_not raise_error(Yajl::ParseError)
+    }.should_not raise_error
   end
 
   it "should raise a Yajl::ParseError error if multiple JSON strings were found when no on_parse_complete callback assigned" do
