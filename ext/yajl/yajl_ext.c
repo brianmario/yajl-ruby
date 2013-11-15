@@ -275,7 +275,7 @@ static int yajl_found_boolean(void * ctx, int boolean) {
 }
 
 static int yajl_found_number(void * ctx, const char * numberVal, unsigned int numberLen) {
-    char buf[numberLen+1];
+    char* buf = (char*)malloc(numberLen + 1);
     buf[numberLen] = 0;
     memcpy(buf, numberVal, numberLen);
 
@@ -286,6 +286,7 @@ static int yajl_found_number(void * ctx, const char * numberVal, unsigned int nu
     } else {
         yajl_set_static_value(ctx, rb_cstr2inum(buf, 10));
     }
+    free(buf);
     return 1;
 }
 
