@@ -316,10 +316,11 @@ static int yajl_found_hash_key(void * ctx, const unsigned char * stringVal, unsi
 #endif
 
     if (wrapper->symbolizeKeys) {
-        char buf[stringLen+1];
+        char* buf = (char*)malloc(stringLen+1);
         memcpy(buf, stringVal, stringLen);
         buf[stringLen] = 0;
         VALUE stringEncoded = rb_str_new2(buf);
+        free(buf);
 #ifdef HAVE_RUBY_ENCODING_H
         rb_enc_associate(stringEncoded, rb_utf8_encoding());
 #endif
