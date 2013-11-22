@@ -9,13 +9,6 @@ describe 'Parsing very long text' do
     end
   end
 
-  context 'when parsing big integers' do
-    include_examples('running script successfully', <<-EOS)
-require "yajl"
-Yajl::Parser.parse('[' + '1' * 2**23 + ']')
-    EOS
-  end
-
   context 'when parseing big floats' do
     include_examples('running script successfully', <<-EOS)
 require "yajl"
