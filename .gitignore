@@ -10,3 +10,4 @@ pkg/*
 vendor/gems
 Gemfile.lock
 .rbx
+bin/
