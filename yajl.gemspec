@@ -1,7 +1,7 @@
 require './lib/yajl/version'
 
 Gem::Specification.new do |s|
-  s.name = %q{yajl-ruby}
+  s.name = %q{yajl}
   s.version = Yajl::VERSION
   s.license = "MIT"
   s.authors = ["Brian Lopez", "Lloyd Hilaiel"]
