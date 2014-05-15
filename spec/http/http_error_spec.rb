@@ -23,10 +23,10 @@ describe "Yajl HTTP error" do
   end
 
   it "should contain the error code in the message" do
-    @error.message.should match(/404/)
+    expect(@error.message).to match(/404/)
   end
 
   it "should provide the HTTP response headers" do
-    @error.headers.keys.should include('ETag', 'Content-Length', 'Server')
+    expect(@error.headers.keys).to include('ETag', 'Content-Length', 'Server')
   end
 end
