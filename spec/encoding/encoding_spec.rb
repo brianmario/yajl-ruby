@@ -312,4 +312,20 @@ describe "Yajl JSON encoder" do
       Yajl::Encoder.encode(root)
     }.should raise_error(Yajl::EncodeError)
   end
+
+  it "should sort keys when asked to" do
+    a = {}
+    a["z"] = 1
+    a["a"] = 2
+
+    Yajl::Encoder.encode(a, :sort_keys=> true).should eql(%({"a":2,"z":1}))
+  end
+  it "should not sort keys when not asked to" do
+    a = {}
+    a["z"] = 1
+    a["a"] = 2
+
+    Yajl::Encoder.encode(a).should eql(%({"z":1,"a":2}))
+  end
+
 end
