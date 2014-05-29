@@ -44,12 +44,6 @@ describe "One-off JSON examples" do
     Yajl::Parser.parse('{"key": 1234}', :symbolize_keys => true).should == {:key => 1234}
   end
 
-  it "should parse using it's class method, from a string with symbolized keys, and associate utf-8 to the symbol's encoding" do
-    parsed = Yajl::Parser.parse('{"曦": 1234}', :symbolize_keys => true)
-
-    parsed.keys.fetch(0).encoding.should == Encoding::UTF_8
-  end
-
   it "should parse using it's class method, from a utf-8 string with multibyte characters, with symbolized keys" do
     Yajl::Parser.parse('{"日本語": 1234}', :symbolize_keys => true).should == {:"日本語" => 1234}
   end
@@ -73,6 +67,11 @@ describe "One-off JSON examples" do
   end
 
   if RUBY_VERSION =~ /^1.9/
+    it "should encode non-ascii symbols in utf-8" do
+      parsed = Yajl::Parser.parse('{"曦": 1234}', :symbolize_keys => true)
+      parsed.keys.fetch(0).encoding.should eq(Encoding::UTF_8)
+    end
+
     it "should return strings and hash keys in utf-8 if Encoding.default_internal is nil" do
       Encoding.default_internal = nil
       Yajl::Parser.parse('{"key": "value"}').keys.first.encoding.should eql(Encoding.find('utf-8'))
