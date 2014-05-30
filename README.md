@@ -25,6 +25,12 @@ Go ahead and install it as usual:
 gem install yajl-ruby
 ```
 
+Or use your Gemfile:
+
+``` ruby
+gem 'yajl-ruby', require: 'yajl'
+```
+
 ## Example of use
 
 NOTE: I'm building up a collection of small examples in the examples (http://github.com/brianmario/yajl-ruby/tree/master/examples) folder.
