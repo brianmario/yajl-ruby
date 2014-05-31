@@ -316,12 +316,13 @@ static int yajl_found_hash_key(void * ctx, const unsigned char * stringVal, unsi
 #endif
 
     if (wrapper->symbolizeKeys) {
-        VALUE stringEncoded = rb_str_new((const char *)stringVal, stringLen);
 #ifdef HAVE_RUBY_ENCODING_H
-        rb_enc_associate(stringEncoded, rb_utf8_encoding());
+        ID id = rb_intern3((const char *)stringVal, stringLen, utf8Encoding);
+        keyStr = ID2SYM(id);
+#else
+        VALUE str = rb_str_new((const char *)stringVal, stringLen);
+        keyStr = rb_str_intern(str);
 #endif
-
-        yajl_set_static_value(ctx, rb_str_intern(stringEncoded));
     } else {
         keyStr = rb_str_new((const char *)stringVal, stringLen);
 #ifdef HAVE_RUBY_ENCODING_H
@@ -330,8 +331,8 @@ static int yajl_found_hash_key(void * ctx, const unsigned char * stringVal, unsi
           keyStr = rb_str_export_to_enc(keyStr, default_internal_enc);
         }
 #endif
-        yajl_set_static_value(ctx, keyStr);
     }
+    yajl_set_static_value(ctx, keyStr);
     yajl_check_and_fire_callback(ctx);
     return 1;
 }
