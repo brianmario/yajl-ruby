@@ -17,7 +17,7 @@ Gem::Specification.new do |s|
 
   # tests
   s.add_development_dependency 'rake-compiler', ">= 0.7.5"
-  s.add_development_dependency 'rspec', ">= 2.0.0"
+  s.add_development_dependency 'rspec', "~> 2.14"
   # benchmarks
   s.add_development_dependency 'activesupport', '~> 3.1.2'
   s.add_development_dependency 'json'
