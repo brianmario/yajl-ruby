@@ -192,7 +192,7 @@ describe "JSON Gem compatability API" do
       it "should be able to parse #{File.basename(name)} as an IO" do
           lambda {
             JSON.parse(StringIO.new(source))
-          }.should_not raise_error(JSON::ParserError)
+          }.should_not raise_error
       end
     end
 
@@ -200,7 +200,7 @@ describe "JSON Gem compatability API" do
       it "should be able to parse #{File.basename(name)} as a string" do
           lambda {
             JSON.parse(source)
-          }.should_not raise_error(JSON::ParserError)
+          }.should_not raise_error
       end
     end
   end
