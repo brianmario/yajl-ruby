@@ -3,6 +3,7 @@ require './lib/yajl/version'
 Gem::Specification.new do |s|
   s.name = %q{yajl-ruby}
   s.version = Yajl::VERSION
+  s.license = "MIT"
   s.authors = ["Brian Lopez", "Lloyd Hilaiel"]
   s.date = Time.now.utc.strftime("%Y-%m-%d")
   s.email = %q{seniorlopez@gmail.com}
