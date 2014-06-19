@@ -389,22 +389,25 @@ static int yajl_found_end_array(void * ctx) {
 /*
  * Document-method: new
  *
- * call-seq: new([:symbolize_keys => true, [:allow_comments => false[, :check_utf8 => false]]])
+ * call-seq: new([:symbolize_keys => true, [:allow_comments => false[, :check_utf8 => false]]][, &callback])
  *
  * :symbolize_keys will turn hash keys into Ruby symbols, defaults to false.
  *
  * :allow_comments will turn on/off the check for comments inside the JSON stream, defaults to true.
  *
  * :check_utf8 will validate UTF8 characters found in the JSON stream, defaults to true.
+ *
+ * If a block was passed, it's called when an object has been parsed off the stream. This is especially
+ * useful when parsing a stream of multiple JSON objects.
  */
 static VALUE rb_yajl_parser_new(int argc, VALUE * argv, VALUE klass) {
     yajl_parser_wrapper * wrapper;
     yajl_parser_config cfg;
-    VALUE opts, obj;
+    VALUE opts, blk, obj;
     int allowComments = 1, checkUTF8 = 1, symbolizeKeys = 0;
 
     /* Scan off config vars */
-    if (rb_scan_args(argc, argv, "01", &opts) == 1) {
+    if (rb_scan_args(argc, argv, "01&", &opts, &blk) == 1) {
         Check_Type(opts, T_HASH);
 
         if (rb_hash_aref(opts, sym_allow_comments) == Qfalse) {
@@ -426,7 +429,7 @@ static VALUE rb_yajl_parser_new(int argc, VALUE * argv, VALUE klass) {
     wrapper->objectsFound = 0;
     wrapper->symbolizeKeys = symbolizeKeys;
     wrapper->builderStack = rb_ary_new();
-    wrapper->parse_complete_callback = Qnil;
+    wrapper->parse_complete_callback = blk;
     rb_obj_call_init(obj, 0, 0);
     return obj;
 }
@@ -434,7 +437,7 @@ static VALUE rb_yajl_parser_new(int argc, VALUE * argv, VALUE klass) {
 /*
  * Document-method: initialize
  *
- * call-seq: new([:symbolize_keys => true, [:allow_comments => false[, :check_utf8 => false]]])
+ * call-seq: new([:symbolize_keys => true, [:allow_comments => false[, :check_utf8 => false]]][, &callback])
  *
  * :symbolize_keys will turn hash keys into Ruby symbols, defaults to false.
  *
