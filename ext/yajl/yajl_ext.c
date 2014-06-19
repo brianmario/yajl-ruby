@@ -702,10 +702,10 @@ static VALUE rb_yajl_encoder_encode(int argc, VALUE * argv, VALUE self) {
             rb_io_write(io, wrapper->terminator);
         }
         return Qnil;
-    } else if (blk != Qnil) {
-        rb_funcall(blk, intern_call, 1, outBuff);
+    } else if (wrapper->on_progress_callback != Qnil) {
+        rb_funcall(wrapper->on_progress_callback, intern_call, 1, outBuff);
         if (wrapper->terminator != 0) {
-            rb_funcall(blk, intern_call, 1, wrapper->terminator);
+            rb_funcall(wrapper->on_progress_callback, intern_call, 1, wrapper->terminator);
         }
         return Qnil;
     } else {
