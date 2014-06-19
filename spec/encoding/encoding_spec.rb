@@ -132,6 +132,25 @@ describe "Yajl JSON encoder" do
     output.should == output
   end
 
+  it "should encode with a callback passed via on_progress" do
+    callback = lambda { |str|
+      # no-op
+    }
+    encoder = Yajl::Encoder.new
+    encoder.on_progress = callback
+    callback.should_receive(:call).with('{}')
+    encoder.encode({})
+  end
+
+  it "should encode with a callback passed as block" do
+    callback = lambda { |str|
+      # no-op
+    }
+    encoder = Yajl::Encoder.new(&callback)
+    callback.should_receive(:call).with('{}')
+    encoder.encode({})
+  end
+
   it "should encode with it's class method with :pretty and a tab character indent options set, to an IO" do
     output = "{\n\t\"foo\": 1234\n}"
     obj = {:foo => 1234}

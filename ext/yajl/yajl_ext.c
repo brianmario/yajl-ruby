@@ -575,7 +575,7 @@ static unsigned char * defaultIndentString = (unsigned char *)"  ";
 /*
  * Document-method: new
  *
- * call-seq: new([:pretty => false[, :indent => '  '][, :terminator => "\n"]])
+ * call-seq: new([:pretty => false[, :indent => '  '][, :terminator => "\n"]][, &callback])
  *
  * :pretty will enable/disable beautifying or "pretty priting" the output string.
  *
@@ -586,16 +586,18 @@ static unsigned char * defaultIndentString = (unsigned char *)"  ";
  * determine when the last chunk of the current encode is sent.
  * If you specify this option to be nil, it will be ignored if encoding directly to an IO or simply returning a string. But if a block is used,
  * the encoder will still pass it - I hope that makes sense ;).
+ *
+ * If an optional block is passed, it's called when encoding is complete and passed the resulting JSON string
  */
 static VALUE rb_yajl_encoder_new(int argc, VALUE * argv, VALUE klass) {
     yajl_encoder_wrapper * wrapper;
     yajl_gen_config cfg;
-    VALUE opts, obj, indent;
+    VALUE opts, blk, obj, indent;
     unsigned char *indentString = NULL, *actualIndent = NULL;
     int beautify = 0, htmlSafe = 0;
 
     /* Scan off config vars */
-    if (rb_scan_args(argc, argv, "01", &opts) == 1) {
+    if (rb_scan_args(argc, argv, "01&", &opts, &blk) == 1) {
         Check_Type(opts, T_HASH);
 
         if (rb_hash_aref(opts, sym_pretty) == Qtrue) {
@@ -624,7 +626,7 @@ static VALUE rb_yajl_encoder_new(int argc, VALUE * argv, VALUE klass) {
     obj = Data_Make_Struct(klass, yajl_encoder_wrapper, yajl_encoder_wrapper_mark, yajl_encoder_wrapper_free, wrapper);
     wrapper->indentString = actualIndent;
     wrapper->encoder = yajl_gen_alloc(&cfg, NULL);
-    wrapper->on_progress_callback = Qnil;
+    wrapper->on_progress_callback = blk;
     if (opts != Qnil && rb_funcall(opts, intern_has_key, 1, sym_terminator) == Qtrue) {
         wrapper->terminator = rb_hash_aref(opts, sym_terminator);
 #ifdef HAVE_RUBY_ENCODING_H
@@ -642,7 +644,7 @@ static VALUE rb_yajl_encoder_new(int argc, VALUE * argv, VALUE klass) {
 /*
  * Document-method: initialize
  *
- * call-seq: initialize([:pretty => false[, :indent => '  '][, :terminator => "\n"]])
+ * call-seq: initialize([:pretty => false[, :indent => '  '][, :terminator => "\n"]][, &callback])
  *
  * :pretty will enable/disable beautifying or "pretty priting" the output string.
  *
