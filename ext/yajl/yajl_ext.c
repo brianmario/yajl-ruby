@@ -575,7 +575,7 @@ static unsigned char * defaultIndentString = (unsigned char *)"  ";
 /*
  * Document-method: new
  *
- * call-seq: initialize([:pretty => false[, :indent => '  '][, :terminator => "\n"]])
+ * call-seq: new([:pretty => false[, :indent => '  '][, :terminator => "\n"]])
  *
  * :pretty will enable/disable beautifying or "pretty priting" the output string.
  *
