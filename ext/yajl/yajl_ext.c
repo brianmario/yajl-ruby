@@ -462,7 +462,7 @@ static VALUE rb_yajl_parser_init(int argc, VALUE * argv, VALUE self) {
  * reading off of a socket directly.
  *
  * If a block was passed, it's called when an object has been parsed off the stream. This is especially
- * usefull when parsing a stream of multiple JSON objects.
+ * useful when parsing a stream of multiple JSON objects.
  *
  * NOTE: you can optionally assign the +on_parse_complete+ callback, and it will be called the same way the optional
  * block is for this method.
