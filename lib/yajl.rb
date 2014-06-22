@@ -57,6 +57,8 @@ module Yajl
     #
     # :indent accepts a string and will be used as the indent character(s) during the pretty print process
     #
+    # :sort_keys accepts a boolean and will cause the keys of an object to be output in sorted order
+    #
     # If a block is passed, it will be used as (and work the same as) the +on_progress+ callback
     def self.encode(obj, *args, &block)
       # TODO: this code smells, any ideas?

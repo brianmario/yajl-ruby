@@ -165,6 +165,9 @@ void yajl_encode_part(void * wrapper, VALUE obj, VALUE io) {
 
             /* TODO: itterate through keys in the hash */
             keys = rb_funcall(obj, intern_keys, 0);
+            if (w->sortKeys) {
+              keys = rb_funcall(keys, intern_sort, 0);
+            }
             for(idx=0; idx<RARRAY_LEN(keys); idx++) {
                 entry = rb_ary_entry(keys, idx);
                 keyStr = rb_funcall(entry, intern_to_s, 0); /* key must be a string */
@@ -589,7 +592,7 @@ static VALUE rb_yajl_encoder_new(int argc, VALUE * argv, VALUE klass) {
     yajl_gen_config cfg;
     VALUE opts, obj, indent;
     unsigned char *indentString = NULL, *actualIndent = NULL;
-    int beautify = 0, htmlSafe = 0;
+    int beautify = 0, htmlSafe = 0, sortKeys = 0;
 
     /* Scan off config vars */
     if (rb_scan_args(argc, argv, "01", &opts) == 1) {
@@ -612,6 +615,9 @@ static VALUE rb_yajl_encoder_new(int argc, VALUE * argv, VALUE klass) {
         if (rb_hash_aref(opts, sym_html_safe) == Qtrue) {
           htmlSafe = 1;
         }
+        if (rb_hash_aref(opts, sym_sort_keys) == Qtrue) {
+          sortKeys = 1;
+        }
     }
     if (!indentString) {
       indentString = defaultIndentString;
@@ -622,6 +628,7 @@ static VALUE rb_yajl_encoder_new(int argc, VALUE * argv, VALUE klass) {
     wrapper->indentString = actualIndent;
     wrapper->encoder = yajl_gen_alloc(&cfg, NULL);
     wrapper->on_progress_callback = Qnil;
+    wrapper->sortKeys = sortKeys;
     if (opts != Qnil && rb_funcall(opts, intern_has_key, 1, sym_terminator) == Qtrue) {
         wrapper->terminator = rb_hash_aref(opts, sym_terminator);
 #ifdef HAVE_RUBY_ENCODING_H
@@ -921,10 +928,12 @@ void Init_yajl() {
     intern_to_sym = rb_intern("to_sym");
     intern_has_key = rb_intern("has_key?");
     intern_as_json = rb_intern("as_json");
+    intern_sort = rb_intern("sort");
 
     sym_allow_comments = ID2SYM(rb_intern("allow_comments"));
     sym_check_utf8 = ID2SYM(rb_intern("check_utf8"));
     sym_pretty = ID2SYM(rb_intern("pretty"));
+    sym_sort_keys = ID2SYM(rb_intern("sort_keys"));
     sym_indent = ID2SYM(rb_intern("indent"));
     sym_html_safe = ID2SYM(rb_intern("html_safe"));
     sym_terminator = ID2SYM(rb_intern("terminator"));
