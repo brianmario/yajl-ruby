@@ -36,29 +36,29 @@ describe "ActiveSupport test cases" do
 
   TESTS.each do |json, expected|
     it "should be able to parse #{json} as an IO" do
-      lambda {
-        Yajl::Parser.parse(StringIO.new(json)).should == expected
-      }.should_not raise_error
+      expect {
+        expect(Yajl::Parser.parse(StringIO.new(json))).to eq(expected)
+      }.not_to raise_error
     end
   end
 
   TESTS.each do |json, expected|
     it "should be able to parse #{json} as a string" do
-      lambda {
-        Yajl::Parser.parse(json).should == expected
-      }.should_not raise_error
+      expect {
+        expect(Yajl::Parser.parse(json)).to eq(expected)
+      }.not_to raise_error
     end
   end
 
   it "should fail parsing {: 1} as an IO" do
-    lambda {
+    expect {
       Yajl::Parser.parse(StringIO.new("{: 1}"))
-    }.should raise_error(Yajl::ParseError)
+    }.to raise_error(Yajl::ParseError)
   end
 
   it "should fail parsing {: 1} as a string" do
-    lambda {
+    expect {
       Yajl::Parser.parse("{: 1}")
-    }.should raise_error(Yajl::ParseError)
+    }.to raise_error(Yajl::ParseError)
   end
 end

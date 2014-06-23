@@ -8,20 +8,20 @@ describe "Passing options to HttpStream instance methods" do
   end
 
   it "should not create a new socket it one is provided" do
-    TCPSocket.should_not_receive(:new)
+    expect(TCPSocket).not_to receive(:new)
     options = {:socket => :my_provided_socket}
 
     @stream.send(:initialize_socket, URI.parse("http://google.com"), options)
 
-    options[:socket].should == :my_provided_socket
+    expect(options[:socket]).to eq(:my_provided_socket)
   end
 
   it "should create a new socket if one is not provided" do
-    TCPSocket.should_receive(:new).with("google.com", 80).and_return( :tcp_socket )
+    expect(TCPSocket).to receive(:new).with("google.com", 80).and_return( :tcp_socket )
     options = {}
 
     @stream.send(:initialize_socket, URI.parse("http://google.com"), options)
 
-    options[:socket].should == :tcp_socket
+    expect(options[:socket]).to eq(:tcp_socket)
   end
 end

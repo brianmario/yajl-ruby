@@ -40,7 +40,7 @@ describe 'Parsing very long text' do
 
     it 'runs successfully' do
       out, err, status = capture('ruby', script)
-      [err, status.exitstatus].should eq(['', 0])
+      expect([err, status.exitstatus]).to eq(['', 0])
     end
   end
 

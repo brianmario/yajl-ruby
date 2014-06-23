@@ -17,8 +17,8 @@ Gem::Specification.new do |s|
   s.required_ruby_version = ">= 1.8.6"
 
   # tests
-  s.add_development_dependency 'rake-compiler', ">= 0.7.5"
-  s.add_development_dependency 'rspec', "~> 2.14"
+  s.add_development_dependency 'rake-compiler', '>= 0.7.5'
+  s.add_development_dependency 'rspec', '~> 2.99'
   # benchmarks
   s.add_development_dependency 'activesupport', '~> 3.1.2'
   s.add_development_dependency 'json'

@@ -37,7 +37,7 @@ describe "Yajl JSON encoder" do
          hash2 = Yajl::Parser.parse(io)
          io.close
          input.close
-         hash.should == hash2
+         expect(hash).to eq(hash2)
        end
      end
    end
@@ -58,7 +58,7 @@ describe "Yajl JSON encoder" do
                Yajl::Parser.parse(reader.read)
             end
          end
-         hash.should == hash2
+         expect(hash).to eq(hash2)
       end
      end
    end
@@ -73,7 +73,7 @@ describe "Yajl JSON encoder" do
          output = encoder.encode(hash)
          hash2 = Yajl::Parser.parse(output)
          input.close
-         hash.should == hash2
+         expect(hash).to eq(hash2)
        end
      end
    end
@@ -91,7 +91,7 @@ describe "Yajl JSON encoder" do
          end
          hash2 = Yajl::Parser.parse(output)
          input.close
-         hash.should == hash2
+         expect(hash).to eq(hash2)
        end
      end
    end
@@ -103,7 +103,7 @@ describe "Yajl JSON encoder" do
     encoder = Yajl::Encoder.new(:pretty => true, :indent => ' ')
     encoder.encode(obj, io)
     io.rewind
-    io.read.should == output
+    expect(io.read).to eq(output)
   end
 
   it "should encode with :pretty turned on and a single space indent, and return a String" do
@@ -111,7 +111,7 @@ describe "Yajl JSON encoder" do
     obj = {:foo => 1234}
     encoder = Yajl::Encoder.new(:pretty => true, :indent => ' ')
     output = encoder.encode(obj)
-    output.should == output
+    expect(output).to eq(output)
   end
 
   it "should encode with :pretty turned on and a tab character indent, to an IO" do
@@ -121,7 +121,7 @@ describe "Yajl JSON encoder" do
     encoder = Yajl::Encoder.new(:pretty => true, :indent => "\t")
     encoder.encode(obj, io)
     io.rewind
-    io.read.should == output
+    expect(io.read).to eq(output)
   end
 
   it "should encode with :pretty turned on and a tab character indent, and return a String" do
@@ -129,7 +129,7 @@ describe "Yajl JSON encoder" do
     obj = {:foo => 1234}
     encoder = Yajl::Encoder.new(:pretty => true, :indent => "\t")
     output = encoder.encode(obj)
-    output.should == output
+    expect(output).to eq(output)
   end
 
   it "should encode with it's class method with :pretty and a tab character indent options set, to an IO" do
@@ -138,14 +138,14 @@ describe "Yajl JSON encoder" do
     io = StringIO.new
     Yajl::Encoder.encode(obj, io, :pretty => true, :indent => "\t")
     io.rewind
-    io.read.should == output
+    expect(io.read).to eq(output)
   end
 
   it "should encode with it's class method with :pretty and a tab character indent options set, and return a String" do
     output = "{\n\t\"foo\": 1234\n}"
     obj = {:foo => 1234}
     output = Yajl::Encoder.encode(obj, :pretty => true, :indent => "\t")
-    output.should == output
+    expect(output).to eq(output)
   end
 
   it "should encode with it's class method with :pretty and a tab character indent options set, to a block" do
@@ -155,7 +155,7 @@ describe "Yajl JSON encoder" do
     Yajl::Encoder.encode(obj, :pretty => true, :indent => "\t") do |json_str|
       output = json_str
     end
-    output.should == output
+    expect(output).to eq(output)
   end
 
   it "should encode multiple objects into a single stream, to an IO" do
@@ -167,7 +167,7 @@ describe "Yajl JSON encoder" do
     end
     io.rewind
     output = "{\"foo\":1234}{\"foo\":1234}{\"foo\":1234}{\"foo\":1234}{\"foo\":1234}"
-    io.read.should == output
+    expect(io.read).to eq(output)
   end
 
   it "should encode multiple objects into a single stream, and return a String" do
@@ -178,37 +178,37 @@ describe "Yajl JSON encoder" do
       json_output << encoder.encode(obj)
     end
     output = "{\"foo\":1234}{\"foo\":1234}{\"foo\":1234}{\"foo\":1234}{\"foo\":1234}"
-    json_output.should == output
+    expect(json_output).to eq(output)
   end
 
   it "should encode all map keys as strings" do
-    Yajl::Encoder.encode({1=>1}).should eql("{\"1\":1}")
+    expect(Yajl::Encoder.encode({1=>1})).to eql("{\"1\":1}")
   end
 
   it "should check for and call #to_json if it exists on custom objects" do
     d = Dummy2.new
-    Yajl::Encoder.encode({:foo => d}).should eql('{"foo":{"hawtness":true}}')
+    expect(Yajl::Encoder.encode({:foo => d})).to eql('{"foo":{"hawtness":true}}')
   end
 
   it "should encode a hash where the key and value can be symbols" do
-    Yajl::Encoder.encode({:foo => :bar}).should eql('{"foo":"bar"}')
+    expect(Yajl::Encoder.encode({:foo => :bar})).to eql('{"foo":"bar"}')
   end
 
   it "should encode using a newline or nil terminator" do
-    Yajl::Encoder.new(:terminator => "\n").encode({:foo => :bar}).should eql("{\"foo\":\"bar\"}\n")
-    Yajl::Encoder.new(:terminator => nil).encode({:foo => :bar}).should eql("{\"foo\":\"bar\"}")
+    expect(Yajl::Encoder.new(:terminator => "\n").encode({:foo => :bar})).to eql("{\"foo\":\"bar\"}\n")
+    expect(Yajl::Encoder.new(:terminator => nil).encode({:foo => :bar})).to eql("{\"foo\":\"bar\"}")
   end
 
   it "should encode using a newline or nil terminator, to an IO" do
     s = StringIO.new
     Yajl::Encoder.new(:terminator => "\n").encode({:foo => :bar}, s)
     s.rewind
-    s.read.should eql("{\"foo\":\"bar\"}\n")
+    expect(s.read).to eql("{\"foo\":\"bar\"}\n")
 
     s = StringIO.new
     Yajl::Encoder.new(:terminator => nil).encode({:foo => :bar}, s)
     s.rewind
-    s.read.should eql("{\"foo\":\"bar\"}")
+    expect(s.read).to eql("{\"foo\":\"bar\"}")
   end
 
   it "should encode using a newline or nil terminator, using a block" do
@@ -217,7 +217,7 @@ describe "Yajl JSON encoder" do
       s << chunk
     end
     s.rewind
-    s.read.should eql("{\"foo\":\"bar\"}\n")
+    expect(s.read).to eql("{\"foo\":\"bar\"}\n")
 
     s = StringIO.new
     nilpassed = false
@@ -225,45 +225,45 @@ describe "Yajl JSON encoder" do
       nilpassed = true if chunk.nil?
       s << chunk
     end
-    nilpassed.should be_true
+    expect(nilpassed).to be_truthy
     s.rewind
-    s.read.should eql("{\"foo\":\"bar\"}")
+    expect(s.read).to eql("{\"foo\":\"bar\"}")
   end
 
   it "should not encode NaN" do
-    lambda {
+    expect {
       Yajl::Encoder.encode(0.0/0.0)
-    }.should raise_error(Yajl::EncodeError)
+    }.to raise_error(Yajl::EncodeError)
   end
 
   it "should not encode Infinity or -Infinity" do
-    lambda {
+    expect {
       Yajl::Encoder.encode(1.0/0.0)
-    }.should raise_error(Yajl::EncodeError)
-    lambda {
+    }.to raise_error(Yajl::EncodeError)
+    expect {
       Yajl::Encoder.encode(-1.0/0.0)
-    }.should raise_error(Yajl::EncodeError)
+    }.to raise_error(Yajl::EncodeError)
   end
 
   it "should encode with unicode chars in the key" do
     hash = {"浅草" => "<- those are unicode"}
-    Yajl::Encoder.encode(hash).should eql("{\"浅草\":\"<- those are unicode\"}")
+    expect(Yajl::Encoder.encode(hash)).to eql("{\"浅草\":\"<- those are unicode\"}")
   end
 
   if RUBY_VERSION =~ /^1.9/
     it "should return a string encoded in utf-8 if Encoding.default_internal is nil" do
       Encoding.default_internal = nil
       hash = {"浅草" => "<- those are unicode"}
-      Yajl::Encoder.encode(hash).encoding.should eql(Encoding.find('utf-8'))
+      expect(Yajl::Encoder.encode(hash).encoding).to eql(Encoding.find('utf-8'))
     end
 
     it "should return a string encoded in utf-8 even if Encoding.default_internal *is* set" do
       Encoding.default_internal = Encoding.find('utf-8')
       hash = {"浅草" => "<- those are unicode"}
-      Yajl::Encoder.encode(hash).encoding.should eql(Encoding.default_internal)
+      expect(Yajl::Encoder.encode(hash).encoding).to eql(Encoding.default_internal)
       Encoding.default_internal = Encoding.find('us-ascii')
       hash = {"浅草" => "<- those are unicode"}
-      Yajl::Encoder.encode(hash).encoding.should eql(Encoding.find('utf-8'))
+      expect(Yajl::Encoder.encode(hash).encoding).to eql(Encoding.find('utf-8'))
     end
   end
 
@@ -271,45 +271,45 @@ describe "Yajl JSON encoder" do
     unsafe_encoder = Yajl::Encoder.new(:html_safe => false)
     safe_encoder   = Yajl::Encoder.new(:html_safe => true)
 
-    unsafe_encoder.encode("</script>").should_not eql("\"<\\/script>\"")
-    safe_encoder.encode("</script>").should eql("\"<\\/script>\"")
+    expect(unsafe_encoder.encode("</script>")).not_to eql("\"<\\/script>\"")
+    expect(safe_encoder.encode("</script>")).to eql("\"<\\/script>\"")
   end
 
   it "should default to *not* escaping / characters" do
     unsafe_encoder = Yajl::Encoder.new
-    unsafe_encoder.encode("</script>").should_not eql("\"<\\/script>\"")
+    expect(unsafe_encoder.encode("</script>")).not_to eql("\"<\\/script>\"")
   end
 
   it "return value of #to_json must be a string" do
-    lambda {
+    expect {
       Yajl::Encoder.encode(TheMindKiller.new)
-    }.should raise_error(TypeError)
+    }.to raise_error(TypeError)
   end
 
   it "return value of #to_s must be a string" do
-    lambda {
+    expect {
       if TheMindKillerDuce.send(:method_defined?, :to_json)
         TheMindKillerDuce.send(:undef_method, :to_json)
       end
       Yajl::Encoder.encode(TheMindKillerDuce.new)
-    }.should raise_error(TypeError)
+    }.to raise_error(TypeError)
   end
 
   it "should raise an exception for deeply nested arrays" do
     root = []
     a = root
     (Yajl::MAX_DEPTH + 1).times { |_| a << []; a = a[0] }
-    lambda {
+    expect {
       Yajl::Encoder.encode(root)
-    }.should raise_error(Yajl::EncodeError)
+    }.to raise_error(Yajl::EncodeError)
   end
 
   it "should raise an exception for deeply nested hashes" do
     root = {}
     a = root
     (Yajl::MAX_DEPTH + 1).times { |_| a["a"] = {}; a = a["a"] }
-    lambda {
+    expect {
       Yajl::Encoder.encode(root)
-    }.should raise_error(Yajl::EncodeError)
+    }.to raise_error(Yajl::EncodeError)
   end
 end
