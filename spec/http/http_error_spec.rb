@@ -10,11 +10,10 @@ require 'yajl/http_stream'
 
 describe "Yajl HTTP error" do
   before(:all) do
+    @uri = 'file://' + File.expand_path(File.dirname(__FILE__) + "/fixtures/http/http.error.dump")
     @request = File.new(File.expand_path(File.dirname(__FILE__) + "/fixtures/http.error.dump"), 'r')
-    @uri = 'file://'+File.expand_path(File.dirname(__FILE__) + "/fixtures/http/http.error.dump")
     TCPSocket.should_receive(:new).and_return(@request)
     @request.should_receive(:write)
-
     begin
       Yajl::HttpStream.get(@uri)
     rescue Yajl::HttpStream::HttpError => e
@@ -23,10 +22,10 @@ describe "Yajl HTTP error" do
   end
 
   it "should contain the error code in the message" do
-    @error.message.should match(/404/)
+    expect(@error.message).to match(/404/)
   end
 
   it "should provide the HTTP response headers" do
-    @error.headers.keys.should include('ETag', 'Content-Length', 'Server')
+    expect(@error.headers.keys).to include('ETag', 'Content-Length', 'Server')
   end
 end

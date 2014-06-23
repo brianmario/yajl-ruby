@@ -8,33 +8,33 @@ describe "Parsing JSON Fixtures" do
 
   FAILED.each do |name, source|
     it "should not be able to parse #{File.basename(name)} as an IO" do
-        lambda {
+        expect {
           Yajl::Parser.parse(StringIO.new(source))
-        }.should raise_error(Yajl::ParseError)
+        }.to raise_error(Yajl::ParseError)
     end
   end
 
   FAILED.each do |name, source|
     it "should not be able to parse #{File.basename(name)} as a string" do
-        lambda {
+        expect {
           Yajl::Parser.parse(source)
-        }.should raise_error(Yajl::ParseError)
+        }.to raise_error(Yajl::ParseError)
     end
   end
 
   PASSED.each do |name, source|
     it "should be able to parse #{File.basename(name)} as an IO" do
-        lambda {
+        expect {
           Yajl::Parser.parse(StringIO.new(source))
-        }.should_not raise_error
+        }.not_to raise_error
     end
   end
 
   PASSED.each do |name, source|
     it "should be able to parse #{File.basename(name)} as a string" do
-        lambda {
+        expect {
           Yajl::Parser.parse(source)
-        }.should_not raise_error
+        }.not_to raise_error
     end
   end
 end

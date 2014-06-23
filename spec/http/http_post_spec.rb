@@ -40,84 +40,84 @@ describe "Yajl HTTP POST request" do
   def prepare_mock_request_dump(format=:raw)
     @request = File.new(File.expand_path(File.dirname(__FILE__) + "/fixtures/http.#{format}.dump"), 'r')
     @uri = 'file://'+File.expand_path(File.dirname(__FILE__) + "/fixtures/http/http.#{format}.dump")
-    TCPSocket.should_receive(:new).and_return(@request)
-    @request.should_receive(:write)
+    expect(TCPSocket).to receive(:new).and_return(@request)
+    expect(@request).to receive(:write)
   end
 
   it "should parse a raw response" do
     prepare_mock_request_dump :raw
-    @template_hash.should == Yajl::HttpStream.post(@uri, @body)
+    expect(@template_hash).to eq(Yajl::HttpStream.post(@uri, @body))
   end
 
   it "should parse a raw response using instance method" do
     prepare_mock_request_dump :raw
-    @uri.should_receive(:host)
-    @uri.should_receive(:port)
+    expect(@uri).to receive(:host)
+    expect(@uri).to receive(:port)
     stream = Yajl::HttpStream.new
-    @template_hash.should == stream.post(@uri, @body)
+    expect(@template_hash).to eq(stream.post(@uri, @body))
   end
 
   it "should parse a raw response with hashed body" do
     prepare_mock_request_dump :raw
-    @template_hash.should == Yajl::HttpStream.post(@uri, @hashed_body)
+    expect(@template_hash).to eq(Yajl::HttpStream.post(@uri, @hashed_body))
   end
 
   it "should parse a raw response and symbolize keys" do
     prepare_mock_request_dump :raw
-    @template_hash_symbolized.should == Yajl::HttpStream.post(@uri, @body, :symbolize_keys => true)
+    expect(@template_hash_symbolized).to eq(Yajl::HttpStream.post(@uri, @body, :symbolize_keys => true))
   end
 
   if defined?(Yajl::Bzip2::StreamReader)
     it "should parse a bzip2 compressed response" do
       prepare_mock_request_dump :bzip2
-      @template_hash.should == Yajl::HttpStream.post(@uri, @body)
+      expect(@template_hash).to eq(Yajl::HttpStream.post(@uri, @body))
     end
 
     it "should parse a bzip2 compressed response and symbolize keys" do
       prepare_mock_request_dump :bzip2
-      @template_hash_symbolized.should == Yajl::HttpStream.post(@uri, @body, :symbolize_keys => true)
+      expect(@template_hash_symbolized).to eq(Yajl::HttpStream.post(@uri, @body, :symbolize_keys => true))
     end
   end
 
   it "should parse a deflate compressed response" do
     prepare_mock_request_dump :deflate
-    @template_hash.should == Yajl::HttpStream.post(@uri, @body)
+    expect(@template_hash).to eq(Yajl::HttpStream.post(@uri, @body))
   end
 
   it "should parse a deflate compressed response and symbolize keys" do
     prepare_mock_request_dump :deflate
-    @template_hash_symbolized.should == Yajl::HttpStream.post(@uri, @body, :symbolize_keys => true)
+    expect(@template_hash_symbolized).to eq(Yajl::HttpStream.post(@uri, @body, :symbolize_keys => true))
   end
 
   it "should parse a gzip compressed response" do
     prepare_mock_request_dump :gzip
-    @template_hash.should == Yajl::HttpStream.post(@uri, @body)
+    expect(@template_hash).to eq(Yajl::HttpStream.post(@uri, @body))
   end
 
   it "should parse a gzip compressed response and symbolize keys" do
     prepare_mock_request_dump :gzip
-    @template_hash_symbolized.should == Yajl::HttpStream.post(@uri, @body, :symbolize_keys => true)
+    expect(@template_hash_symbolized).to eq(Yajl::HttpStream.post(@uri, @body, :symbolize_keys => true))
   end
 
   it "should parse a chunked raw response" do
     prepare_mock_request_dump :chunked
     Yajl::HttpStream.post(@uri, @body) do |obj|
-      obj.should eql(@chunked_body)
+      expect(obj).to eql(@chunked_body)
     end
   end
 
   it "should throw Exception if chunked response and no block given" do
     prepare_mock_request_dump :chunked
-    lambda {Yajl::HttpStream.post(@uri, @body)}.should raise_error(Exception)
+    expect {Yajl::HttpStream.post(@uri, @body)}.to raise_error(Exception)
   end
 
   it "should throw InvalidContentType if unable to handle the MIME type" do
     prepare_mock_request_dump :html
-    lambda {Yajl::HttpStream.post(@uri, @body)}.should raise_error(Yajl::HttpStream::InvalidContentType)
+    expect {Yajl::HttpStream.post(@uri, @body)}.to raise_error(Yajl::HttpStream::InvalidContentType)
   end
 
   it "should raise when an HTTP code that isn't 200 is returned" do
     prepare_mock_request_dump :error
-    lambda { Yajl::HttpStream.post(@uri, @body) }.should raise_exception(Yajl::HttpStream::HttpError)
+    expect { Yajl::HttpStream.post(@uri, @body) }.to raise_exception(Yajl::HttpStream::HttpError)
   end
 end
