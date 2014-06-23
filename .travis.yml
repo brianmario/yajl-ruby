@@ -4,15 +4,10 @@ rvm:
   - 1.9.2
   - 1.9.3
   - 2.0.0
-  - 2.1.0
-  - 2.1.1
-  - 2.1.2
+  - 2.1
+  - rbx-2
   - ree
   - ruby-head
-  - rbx-18mode
-  - rbx-19mode
 matrix:
   allow_failures:
-    - rvm: rbx
-    - rvm: rbx-18mode
-    - rvm: rbx-19mode
+    - rvm: rbx-2
