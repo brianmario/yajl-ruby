@@ -1,7 +1,7 @@
 require 'yajl/yajl'
 
 # = Extras
-# We're not going to load these auotmatically, because you might not need them ;)
+# We're not going to load these automatically, because you might not need them ;)
 #
 # require 'yajl/http_stream.rb' unless defined?(Yajl::HttpStream)
 # require 'yajl/gzip.rb' unless defined?(Yajl::Gzip)
