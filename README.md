@@ -28,7 +28,7 @@ gem install yajl-ruby
 Or use your Gemfile:
 
 ``` ruby
-gem 'yajl-ruby', require: 'yajl'
+gem 'yajl-ruby'
 ```
 
 ## Example of use
