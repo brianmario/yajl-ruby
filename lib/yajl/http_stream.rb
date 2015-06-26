@@ -1,9 +1,9 @@
-puts "DEPRECATION WARNING: Yajl::HttpStream is going to be removed in 2.0"
-
 require 'socket'
 require 'yajl'
 require 'yajl/version' unless defined? Yajl::VERSION
 require 'uri'
+
+puts "DEPRECATION WARNING: Yajl::HttpStream is going to be removed in 2.0" unless Yajl.suppress_deprecation_warnings
 
 module Yajl
   # This module is for making HTTP requests to which the response bodies (and possibly requests in the near future)

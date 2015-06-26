@@ -1,6 +1,6 @@
-puts "DEPRECATION WARNING: Yajl's Bzip2 support is going to be removed in 2.0"
-
 require 'yajl' unless defined?(Yajl::Parser)
+
+puts "DEPRECATION WARNING: Yajl's Bzip2 support is going to be removed in 2.0" unless Yajl.suppress_deprecation_warnings
 
 begin
   require 'bzip2' unless defined?(Bzip2)
