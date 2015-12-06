@@ -76,7 +76,6 @@ describe "One-off JSON examples" do
   end
 
   it "should accept correct surrogate pairs" do
-    Encoding.default_internal = Encoding.find('utf-8')
     expect {
       expect(Yajl::Parser.parse('["\\ud800\\udf02"]')).to eql(["𐌂"])
     }.not_to raise_error
