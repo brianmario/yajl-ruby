@@ -271,6 +271,94 @@ if (*offset >= jsonTextLen) { \
    goto finish_string_lex; \
 }
 
+/* helper to lex \u sequences, including surrogates pairs.
+ * surrogate pairs are unicode sequence of two codepoints, where first
+ * must be in range 0xD800..0xDBFF, and the second in range 0xDC00..0xDFFF.
+ */
+static yajl_tok
+yajl_lex_escaped_unicode(yajl_lexer lexer, const unsigned char * jsonText,
+                unsigned int jsonTextLen, unsigned int * offset)
+{
+    yajl_tok tok = yajl_tok_error;
+    unsigned int i;
+    unsigned char curChar;
+    unsigned int pairs[2] = {0, 0};
+    unsigned int pair_index = 0;
+
+    for (;;) {
+        for (i=0;i<4;i++) {
+            STR_CHECK_EOF;
+            curChar = readChar(lexer, jsonText, offset);
+            if (!(charLookupTable[curChar] & VHC)) {
+                /* back up to offending char */
+                unreadChar(lexer, offset);
+                lexer->error = yajl_lex_string_invalid_hex_char;
+                goto finish_string_lex;
+            }
+            /* if we reached here, it means we passed the hex validation above */
+            /* if it's 0-9 - convert by subtracting '0' */
+            if(curChar>='0' && curChar<='9') {
+                pairs[pair_index] <<=  4;
+                pairs[pair_index] |= (curChar-'0');
+            }
+            /* if it's a-f - convert by subtracting 'a' and adding 10 */
+            if(curChar>='a' && curChar<='f') {
+                pairs[pair_index] <<=  4;
+                pairs[pair_index] |= ((curChar-'a') + 10);
+            }
+            /* if it's A-F - convert by subtracting 'A' and adding 10 */
+            if(curChar>='A' && curChar<='F') {
+                pairs[pair_index] <<=  4;
+                pairs[pair_index] |= ((curChar-'A') + 10);
+            }
+        }
+
+        /* We've read first pair candidate, and it's a surrogate - make sure we have a second in pair, starting with \u */
+        if (pair_index == 0 && pairs[0] >= 0xd800 && pairs[0] <= 0xdbff) {
+            STR_CHECK_EOF;
+            curChar = readChar(lexer, jsonText, offset);
+            if(curChar == '\\') {
+                STR_CHECK_EOF;
+                curChar = readChar(lexer, jsonText, offset);
+                if(curChar == 'u') {
+                    /* continue to the next one */
+                    pair_index++;
+                }
+                else {
+                    unreadChar(lexer, offset);
+                    unreadChar(lexer, offset);
+                    lexer->error = yajl_lex_string_invalid_surrogate;
+                    goto finish_string_lex;
+                }
+            }
+            else {
+                unreadChar(lexer, offset);
+                lexer->error = yajl_lex_string_invalid_surrogate;
+                goto finish_string_lex;
+            }
+        }
+        /* We've read first pair candidate, and it's not a surrogate */
+        else if (pair_index == 0 && !(pairs[pair_index] >= 0xd800 && pairs[pair_index] <= 0xdbff)) {
+            tok = yajl_tok_string_with_escapes;
+            goto finish_string_lex;
+        }
+        /* We've read second pair candidate, and it's a valid second in pair */
+        else if (pair_index == 1 && pairs[pair_index] >= 0xdc00 && pairs[pair_index] <= 0xdfff) {
+            tok = yajl_tok_string_with_escapes;
+            goto finish_string_lex;
+        }
+        /* We've read second pair candidate, and it's an invalid second in pair */
+        else if (pair_index == 1 && !(pairs[pair_index] >= 0xdc00 && pairs[pair_index] <= 0xdfff)) {
+            lexer->error = yajl_lex_string_invalid_surrogate;
+            goto finish_string_lex;
+        }
+    }
+
+
+    finish_string_lex:
+    return tok;
+}
+
 static yajl_tok
 yajl_lex_string(yajl_lexer lexer, const unsigned char * jsonText,
                 unsigned int jsonTextLen, unsigned int * offset)
@@ -298,17 +386,9 @@ yajl_lex_string(yajl_lexer lexer, const unsigned char * jsonText,
             /* special case \u */
             curChar = readChar(lexer, jsonText, offset);
             if (curChar == 'u') {
-                unsigned int i = 0;
-
-                for (i=0;i<4;i++) {
-                    STR_CHECK_EOF;                
-                    curChar = readChar(lexer, jsonText, offset);                
-                    if (!(charLookupTable[curChar] & VHC)) {
-                        /* back up to offending char */
-                        unreadChar(lexer, offset);
-                        lexer->error = yajl_lex_string_invalid_hex_char;
-                        goto finish_string_lex;
-                    }
+                tok = yajl_lex_escaped_unicode(lexer, jsonText, jsonTextLen, offset);
+                if (tok != yajl_tok_string_with_escapes) {
+                    goto finish_string_lex;
                 }
             } else if (!(charLookupTable[curChar] & VEC)) {
                 /* back up to offending char */
@@ -688,6 +768,8 @@ yajl_lex_error_to_string(yajl_lex_error error)
         case yajl_lex_string_invalid_hex_char:
             return "invalid (non-hex) character occurs after '\\u' inside "
                    "string.";
+        case yajl_lex_string_invalid_surrogate:
+            return "invalid surrogate pair occurs inside string.";
         case yajl_lex_invalid_char:
             return "invalid char in json text.";
         case yajl_lex_invalid_string:
