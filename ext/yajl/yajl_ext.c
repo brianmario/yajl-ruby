@@ -209,6 +209,12 @@ void yajl_encode_part(void * wrapper, VALUE obj, VALUE io) {
             len = RSTRING_LEN(obj);
             CHECK_STATUS(yajl_gen_string(w->encoder, (const unsigned char *)cptr, len));
             break;
+        case T_SYMBOL:
+            str = rb_id2str(SYM2ID(obj));
+            cptr = RSTRING_PTR(str);
+            len = RSTRING_LEN(str);
+            CHECK_STATUS(yajl_gen_string(w->encoder, (const unsigned char *)cptr, len));
+            break;
         default:
             if (rb_respond_to(obj, intern_to_json)) {
                 str = rb_funcall(obj, intern_to_json, 0);
