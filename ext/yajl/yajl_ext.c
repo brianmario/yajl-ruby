@@ -167,7 +167,12 @@ void yajl_encode_part(void * wrapper, VALUE obj, VALUE io) {
             keys = rb_funcall(obj, intern_keys, 0);
             for(idx=0; idx<RARRAY_LEN(keys); idx++) {
                 entry = rb_ary_entry(keys, idx);
-                keyStr = rb_funcall(entry, intern_to_s, 0); /* key must be a string */
+                /* key must be encoded as a string */
+                if(RB_TYPE_P(entry, T_STRING) || RB_TYPE_P(entry, T_SYMBOL)) {
+                    keyStr = entry;
+                } else {
+                    keyStr = rb_funcall(entry, intern_to_s, 0);
+                }
                 /* the key */
                 yajl_encode_part(w, keyStr, io);
                 /* the value */
