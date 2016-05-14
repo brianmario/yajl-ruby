@@ -199,6 +199,11 @@ void yajl_encode_part(void * wrapper, VALUE obj, VALUE io) {
             CHECK_STATUS(yajl_gen_bool(w->encoder, 0));
             break;
         case T_FIXNUM:
+            str = rb_fix2str(obj, 10);
+            cptr = RSTRING_PTR(str);
+            len = RSTRING_LEN(str);
+            CHECK_STATUS(yajl_gen_number(w->encoder, cptr, len));
+            break;
         case T_FLOAT:
         case T_BIGNUM:
             str = rb_funcall(obj, intern_to_s, 0);
