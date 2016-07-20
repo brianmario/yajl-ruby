@@ -10,6 +10,7 @@ rvm:
   - ruby-head
   - rbx-18mode
   - rbx-19mode
+before_install: gem install bundler --no-document
 matrix:
   allow_failures:
     - rvm: rbx
