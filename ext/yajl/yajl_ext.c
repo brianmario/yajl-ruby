@@ -237,6 +237,7 @@ void yajl_parser_wrapper_free(void * wrapper) {
     if (w) {
         yajl_free(w->parser);
         st_free_table(w->strings);
+        st_free_table(w->keycache);
         xfree(w);
     }
 }
@@ -254,6 +255,7 @@ void yajl_parser_wrapper_mark(void * wrapper) {
         rb_gc_mark(w->builderStack);
         rb_gc_mark(w->parse_complete_callback);
         st_foreach(w->strings, mark_value, NULL);
+        st_foreach(w->keycache, mark_value, NULL);
     }
 }
 
@@ -299,6 +301,17 @@ static int yajl_found_number(void * ctx, const char * numberVal, unsigned int nu
     return 1;
 }
 
+static VALUE apply_encoding(VALUE string) {
+#ifdef HAVE_RUBY_ENCODING_H
+    rb_encoding *default_internal_enc = rb_default_internal_encoding();
+    rb_enc_associate(string, utf8Encoding);
+    if (default_internal_enc) {
+      string = rb_str_export_to_enc(string, default_internal_enc);
+    }
+#endif
+    return string;
+}
+
 static VALUE find_or_make_string(st_table *table, const unsigned char * stringVal, unsigned int stringLen) {
     VALUE string;
 
@@ -313,13 +326,16 @@ static VALUE find_or_make_string(st_table *table, const unsigned char * stringVa
         }
     }
 
-#ifdef HAVE_RUBY_ENCODING_H
-    rb_encoding *default_internal_enc = rb_default_internal_encoding();
-    rb_enc_associate(string, utf8Encoding);
-    if (default_internal_enc) {
-      string = rb_str_export_to_enc(string, default_internal_enc);
+    return apply_encoding(string);
+}
+
+static VALUE find_or_make_hash_key(st_table * keycache, const unsigned char * stringVal, unsigned int stringLen) {
+    VALUE string;
+
+    if (!st_lookup(keycache, stringVal, &string)) {
+        string = rb_str_freeze(apply_encoding(rb_str_new((const char *)stringVal, stringLen)));
+        st_insert(keycache, StringValuePtr(string), string);
     }
-#endif
 
     return string;
 }
@@ -355,13 +371,7 @@ static int yajl_found_hash_key(void * ctx, const unsigned char * stringVal, unsi
         keyStr = rb_str_intern(str);
 #endif
     } else {
-        keyStr = find_or_make_string(wrapper->strings, stringVal, stringLen);
-#ifdef HAVE_RUBY_ENCODING_H
-        rb_enc_associate(keyStr, utf8Encoding);
-        if (default_internal_enc) {
-          keyStr = rb_str_export_to_enc(keyStr, default_internal_enc);
-        }
-#endif
+        keyStr = find_or_make_hash_key(wrapper->keycache, stringVal, stringLen);
     }
     yajl_set_static_value(ctx, keyStr);
     yajl_check_and_fire_callback(ctx);
@@ -459,6 +469,7 @@ static VALUE rb_yajl_parser_new(int argc, VALUE * argv, VALUE klass) {
     wrapper->builderStack = rb_ary_new();
     wrapper->parse_complete_callback = Qnil;
     wrapper->strings = st_init_strtable();
+    wrapper->keycache = st_init_strtable();
     rb_obj_call_init(obj, 0, 0);
     return obj;
 }

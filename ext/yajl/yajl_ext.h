@@ -100,6 +100,7 @@ typedef struct {
     int symbolizeKeys;
     yajl_handle parser;
     st_table * strings;
+    st_table * keycache;
 } yajl_parser_wrapper;
 
 typedef struct {
