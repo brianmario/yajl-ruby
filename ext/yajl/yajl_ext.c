@@ -355,7 +355,7 @@ static int yajl_found_hash_key(void * ctx, const unsigned char * stringVal, unsi
         keyStr = rb_str_intern(str);
 #endif
     } else {
-        keyStr = rb_str_new((const char *)stringVal, stringLen);
+        keyStr = find_or_make_string(wrapper->strings, stringVal, stringLen);
 #ifdef HAVE_RUBY_ENCODING_H
         rb_enc_associate(keyStr, utf8Encoding);
         if (default_internal_enc) {
