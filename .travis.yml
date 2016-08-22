@@ -8,6 +8,7 @@ rvm:
   - rbx-2
   - ree
   - ruby-head
+before_install: gem install bundler --no-document
 matrix:
   allow_failures:
     - rvm: rbx-2

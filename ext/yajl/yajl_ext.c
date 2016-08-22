@@ -878,7 +878,11 @@ static VALUE rb_yajl_json_ext_nil_to_json(int argc, VALUE * argv, VALUE self) {
 static VALUE rb_yajl_encoder_enable_json_gem_ext(VALUE klass) {
     rb_define_method(rb_cHash, "to_json", rb_yajl_json_ext_hash_to_json, -1);
     rb_define_method(rb_cArray, "to_json", rb_yajl_json_ext_array_to_json, -1);
+#ifdef RUBY_INTEGER_UNIFICATION
+    rb_define_method(rb_cInteger, "to_json", rb_yajl_json_ext_fixnum_to_json, -1);
+#else
     rb_define_method(rb_cFixnum, "to_json", rb_yajl_json_ext_fixnum_to_json, -1);
+#endif
     rb_define_method(rb_cFloat, "to_json", rb_yajl_json_ext_float_to_json, -1);
     rb_define_method(rb_cString, "to_json", rb_yajl_json_ext_string_to_json, -1);
     rb_define_method(rb_cTrueClass, "to_json", rb_yajl_json_ext_true_to_json, -1);
