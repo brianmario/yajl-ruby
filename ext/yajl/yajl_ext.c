@@ -793,7 +793,7 @@ static VALUE rb_yajl_projector_build_subtree(yajl_event_stream_t parser, yajl_ev
             } else if (strcmp(event.buf, "false") == 0) {
                 return Qfalse;
             } else {
-                assert(0);
+                rb_raise(cStandardError, "unknown boolean token %s", event.buf);
             }
         case yajl_tok_integer:;
         case yajl_tok_double:;
