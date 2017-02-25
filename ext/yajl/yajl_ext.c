@@ -788,9 +788,9 @@ static VALUE rb_yajl_projector_build_subtree(yajl_event_stream_t parser, yajl_ev
         case yajl_tok_null:;
             return Qnil;
         case yajl_tok_bool:;
-            if (strcmp(event.buf, "true") == 0) {
+            if (memcmp(event.buf, "true", 4) == 0) {
                 return Qtrue;
-            } else if (strcmp(event.buf, "false") == 0) {
+            } else if (memcmp(event.buf, "false", 4) == 0) {
                 return Qfalse;
             } else {
                 rb_raise(cStandardError, "unknown boolean token %s", event.buf);
