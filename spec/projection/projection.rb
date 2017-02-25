@@ -49,7 +49,9 @@ describe "projection" do
           "department" => "drop bear containment",
         }
       ]
-    }
+    }.to_json
+
+    puts json
 
     schema = {
       # /users is an array of objects, each having many keys we only want name
@@ -58,7 +60,7 @@ describe "projection" do
       }
     }
 
-    expect(project(schema, over: json)).to eql({
+    expect(project(schema, json: json)).to eql({
       "users" => [
         { "name" => "keith" },
         { "name" => "justin" },
