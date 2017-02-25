@@ -587,6 +587,9 @@ struct yajl_event_s {
 typedef struct yajl_event_s yajl_event_t;
 
 static yajl_event_t yajl_event_stream_next(yajl_event_stream_t parser) {
+    assert(parser->stream);
+    assert(parser->buffer);
+
     while (1) {
         if (parser->offset >= RSTRING_LEN(parser->buffer)) {
             // Refill the buffer
