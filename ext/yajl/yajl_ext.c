@@ -735,11 +735,14 @@ static VALUE rb_yajl_projector_filter_object_subtree(yajl_event_stream_t parser,
             yajl_event_stream_next(parser, 1);            
 
             event = yajl_event_stream_next(parser, 0);
-
             if (event.token != yajl_tok_string) {
-                rb_raise(cStandardError, "read a comma, expected a key to follow");
+                rb_raise(cParseError, "read a comma, expected a key to follow, actually read %d", event.token);
             }
             continue;
+        }
+
+        if (event.token != yajl_tok_right_bracket) {
+            rb_raise(cParseError, "read a value without tailing comma, expected cloing bracket, actually read %d", event.token);
         }
     }
 
