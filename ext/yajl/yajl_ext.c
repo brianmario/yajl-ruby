@@ -22,6 +22,9 @@
 */
 
 #include "yajl_ext.h"
+#include "yajl_lex.h"
+#include "yajl_alloc.h"
+#include "api/yajl_common.h"
 
 #define YAJL_RB_TO_JSON                                   \
  VALUE rb_encoder, cls;                                   \
@@ -561,14 +564,55 @@ static VALUE rb_yajl_parser_set_complete_cb(VALUE self, VALUE callback) {
 }
 
 /*
+ * An event stream pulls data off the IO source into the buffer,
+ * then runs the lexer over that stream.
+ */
+struct yajl_event_stream_s {
+    VALUE stream;     // source
+
+    char *buffer;     // buffer
+    size_t size;
+    size_t offset;
+
+    yajl_lexer lexer; // event source
+};
+
+typedef struct yajl_event_stream_s *yajl_event_stream_t;
+
+static yajl_tok yajl_event_stream_next(yajl_event_stream_t parser) {
+    return yajl_tok_eof;
+}
+
+/*
  * Document-method: project
  */
 static VALUE rb_yajl_projector_project(VALUE self, VALUE schema) {
+    yajl_alloc_funcs allocFuncs;
+    yajl_set_default_alloc_funcs(&allocFuncs);
+
+    struct yajl_event_stream_s parser = {
+        .stream = Qnil,
+
+        .buffer = malloc(4096),
+        .size = 4096,
+        .offset = 0,
+
+        .lexer = yajl_lex_alloc(&allocFuncs, 0, 1),
+    };
+
     VALUE hash = rb_hash_new();
     VALUE key = rb_str_new((const char *)"name", 4);
     VALUE val = rb_str_new((const char *)"keith", 5);
     rb_hash_aset(hash, key, val);
+
+    yajl_lex_free(parser.lexer);
+    free(parser.buffer);
+
     return hash;
+}
+
+static VALUE rb_yajl_projector_filter_subtree(yajl_event_stream_t parser, VALUE schema, VALUE event) {
+    return Qnil;
 }
 
 /*
