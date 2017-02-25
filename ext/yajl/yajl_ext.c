@@ -683,7 +683,8 @@ static VALUE rb_yajl_projector_filter_array_subtree(yajl_event_stream_t parser, 
 
         event = yajl_event_stream_next(parser, 0);
         if (event.token == yajl_tok_comma) {
-            yajl_event_stream_next(parser, 1);
+            event = yajl_event_stream_next(parser, 1);
+            assert(event.token == yajl_tok_comma);
 
             event = yajl_event_stream_next(parser, 0);
             if (!(event.token == yajl_tok_string || event.token == yajl_tok_integer || event.token == yajl_tok_double || event.token == yajl_tok_null || event.token == yajl_tok_bool || event.token == yajl_tok_left_bracket || event.token == yajl_tok_left_brace)) {
@@ -750,7 +751,8 @@ static VALUE rb_yajl_projector_filter_object_subtree(yajl_event_stream_t parser,
 
         event = yajl_event_stream_next(parser, 0);
         if (event.token == yajl_tok_comma) {
-            yajl_event_stream_next(parser, 1);            
+            event = yajl_event_stream_next(parser, 1);
+            assert(event.token == yajl_tok_comma);
 
             event = yajl_event_stream_next(parser, 0);
             if (event.token != yajl_tok_string) {
