@@ -687,10 +687,6 @@ static VALUE rb_yajl_projector_filter_object_subtree(yajl_event_stream_t parser,
     while (1) {
         event = yajl_event_stream_next(parser, 1);
 
-        if (event.token == yajl_tok_comma) {
-            continue;
-        }
-
         if (event.token == yajl_tok_right_bracket) {
             break;
         }
@@ -711,7 +707,7 @@ static VALUE rb_yajl_projector_filter_object_subtree(yajl_event_stream_t parser,
         int interesting = (schema == Qnil || rb_funcall(schema, rb_intern("key?"), 1, key) == Qtrue);
         if (!interesting) {
             rb_yajl_projector_ignore_value(parser);
-            continue;
+            goto peek_comma;
         }
 
         yajl_event_t value_event = yajl_event_stream_next(parser, 1);
@@ -731,6 +727,20 @@ static VALUE rb_yajl_projector_filter_object_subtree(yajl_event_stream_t parser,
         }
         
         rb_hash_aset(hsh, key, val);
+
+    peek_comma:
+
+        event = yajl_event_stream_next(parser, 0);
+        if (event.token == yajl_tok_comma) {
+            yajl_event_stream_next(parser, 1);            
+
+            event = yajl_event_stream_next(parser, 0);
+
+            if (event.token != yajl_tok_string) {
+                rb_raise(cStandardError, "read a comma, expected a key to follow");
+            }
+            continue;
+        }
     }
 
     return hsh;
