@@ -606,11 +606,12 @@ static yajl_event_t yajl_event_stream_next(yajl_event_stream_t parser) {
             parser->offset = 0;
         }
 
-        printf("pulling event\n");
-
         // Try to pull an event off the lexer
         yajl_event_t event;
         yajl_tok token = yajl_lex_lex(parser->lexer, RSTRING_PTR(parser->buffer), RSTRING_LEN(parser->buffer), &parser->offset, &event.buf, &event.len);
+
+        printf("pulling event %d\n", token);
+
         if (token == yajl_tok_eof) {
             continue;
         }
