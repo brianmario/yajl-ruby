@@ -581,7 +581,7 @@ typedef struct yajl_event_stream_s *yajl_event_stream_t;
 
 struct yajl_event_s {
     yajl_tok token;
-    const unsigned char *buf;
+    const char *buf;
     unsigned int len;
 };
 typedef struct yajl_event_s yajl_event_t;
@@ -608,7 +608,7 @@ static yajl_event_t yajl_event_stream_next(yajl_event_stream_t parser) {
 
         // Try to pull an event off the lexer
         yajl_event_t event;
-        yajl_tok token = yajl_lex_lex(parser->lexer, RSTRING_PTR(parser->buffer), RSTRING_LEN(parser->buffer), &parser->offset, &event.buf, &event.len);
+        yajl_tok token = yajl_lex_lex(parser->lexer, (const unsigned char *)RSTRING_PTR(parser->buffer), RSTRING_LEN(parser->buffer), &parser->offset, (const unsigned char **)&event.buf, &event.len);
 
         printf("pulling event %d\n", token);
 
@@ -749,6 +749,8 @@ static void rb_yajl_projector_ignore_value(yajl_event_stream_t parser) {
         case yajl_tok_double:
         case yajl_tok_string:
             return;
+        default:
+            break;
     }
 
     if (value_event.token == yajl_tok_left_brace || value_event.token == yajl_tok_left_bracket) {
