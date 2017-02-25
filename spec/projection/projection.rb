@@ -349,7 +349,11 @@ EOJ
     }.to raise_error(Yajl::ParseError)
   end
 
-  it "supports parsing empty array"
+  it "supports parsing empty array" do
+    expect(project(nil, json: '[]')).to eql([])
+  end
 
-  it "supports parsing empty object"
+  it "supports parsing empty object" do
+    expect(project(nil, json: '{}')).to eql({})
+  end
 end
