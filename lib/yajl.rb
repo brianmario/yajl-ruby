@@ -26,6 +26,7 @@ module Yajl
   class Projector
     def initialize(stream)
       @stream = stream
+      puts stream
     end
   end
 

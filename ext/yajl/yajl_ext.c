@@ -592,6 +592,8 @@ static yajl_event_t yajl_event_stream_next(yajl_event_stream_t parser) {
 
     while (1) {
         if (parser->offset >= RSTRING_LEN(parser->buffer)) {
+            printf("reading from stream %p %ld %p\n", parser->stream, RSTRING_LEN(parser->buffer), parser->buffer);
+
             // Refill the buffer
             VALUE read = rb_funcall(parser->stream, rb_intern("read"), 2, RSTRING_LEN(parser->buffer), parser->buffer);
             if (read == Qnil) {
@@ -603,6 +605,8 @@ static yajl_event_t yajl_event_stream_next(yajl_event_stream_t parser) {
 
             parser->offset = 0;
         }
+
+        printf("pulling event\n");
 
         // Try to pull an event off the lexer
         yajl_event_t event;
