@@ -600,15 +600,12 @@ static VALUE rb_yajl_projector_project(VALUE self, VALUE schema) {
         .lexer = yajl_lex_alloc(&allocFuncs, 0, 1),
     };
 
-    VALUE hash = rb_hash_new();
-    VALUE key = rb_str_new((const char *)"name", 4);
-    VALUE val = rb_str_new((const char *)"keith", 5);
-    rb_hash_aset(hash, key, val);
+    VALUE result = rb_yajl_projector_filter_subtree(&parser, schema, yajl_event_stream_next(&parser));
 
     yajl_lex_free(parser.lexer);
     free(parser.buffer);
 
-    return hash;
+    return result;
 }
 
 static VALUE rb_yajl_projector_filter_subtree(yajl_event_stream_t parser, VALUE schema, VALUE event) {
