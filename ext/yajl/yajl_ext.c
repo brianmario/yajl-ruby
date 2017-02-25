@@ -565,6 +565,9 @@ static VALUE rb_yajl_parser_set_complete_cb(VALUE self, VALUE callback) {
  */
 static VALUE rb_yajl_projector_project(VALUE self, VALUE schema) {
     VALUE hash = rb_hash_new();
+    VALUE key = rb_str_new((const char *)"name", 4);
+    VALUE val = rb_str_new((const char *)"keith", 5);
+    rb_hash_aset(hash, key, val);
     return hash;
 }
 
