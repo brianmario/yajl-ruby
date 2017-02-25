@@ -586,7 +586,7 @@ struct yajl_event_s {
 };
 typedef struct yajl_event_s yajl_event_t;
 
-static yajl_event_t yajl_event_stream_next(yajl_event_stream_t parser) {
+static yajl_event_t yajl_event_stream_next(yajl_event_stream_t parser, int pop) {
     assert(parser->stream);
     assert(parser->buffer);
 
@@ -608,9 +608,15 @@ static yajl_event_t yajl_event_stream_next(yajl_event_stream_t parser) {
 
         // Try to pull an event off the lexer
         yajl_event_t event;
-        yajl_tok token = yajl_lex_lex(parser->lexer, (const unsigned char *)RSTRING_PTR(parser->buffer), RSTRING_LEN(parser->buffer), &parser->offset, (const unsigned char **)&event.buf, &event.len);
 
-        printf("pulling event %d\n", token);
+        yajl_tok token;
+        if (pop == 0) {
+            token = yajl_lex_lex(parser->lexer, (const unsigned char *)RSTRING_PTR(parser->buffer), RSTRING_LEN(parser->buffer), &parser->offset, (const unsigned char **)&event.buf, &event.len);
+            printf("popping event %d\n", token);
+        } else {
+            token = yajl_lex_peek(parser->lexer, (const unsigned char *)RSTRING_PTR(parser->buffer), RSTRING_LEN(parser->buffer), parser->offset);
+            printf("peeking event %d\n", token);
+        }
 
         if (token == yajl_tok_eof) {
             continue;
@@ -652,7 +658,7 @@ static VALUE rb_yajl_projector_filter_array_subtree(yajl_event_stream_t parser, 
     VALUE ary = rb_ary_new();
 
     while (1) {
-        event = yajl_event_stream_next(parser);
+        event = yajl_event_stream_next(parser, 1);
         if (event.token == yajl_tok_comma) {
             continue;
         }
@@ -679,7 +685,7 @@ static VALUE rb_yajl_projector_filter_object_subtree(yajl_event_stream_t parser,
     VALUE hsh = rb_hash_new();
 
     while (1) {
-        event = yajl_event_stream_next(parser);
+        event = yajl_event_stream_next(parser, 1);
 
         if (event.token == yajl_tok_comma) {
             continue;
@@ -695,7 +701,7 @@ static VALUE rb_yajl_projector_filter_object_subtree(yajl_event_stream_t parser,
 
         VALUE key = rb_str_new(event.buf, event.len);
 
-        event = yajl_event_stream_next(parser);
+        event = yajl_event_stream_next(parser, 1);
         if (!(event.token == yajl_tok_colon)) {
             rb_raise(cParseError, "Expected colon, unexpected stream event %d", event.token);
         }
@@ -708,7 +714,7 @@ static VALUE rb_yajl_projector_filter_object_subtree(yajl_event_stream_t parser,
             continue;
         }
 
-        yajl_event_t value_event = yajl_event_stream_next(parser);
+        yajl_event_t value_event = yajl_event_stream_next(parser, 1);
 
         VALUE val;
         if (value_event.token == yajl_tok_left_bracket || value_event.token == yajl_tok_left_brace) {
@@ -740,7 +746,7 @@ static VALUE rb_yajl_projector_filter_object_subtree(yajl_event_stream_t parser,
     # Returns nothing.
 */
 static void rb_yajl_projector_ignore_value(yajl_event_stream_t parser) {
-    yajl_event_t value_event = yajl_event_stream_next(parser);
+    yajl_event_t value_event = yajl_event_stream_next(parser, 1);
 
     switch (value_event.token) {
         case yajl_tok_null:
@@ -771,7 +777,7 @@ static void rb_yajl_projector_ignore_container(yajl_event_stream_t parser) {
   int depth = 1;
 
   while (depth > 0) {
-    yajl_event_t event = yajl_event_stream_next(parser);
+    yajl_event_t event = yajl_event_stream_next(parser, 1);
 
     if (event.token == yajl_tok_eof) {
         return;
@@ -824,7 +830,7 @@ static VALUE rb_yajl_projector_build_subtree(yajl_event_stream_t parser, yajl_ev
             VALUE ary = rb_ary_new();
 
             while (1) {
-                event = yajl_event_stream_next(parser);
+                event = yajl_event_stream_next(parser, 1);
                 if (event.token == yajl_tok_comma) {
                     continue;
                 }
@@ -843,7 +849,7 @@ static VALUE rb_yajl_projector_build_subtree(yajl_event_stream_t parser, yajl_ev
             VALUE hsh = rb_hash_new();
 
             while (1) {
-                event = yajl_event_stream_next(parser);
+                event = yajl_event_stream_next(parser, 1);
                 if (event.token == yajl_tok_comma) {
                     continue;
                 }
@@ -858,12 +864,12 @@ static VALUE rb_yajl_projector_build_subtree(yajl_event_stream_t parser, yajl_ev
 
                 VALUE key = rb_str_new(event.buf, event.len);
 
-                event = yajl_event_stream_next(parser);
+                event = yajl_event_stream_next(parser, 1);
                 if (!(event.token == yajl_tok_colon)) {
                     rb_raise(cParseError, "Expected colon, unexpected stream event %d", event.token);
                 }
 
-                VALUE val = rb_yajl_projector_build_subtree(parser, yajl_event_stream_next(parser));
+                VALUE val = rb_yajl_projector_build_subtree(parser, yajl_event_stream_next(parser, 1));
                 rb_hash_aset(hsh, key, val);
             }
 
@@ -894,7 +900,7 @@ static VALUE rb_yajl_projector_project(VALUE self, VALUE schema) {
         .lexer = yajl_lex_alloc(&allocFuncs, 0, 1),
     };
 
-    VALUE result = rb_yajl_projector_filter_subtree(&parser, schema, yajl_event_stream_next(&parser));
+    VALUE result = rb_yajl_projector_filter_subtree(&parser, schema, yajl_event_stream_next(&parser, 1));
 
     yajl_lex_free(parser.lexer);
 
