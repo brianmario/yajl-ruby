@@ -571,20 +571,52 @@ static VALUE rb_yajl_parser_set_complete_cb(VALUE self, VALUE callback) {
 struct yajl_event_stream_s {
     VALUE stream;     // source
 
-    char *buffer;     // buffer
-    size_t size;
-    size_t offset;
+    VALUE buffer;
+    unsigned int offset;
 
     yajl_lexer lexer; // event source
 };
 
 typedef struct yajl_event_stream_s *yajl_event_stream_t;
 
-static yajl_tok yajl_event_stream_next(yajl_event_stream_t parser) {
-    return yajl_tok_eof;
+struct yajl_event_s {
+    yajl_tok token;
+    const unsigned char *buf;
+    unsigned int len;
+};
+typedef struct yajl_event_s yajl_event_t;
+
+static yajl_event_t yajl_event_stream_next(yajl_event_stream_t parser) {
+    while (1) {
+        if (parser->offset >= RSTRING_LEN(parser->buffer)) {
+            // Refill the buffer
+            VALUE read = rb_funcall(parser->stream, rb_intern("read"), 2, RSTRING_LEN(parser->buffer), parser->buffer);
+            if (read == Qnil) {
+                yajl_event_t event = {
+                    .token = yajl_tok_eof,
+                };
+                return event;
+            }
+
+            parser->offset = 0;
+        }
+
+        // Try to pull an event off the lexer
+        yajl_event_t event;
+        yajl_tok token = yajl_lex_lex(parser->lexer, RSTRING_PTR(parser->buffer), RSTRING_LEN(parser->buffer), &parser->offset, &event.buf, &event.len);
+        if (token == yajl_tok_eof) {
+            continue;
+        }
+
+        event.token = token;
+
+        return event;
+    }
+
+    return (yajl_event_t){};
 }
 
-static VALUE rb_yajl_projector_filter_subtree(yajl_event_stream_t parser, VALUE schema, VALUE event) {
+static VALUE rb_yajl_projector_filter_subtree(yajl_event_stream_t parser, VALUE schema, yajl_event_t event) {
     assert(parser->stream);
     return Qnil;
 }
@@ -596,12 +628,14 @@ static VALUE rb_yajl_projector_project(VALUE self, VALUE schema) {
     yajl_alloc_funcs allocFuncs;
     yajl_set_default_alloc_funcs(&allocFuncs);
 
-    struct yajl_event_stream_s parser = {
-        .stream = rb_ivar_get(self, rb_intern("stream")),
+    VALUE stream = rb_ivar_get(self, rb_intern("@stream"));
+    VALUE buffer = rb_str_new(0, 4096);
 
-        .buffer = malloc(4096),
-        .size = 4096,
-        .offset = 0,
+    struct yajl_event_stream_s parser = {
+        .stream = stream,
+
+        .buffer = buffer,
+        .offset = 4096,
 
         .lexer = yajl_lex_alloc(&allocFuncs, 0, 1),
     };
@@ -609,7 +643,9 @@ static VALUE rb_yajl_projector_project(VALUE self, VALUE schema) {
     VALUE result = rb_yajl_projector_filter_subtree(&parser, schema, yajl_event_stream_next(&parser));
 
     yajl_lex_free(parser.lexer);
-    free(parser.buffer);
+
+    RB_GC_GUARD(stream);
+    RB_GC_GUARD(buffer);
 
     return result;
 }
