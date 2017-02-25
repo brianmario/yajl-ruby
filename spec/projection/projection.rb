@@ -310,4 +310,10 @@ EOJ
       project({"b" => nil}, json: '{"a":, "b": 2}')
     }.to raise_error(StandardError)
   end
+
+  it "errors with invalid object syntax" do
+    expect {
+      project({"b" => nil}, json: '{"a": {{, "b": 2}')
+    }.to raise_error(StandardError)
+  end
 end

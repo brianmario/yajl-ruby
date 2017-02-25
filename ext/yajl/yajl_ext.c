@@ -595,8 +595,8 @@ static yajl_event_t yajl_event_stream_next(yajl_event_stream_t parser) {
             printf("reading from stream %p %ld %p\n", (void *)parser->stream, RSTRING_LEN(parser->buffer), (void *)parser->buffer);
 
             // Refill the buffer
-            VALUE read = rb_funcall(parser->stream, intern_io_read, 2, INT2FIX(RSTRING_LEN(parser->buffer)), parser->buffer);
-            if (read == Qnil) {
+            rb_funcall(parser->stream, intern_io_read, 2, INT2FIX(RSTRING_LEN(parser->buffer)), parser->buffer);
+            if (RSTRING_LEN(parser->buffer) == 0) {
                 yajl_event_t event = {
                     .token = yajl_tok_eof,
                 };
@@ -772,6 +772,10 @@ static void rb_yajl_projector_ignore_container(yajl_event_stream_t parser) {
 
   while (depth > 0) {
     yajl_event_t event = yajl_event_stream_next(parser);
+
+    if (event.token == yajl_tok_eof) {
+        return;
+    }
 
     if (event.token == yajl_tok_left_bracket || event.token == yajl_tok_left_brace) {
         depth += 1;
