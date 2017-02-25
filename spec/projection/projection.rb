@@ -356,4 +356,10 @@ EOJ
   it "supports parsing empty object" do
     expect(project(nil, json: '{}')).to eql({})
   end
+
+  it "errors if starting with closing object"
+
+  it "handles strings with unicode escape sequences as object keys"
+
+  it "handles strings with unicode escape sequences as object values"
 end
