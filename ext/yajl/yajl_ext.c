@@ -696,14 +696,16 @@ static VALUE rb_yajl_projector_build_subtree(yajl_event_stream_t parser, yajl_ev
                     break;
                 }
 
-                // TODO raise exception instead
-                assert(event.token == yajl_tok_string || event.token == yajl_tok_string_with_escapes);
+                if (!(event.token == yajl_tok_string || event.token == yajl_tok_string_with_escapes)) {
+                    rb_raise(cParseError, "Expected string or string with escapes, unexpected stream event %d", event.token);
+                }
 
                 VALUE key = rb_str_new(event.buf, event.len);
 
                 event = yajl_event_stream_next(parser);
-                // TODO raise exception
-                assert(event.token == yajl_tok_colon);
+                if (!(event.token == yajl_tok_colon)) {
+                    rb_raise(cParseError, "Expected colon, unexpected stream event %d", event.token);
+                }
 
                 VALUE val = rb_yajl_projector_build_subtree(parser, yajl_event_stream_next(parser));
                 rb_hash_aset(hsh, key, val);
