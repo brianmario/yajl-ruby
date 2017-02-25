@@ -342,4 +342,10 @@ EOJ
       project(nil, json: '[')
     }.to raise_error(Yajl::ParseError)
   end
+
+  it "errors when arrays don't have a comma between elements" do
+    expect {
+      project(nil, json: '[1 2]')
+    }.to raise_error(Yajl::ParseError)
+  end
 end
