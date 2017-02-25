@@ -659,9 +659,6 @@ static VALUE rb_yajl_projector_filter_array_subtree(yajl_event_stream_t parser, 
 
     while (1) {
         event = yajl_event_stream_next(parser, 1);
-        if (event.token == yajl_tok_comma) {
-            continue;
-        }
 
         if (event.token == yajl_tok_right_brace) {
             break;
@@ -674,6 +671,18 @@ static VALUE rb_yajl_projector_filter_array_subtree(yajl_event_stream_t parser, 
             val = rb_yajl_projector_build_simple_value(parser, event);
         }
         rb_ary_push(ary, val);
+
+        event = yajl_event_stream_next(parser, 0);
+        if (event.token == yajl_tok_comma) {
+            yajl_event_stream_next(parser, 1);
+
+            event = yajl_event_stream_next(parser, 0);
+            if (!(event.token == yajl_tok_string || event.token == yajl_tok_integer || event.token == yajl_tok_double || event.token == yajl_tok_null || event.token == yajl_tok_bool || event.token == yajl_tok_left_bracket || event.token == yajl_tok_left_brace)) {
+                rb_raise(cParseError, "read a comma, expected a key to follow, actually read %d", event.token);
+            }
+        } else if (event.token != yajl_tok_right_brace) {
+            rb_raise(cParseError, "didn't read a comma, expected closing array, actually read %d", event.token);
+        }
     }
 
     return ary;
@@ -738,10 +747,7 @@ static VALUE rb_yajl_projector_filter_object_subtree(yajl_event_stream_t parser,
             if (event.token != yajl_tok_string) {
                 rb_raise(cParseError, "read a comma, expected a key to follow, actually read %d", event.token);
             }
-            continue;
-        }
-
-        if (event.token != yajl_tok_right_bracket) {
+        } else if (event.token != yajl_tok_right_bracket) {
             rb_raise(cParseError, "read a value without tailing comma, expected cloing bracket, actually read %d", event.token);
         }
     }
