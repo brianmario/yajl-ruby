@@ -216,4 +216,92 @@ describe "projection" do
       "foo" => 42
     })
   end
+
+  it "supports nil schema" do
+    json = {
+      "foo" => "bar",
+    }
+
+    expect(project(nil, over: json)).to eql({
+      "foo" => "bar"
+    })
+  end
+
+  it "supports empty schema" do
+    json = {
+      "foo" => "bar",
+    }
+    expect(project({}, over: json)).to eql({})
+  end
+
+  it "supports object projection" do
+    json = {
+      "foo" => "bar",
+      "qux" => "quux",
+    }
+
+    schema = {
+      "foo" => nil,
+    }
+
+    expect(project(schema, over: json)).to eql({
+      "foo" => "bar"
+    })
+  end
+
+  it "projects the readme example" do
+    json = <<-EOJ
+    [
+      {
+        "user": {
+          "name": "keith",
+          "age": 26,
+          "jobs": [
+            {
+              "title": "director of overworking",
+              "company": "south coast software",
+              "department": "most"
+            },
+            {
+              "title": "some kind of computering",
+              "company": "github the website dot com",
+              "department": true
+            }
+          ]
+        },
+        "another key": {
+
+        },
+        "woah this document is huge": {
+
+        },
+        "many megabytes": {
+
+        },
+        "etc": {
+
+        }
+      }
+    ]
+EOJ
+
+    schema = {
+      "user" => {
+        "name" => nil,
+        "jobs" => {
+          "title" => nil,
+        },
+      },
+    }
+
+    expect(project(schema, json: json)).to eql([{
+      "user" => {
+        "name" => "keith",
+        "jobs" => [
+          { "title" => "director of overworking" },
+          { "title" => "some kind of computering" },
+        ]
+      }
+    }])
+  end
 end
