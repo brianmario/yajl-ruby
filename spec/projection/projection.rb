@@ -9,4 +9,11 @@ describe "projection" do
     projection = projector.project({"name" => nil})
     expect(projection['name']).to eql("keith")
   end
+
+  it "should filter" do
+    stream = StringIO.new('{"name": "keith", "age": 27}')
+    projector = Yajl::Projector.new(stream)
+    projection = projector.project({"name" => nil})
+    expect(projection['age']).to eql(nil)
+  end
 end
