@@ -595,7 +595,7 @@ static yajl_event_t yajl_event_stream_next(yajl_event_stream_t parser) {
             printf("reading from stream %p %ld %p\n", parser->stream, RSTRING_LEN(parser->buffer), parser->buffer);
 
             // Refill the buffer
-            VALUE read = rb_funcall(parser->stream, rb_intern("read"), 2, RSTRING_LEN(parser->buffer), parser->buffer);
+            VALUE read = rb_funcall(parser->stream, intern_io_read, 2, INT2FIX(RSTRING_LEN(parser->buffer)), parser->buffer);
             if (read == Qnil) {
                 yajl_event_t event = {
                     .token = yajl_tok_eof,
