@@ -348,4 +348,8 @@ EOJ
       project(nil, json: '[1 2]')
     }.to raise_error(Yajl::ParseError)
   end
+
+  it "supports parsing empty array"
+
+  it "supports parsing empty object"
 end
