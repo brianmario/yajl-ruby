@@ -357,6 +357,15 @@ EOJ
     expect(project(nil, json: '{}')).to eql({})
   end
 
+  it "supports parsing big strings" do
+    json = [
+      "a",
+      "b"*10_000,
+      "c",
+    ]
+    expect(project(nil, over: json)).to eql(json)
+  end
+
   it "errors if starting with closing object"
 
   it "handles strings with unicode escape sequences as object keys"
