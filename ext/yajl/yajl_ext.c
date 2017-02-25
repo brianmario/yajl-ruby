@@ -756,7 +756,7 @@ static void rb_yajl_projector_ignore_value(yajl_event_stream_t parser) {
         return;
     }
 
-    rb_raise(cStandardError, "unknown value type to ignore %d", value_event.token)
+    rb_raise(cStandardError, "unknown value type to ignore %d", value_event.token);
 }
 
 /*
@@ -766,13 +766,13 @@ static void rb_yajl_projector_ignore_value(yajl_event_stream_t parser) {
 # Returns nothing.
 */
 static void rb_yajl_projector_ignore_container(yajl_event_stream_t parser) {
-  int depth = 1
+  int depth = 1;
 
   while (depth > 0) {
     yajl_event_t event = yajl_event_stream_next(parser);
 
     if (event.token == yajl_tok_left_bracket || event.token == yajl_tok_left_brace) {
-        depth += 1
+        depth += 1;
     } else if (event.token == yajl_tok_right_bracket || event.token == yajl_tok_right_brace) {
         depth -= 1;
     }
@@ -888,7 +888,7 @@ static VALUE rb_yajl_projector_project(VALUE self, VALUE schema) {
         .lexer = yajl_lex_alloc(&allocFuncs, 0, 1),
     };
 
-    VALUE result = rb_yajl_projector_filter_subtree(&parser, yajl_event_stream_next(&parser));
+    VALUE result = rb_yajl_projector_filter_subtree(&parser, schema, yajl_event_stream_next(&parser));
 
     yajl_lex_free(parser.lexer);
 
