@@ -333,7 +333,7 @@ EOJ
 
   it "errors when building if an object comma is missing" do
     expect {
-      project(nil, json: '{"a": 1 "b": 2}')
+      project(nil, json: '{"a": {"b": 2 "c": 3}}')
     }.to raise_error(Yajl::ParseError)
   end
 end
