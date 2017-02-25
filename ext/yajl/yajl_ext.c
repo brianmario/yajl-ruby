@@ -561,6 +561,13 @@ static VALUE rb_yajl_parser_set_complete_cb(VALUE self, VALUE callback) {
 }
 
 /*
+ * Document-method: project
+ */
+static VALUE rb_yajl_projector_project(VALUE self, VALUE schema) {
+    return Qnil;
+}
+
+/*
  * Document-class: Yajl::Encoder
  *
  * This class contains methods for encoding a Ruby object into JSON, streaming it's output into an IO object.
@@ -908,6 +915,9 @@ void Init_yajl() {
     rb_define_method(cParser, "parse_chunk", rb_yajl_parser_parse_chunk, 1);
     rb_define_method(cParser, "<<", rb_yajl_parser_parse_chunk, 1);
     rb_define_method(cParser, "on_parse_complete=", rb_yajl_parser_set_complete_cb, 1);
+
+    cProjector = rb_define_class_under(mYajl, "Projector", rb_cObject);
+    rb_define_method(cProjector, "project", rb_yajl_projector_project, 1);
 
     cEncoder = rb_define_class_under(mYajl, "Encoder", rb_cObject);
     rb_define_singleton_method(cEncoder, "new", rb_yajl_encoder_new, -1);
