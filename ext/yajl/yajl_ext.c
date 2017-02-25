@@ -564,7 +564,8 @@ static VALUE rb_yajl_parser_set_complete_cb(VALUE self, VALUE callback) {
  * Document-method: project
  */
 static VALUE rb_yajl_projector_project(VALUE self, VALUE schema) {
-    return Qnil;
+    VALUE hash = rb_hash_new();
+    return hash;
 }
 
 /*
