@@ -610,7 +610,7 @@ static yajl_event_t yajl_event_stream_next(yajl_event_stream_t parser, int pop) 
         yajl_event_t event;
 
         yajl_tok token;
-        if (pop == 0) {
+        if (pop == 1) {
             token = yajl_lex_lex(parser->lexer, (const unsigned char *)RSTRING_PTR(parser->buffer), RSTRING_LEN(parser->buffer), &parser->offset, (const unsigned char **)&event.buf, &event.len);
             printf("popping event %d\n", token);
         } else {
