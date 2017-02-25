@@ -626,8 +626,8 @@ static yajl_event_t yajl_event_stream_next(yajl_event_stream_t parser) {
 
 static VALUE rb_yajl_projector_filter_array_subtree(yajl_event_stream_t parser, VALUE schema, yajl_event_t event);
 static VALUE rb_yajl_projector_filter_object_subtree(yajl_event_stream_t parser, VALUE schema, yajl_event_t event);
-static VALUE rb_yajl_projector_ignore_value(yajl_event_stream_t parser);
-static VALUE rb_yajl_projector_ignore_container(yajl_event_stream_t parser);
+static void rb_yajl_projector_ignore_value(yajl_event_stream_t parser);
+static void rb_yajl_projector_ignore_container(yajl_event_stream_t parser);
 static VALUE rb_yajl_projector_build_subtree(yajl_event_stream_t parser, yajl_event_t event);
 
 static VALUE rb_yajl_projector_filter_subtree(yajl_event_stream_t parser, VALUE schema, yajl_event_t event) {
@@ -739,7 +739,7 @@ static VALUE rb_yajl_projector_filter_object_subtree(yajl_event_stream_t parser,
     #
     # Returns nothing.
 */
-static VALUE rb_yajl_projector_ignore_value(yajl_event_stream_t parser) {
+static void rb_yajl_projector_ignore_value(yajl_event_stream_t parser) {
     yajl_event_t value_event = yajl_event_stream_next(parser);
 
     switch (value_event.token) {
@@ -765,7 +765,7 @@ static VALUE rb_yajl_projector_ignore_value(yajl_event_stream_t parser) {
 #
 # Returns nothing.
 */
-static VALUE rb_yajl_projector_ignore_container(yajl_event_stream_t parser) {
+static void rb_yajl_projector_ignore_container(yajl_event_stream_t parser) {
   int depth = 1
 
   while (depth > 0) {
