@@ -53,7 +53,7 @@ static rb_encoding *utf8Encoding;
 #define RARRAY_LEN(s) (RARRAY(s)->len)
 #endif
 
-static VALUE cParseError, cEncodeError, mYajl, cParser, cProjector, cEncoder;
+static VALUE cStandardError, cParseError, cEncodeError, mYajl, cParser, cProjector, cEncoder;
 static ID intern_io_read, intern_call, intern_keys, intern_to_s,
             intern_to_json, intern_has_key, intern_to_sym, intern_as_json;
 static ID sym_allow_comments, sym_check_utf8, sym_pretty, sym_indent, sym_terminator, sym_symbolize_keys, sym_symbolize_names, sym_html_safe;
