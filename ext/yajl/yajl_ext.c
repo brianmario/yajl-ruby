@@ -702,7 +702,7 @@ static VALUE rb_yajl_projector_filter_object_subtree(yajl_event_stream_t parser,
 
         // nil schema means reify the subtree from here on
         // otherwise if the schema has a key for this we want it
-        bool interesting = (schema == Qnil || rb_funcall(schema, rb_intern("key?"), 1, key) == Qtrue);
+        int interesting = (schema == Qnil || rb_funcall(schema, rb_intern("key?"), 1, key) == Qtrue);
         if (!interesting) {
             rb_yajl_projector_ignore_value(parser);
             continue;
