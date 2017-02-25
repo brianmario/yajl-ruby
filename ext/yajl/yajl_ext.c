@@ -690,7 +690,7 @@ static VALUE rb_yajl_projector_filter_object_subtree(yajl_event_stream_t parser,
         }
 
         if (event.token != yajl_tok_string) {
-            rb_raise(cParseError, "Expected string or string with escapes, unexpected stream event %d", event.token);
+            rb_raise(cParseError, "Expected string, unexpected stream event %d", event.token);
         }
 
         VALUE key = rb_str_new(event.buf, event.len);
