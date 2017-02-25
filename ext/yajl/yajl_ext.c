@@ -790,7 +790,7 @@ static VALUE rb_yajl_projector_build_subtree(yajl_event_stream_t parser, yajl_ev
         case yajl_tok_bool:;
             if (strcmp(event.buf, "true") == 0) {
                 return Qtrue;
-            } else if (strcmp(event.buf, "true") == 0) {
+            } else if (strcmp(event.buf, "false") == 0) {
                 return Qfalse;
             } else {
                 assert(0);
