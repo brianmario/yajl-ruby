@@ -25,6 +25,7 @@
 #include "yajl_lex.h"
 #include "yajl_alloc.h"
 #include "api/yajl_common.h"
+#include "assert.h"
 
 #define YAJL_RB_TO_JSON                                   \
  VALUE rb_encoder, cls;                                   \
@@ -583,6 +584,11 @@ static yajl_tok yajl_event_stream_next(yajl_event_stream_t parser) {
     return yajl_tok_eof;
 }
 
+static VALUE rb_yajl_projector_filter_subtree(yajl_event_stream_t parser, VALUE schema, VALUE event) {
+    assert(parser->stream);
+    return Qnil;
+}
+
 /*
  * Document-method: project
  */
@@ -591,7 +597,7 @@ static VALUE rb_yajl_projector_project(VALUE self, VALUE schema) {
     yajl_set_default_alloc_funcs(&allocFuncs);
 
     struct yajl_event_stream_s parser = {
-        .stream = Qnil,
+        .stream = rb_ivar_get(self, rb_intern("stream")),
 
         .buffer = malloc(4096),
         .size = 4096,
@@ -606,10 +612,6 @@ static VALUE rb_yajl_projector_project(VALUE self, VALUE schema) {
     free(parser.buffer);
 
     return result;
-}
-
-static VALUE rb_yajl_projector_filter_subtree(yajl_event_stream_t parser, VALUE schema, VALUE event) {
-    return Qnil;
 }
 
 /*
