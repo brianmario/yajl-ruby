@@ -688,6 +688,10 @@ static VALUE rb_yajl_projector_build_subtree(yajl_event_stream_t parser, yajl_ev
 
             while (1) {
                 event = yajl_event_stream_next(parser);
+                if (event.token == yajl_tok_comma) {
+                    continue;
+                }
+
                 if (event.token == yajl_tok_right_bracket) {
                     break;
                 }
