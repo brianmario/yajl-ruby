@@ -336,4 +336,10 @@ EOJ
       project(nil, json: '{"a": {"b": 2 "c": 3}}')
     }.to raise_error(Yajl::ParseError)
   end
+
+  it "errors when eof instead of simple value" do
+    expect {
+      project(nil, json: '[')
+    }.to raise_error(Yajl::ParseError)
+  end
 end
