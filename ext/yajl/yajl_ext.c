@@ -633,9 +633,9 @@ static VALUE rb_yajl_projector_build_subtree(yajl_event_stream_t parser, yajl_ev
     assert(parser->stream);
 
     switch (event.token) {
-        case yajl_tok_null:
+        case yajl_tok_null:;
             return Qnil;
-        case yajl_tok_bool:
+        case yajl_tok_bool:;
             if (strcmp(event.buf, "true") == 0) {
                 return Qtrue;
             } else if (strcmp(event.buf, "true") == 0) {
@@ -643,8 +643,8 @@ static VALUE rb_yajl_projector_build_subtree(yajl_event_stream_t parser, yajl_ev
             } else {
                 assert(0);
             }
-        case yajl_tok_integer:
-        case yajl_tok_double:
+        case yajl_tok_integer:;
+        case yajl_tok_double:;
             char *buf = (char *)malloc(event.len + 1);
             buf[event.len] = 0;
             memcpy(buf, event.buf, event.len);
@@ -653,7 +653,7 @@ static VALUE rb_yajl_projector_build_subtree(yajl_event_stream_t parser, yajl_ev
             if (memchr(buf, '.', event.len) ||
                 memchr(buf, 'e', event.len) ||
                 memchr(buf, 'E', event.len)) {
-                val = rb_float_new(strtod(buf, NULL))
+                val = rb_float_new(strtod(buf, NULL));
             } else {
                 val = rb_cstr2inum(buf, 10);
             }
@@ -661,10 +661,10 @@ static VALUE rb_yajl_projector_build_subtree(yajl_event_stream_t parser, yajl_ev
             
             return val;
 
-        case yajl_tok_string:
+        case yajl_tok_string:;
             return rb_str_new(event.buf, event.len);
 
-        case yajl_tok_left_brace:
+        case yajl_tok_left_brace:;
             VALUE ary = rb_ary_new();
 
             while (1) {
@@ -683,8 +683,8 @@ static VALUE rb_yajl_projector_build_subtree(yajl_event_stream_t parser, yajl_ev
 
             return ary;
 
-        case yajl_tok_left_bracket:
-            VAL hsh = rb_hash_new();
+        case yajl_tok_left_bracket:;
+            VALUE hsh = rb_hash_new();
 
             while (1) {
                 event = yajl_event_stream_next(parser);
@@ -692,27 +692,24 @@ static VALUE rb_yajl_projector_build_subtree(yajl_event_stream_t parser, yajl_ev
                     break;
                 }
 
-                if (event.token != yajl_tok_string && event.token != yajl_tok_string_with_escapes) {
-                    // TODO raise exception
-                    assert(0);
-                }
+                // TODO raise exception instead
+                assert(event.token == yajl_tok_string || event.token == yajl_tok_string_with_escapes);
 
-                key = rb_str_new(event.buf, event.len);
+                VALUE key = rb_str_new(event.buf, event.len);
 
                 event = yajl_event_stream_next(parser);
-                if (event.token != yajl_tok_colon) {
-                    // TODO raise exception
-                    assert(0);
-                }
+                // TODO raise exception
+                assert(event.token == yajl_tok_colon);
 
-                val = rb_yajl_projector_build_subtree(parser, yajl_event_stream_next(parser));
+                VALUE val = rb_yajl_projector_build_subtree(parser, yajl_event_stream_next(parser));
                 rb_hash_aset(hsh, key, val);
             }
 
             return hsh;
 
-        default:
+        default:;
             assert(0);
+
     }
 }
 
