@@ -687,7 +687,7 @@ static VALUE rb_yajl_projector_filter_array_subtree(yajl_event_stream_t parser, 
 
             event = yajl_event_stream_next(parser, 0);
             if (!(event.token == yajl_tok_string || event.token == yajl_tok_integer || event.token == yajl_tok_double || event.token == yajl_tok_null || event.token == yajl_tok_bool || event.token == yajl_tok_left_bracket || event.token == yajl_tok_left_brace)) {
-                rb_raise(cParseError, "read a comma, expected a key to follow, actually read %d", event.token);
+                rb_raise(cParseError, "read a comma, expected a value to follow, actually read %d", event.token);
             }
         } else if (event.token != yajl_tok_right_brace) {
             rb_raise(cParseError, "didn't read a comma, expected closing array, actually read %d", event.token);
