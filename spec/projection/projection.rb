@@ -311,9 +311,15 @@ EOJ
     }.to raise_error(StandardError)
   end
 
-  it "errors with invalid object syntax" do
+  it "errors with ignored unbalanced object syntax" do
     expect {
       project({"b" => nil}, json: '{"a": {{, "b": 2}')
     }.to raise_error(StandardError)
+  end
+
+  it "errors with accepted unbalanced object tokens" do
+    expect {
+      project({"a" => nil}, json: '{"a": {"b": 2}')
+    }.to raise_error(Yajl::ParseError)
   end
 end
