@@ -322,4 +322,10 @@ EOJ
       project({"a" => nil}, json: '{"a": {"b": 2}')
     }.to raise_error(Yajl::ParseError)
   end
+
+  it "errors if an object comma is missing" do
+    expect {
+      project({"a" => nil}, json: '{"a": 1 "b": 2}')
+    }.to raise_error(Yajl::ParseError)
+  end
 end
