@@ -304,4 +304,10 @@ EOJ
       }
     }])
   end
+
+  it "errors with invalid json" do
+    expect {
+      project({"b" => nil}, json: '{"a":, "b": 2}')
+    }.to raise_error(StandardError)
+  end
 end
