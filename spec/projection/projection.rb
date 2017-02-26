@@ -379,6 +379,14 @@ EOJ
     expect(project(nil, over: json)).to eql(json)
   end
 
+  it "supports bigger read buffers" do
+    json = {
+      "a"*10_000 => "b"*10_000
+    }.to_json
+    stream = StringIO.new(json)
+    expect(Yajl::Projector.new(stream, 8192).project(nil)).to have_key("a"*10_000)
+  end
+
   it "errors if starting with closing object"
 
   it "handles strings with unicode escape sequences as object keys"
