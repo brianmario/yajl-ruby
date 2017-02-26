@@ -859,10 +859,19 @@ static VALUE rb_yajl_projector_build_simple_value(yajl_event_stream_t parser, ya
             
             return val;
 
-        case yajl_tok_string:;
-            return rb_str_new(event.buf, event.len);
+        case yajl_tok_string:; {
+            VALUE str = rb_str_new(event.buf, event.len);
+            rb_enc_associate(str, utf8Encoding);
 
-        case yajl_tok_string_with_escapes:;
+            rb_encoding *default_internal_enc = rb_default_internal_encoding();
+            if (default_internal_enc) {
+                str = rb_str_export_to_enc(str, default_internal_enc);
+            }
+
+            return str;
+        }
+
+        case yajl_tok_string_with_escapes:; {
             printf("decoding string with escapes\n");
 
             yajl_buf strBuf = yajl_buf_alloc(parser->funcs);
@@ -879,6 +888,7 @@ static VALUE rb_yajl_projector_build_simple_value(yajl_event_stream_t parser, ya
             }
 
             return str;
+        }
 
         case yajl_tok_eof:;
             rb_raise(cParseError, "unexpected eof while constructing value");
