@@ -434,4 +434,8 @@ EOJ
   it "ignores strings with utf16 escape sequences" do
     expect(project({"grinning face with open mouth" => nil}, json: '{"grinning face": "\ud83d\ude00", "grinning face with open mouth": "\ud83d\ude03"}')).to eql({"grinning face with open mouth" => "😃"})
   end
+
+  it "handles objects whose second key has escape sequences" do
+    expect(project(nil, json: '{"foo": "bar", "\ud83d\ude00": "grinning face"}')).to eql({"foo" => "bar", "😀" => "grinning face"})
+  end
 end
