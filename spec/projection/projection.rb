@@ -403,7 +403,9 @@ EOJ
     expect(project(nil, json: '{"😀": "grinning face"}')).to eql({"😀" => "grinning face"})
   end
 
-  it "handles strings with utf16 escape sequences as object values"
+  it "handles strings with utf16 escape sequences as object values" do
+    expect(project(nil, json: '{"grinning face": "\ud83d\ude00"}')).to eql({"grinning face" => "😀"})
+  end
 
   it "handles strings with utf16 escape sequences as array values" do
     projection = project(nil, json: '["\ud83d\ude00"]')
