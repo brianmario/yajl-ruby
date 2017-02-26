@@ -658,7 +658,7 @@ static VALUE rb_yajl_projector_filter_subtree(yajl_event_stream_t parser, VALUE 
         return rb_yajl_projector_filter_object_subtree(parser, schema, event);
     }
 
-    rb_raise(cStandardError, "cannot filter %d subtree", event.token);
+    rb_raise(cParseError, "expected left bracket or brace, actually read %d", event.token);
     
     return Qnil;
 }
