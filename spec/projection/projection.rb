@@ -393,9 +393,15 @@ EOJ
     }.to raise_error(Yajl::ParseError)
   end
 
-  it "handles objects with utf16 escape sequences as keys"
+  it "handles objects with utf16 escape sequences as keys" do
+    projection = project(nil, json: '{"\ud83d\ude00": "grinning face"}')
+    literal = {"😀" => "grinning face"}
+    expect(projection).to eql(literal)
+  end
 
-  it "handles objects with non-ascii utf8 bytes as keys"
+  it "handles objects with non-ascii utf8 bytes as keys" do
+    expect(project(nil, json: '{"😀": "grinning face"}')).to eql({"😀" => "grinning face"})
+  end
 
   it "handles strings with utf16 escape sequences as object values"
 
