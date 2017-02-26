@@ -396,4 +396,6 @@ EOJ
   it "handles strings with unicode escape sequences as object keys"
 
   it "handles strings with unicode escape sequences as object values"
+
+  it "handles strings with unicode escape sequences as array vaues"
 end
