@@ -393,9 +393,9 @@ EOJ
     }.to raise_error(Yajl::ParseError)
   end
 
-  it "handles strings with unicode escape sequences as object keys"
+  it "handles strings with utf16 escape sequences as object keys"
 
-  it "handles strings with unicode escape sequences as object values"
+  it "handles strings with utf16 escape sequences as object values"
 
   it "handles strings with utf16 escape sequences as array values" do
     projection = project(nil, json: '["\ud83d\ude00"]')
