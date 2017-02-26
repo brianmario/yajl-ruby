@@ -409,5 +409,15 @@ EOJ
     expect(projection).to eql(literal)
   end
 
-  it "handles strings with non-ascii utf8 bytes as array values"
+  it "handles strings with non-ascii utf8 bytes as array values" do
+    projection = project(nil, json: '["😀"]')
+    puts projection.first.inspect
+    puts projection.first.bytes
+
+    literal = ["😀"]
+    puts literal.first.inspect
+    puts literal.first.bytes
+
+    expect(projection).to eql(literal)
+  end
 end
