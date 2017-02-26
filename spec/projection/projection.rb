@@ -387,7 +387,11 @@ EOJ
     expect(Yajl::Projector.new(stream, 8192).project(nil)).to have_key("a"*10_000)
   end
 
-  it "errors if starting with closing object"
+  it "errors if starting with closing object" do
+    expect {
+      project(nil, json: '}')
+    }.to raise_error(Yajl::ParseError)
+  end
 
   it "handles strings with unicode escape sequences as object keys"
 
