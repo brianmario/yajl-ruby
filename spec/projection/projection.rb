@@ -393,7 +393,9 @@ EOJ
     }.to raise_error(Yajl::ParseError)
   end
 
-  it "handles strings with utf16 escape sequences as object keys"
+  it "handles objects with utf16 escape sequences as keys"
+
+  it "handles objects with non-ascii utf8 bytes as keys"
 
   it "handles strings with utf16 escape sequences as object values"
 
