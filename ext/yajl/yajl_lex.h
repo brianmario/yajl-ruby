@@ -63,6 +63,7 @@ typedef enum {
 
 typedef struct yajl_lexer_t * yajl_lexer;
 
+const char *yajl_tok_name(yajl_tok tok);
 
 YAJL_API
 yajl_lexer yajl_lex_alloc(yajl_alloc_funcs * alloc,

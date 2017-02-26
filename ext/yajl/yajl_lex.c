@@ -38,29 +38,25 @@
 #include <assert.h>
 #include <string.h>
 
-#ifdef YAJL_LEXER_DEBUG
-static const char *
-tokToStr(yajl_tok tok) 
-{
+const char *yajl_tok_name(yajl_tok tok) {
     switch (tok) {
         case yajl_tok_bool: return "bool";
         case yajl_tok_colon: return "colon";
         case yajl_tok_comma: return "comma";
         case yajl_tok_eof: return "eof";
         case yajl_tok_error: return "error";
-        case yajl_tok_left_brace: return "brace";
-        case yajl_tok_left_bracket: return "bracket";
+        case yajl_tok_left_brace: return "open_array";
+        case yajl_tok_left_bracket: return "open_object";
         case yajl_tok_null: return "null";
         case yajl_tok_integer: return "integer";
         case yajl_tok_double: return "double";
-        case yajl_tok_right_brace: return "brace";
-        case yajl_tok_right_bracket: return "bracket";
+        case yajl_tok_right_brace: return "close_array";
+        case yajl_tok_right_bracket: return "close_object";
         case yajl_tok_string: return "string";
         case yajl_tok_string_with_escapes: return "string_with_escapes";
     }
     return "unknown";
 }
-#endif
 
 /* Impact of the stream parsing feature on the lexer:
  *
