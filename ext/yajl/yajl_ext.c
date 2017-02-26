@@ -863,7 +863,6 @@ static VALUE rb_yajl_projector_build_simple_value(yajl_event_stream_t parser, ya
 
         default:;
             assert(0);
-
     }
 }
 
