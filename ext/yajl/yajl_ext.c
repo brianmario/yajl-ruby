@@ -24,6 +24,8 @@
 #include "yajl_ext.h"
 #include "yajl_lex.h"
 #include "yajl_alloc.h"
+#include "yajl_buf.h"
+#include "yajl_encode.h"
 #include "api/yajl_common.h"
 #include "assert.h"
 
@@ -569,6 +571,8 @@ static VALUE rb_yajl_parser_set_complete_cb(VALUE self, VALUE callback) {
  * then runs the lexer over that stream.
  */
 struct yajl_event_stream_s {
+    yajl_alloc_funcs *funcs;
+
     VALUE stream;     // source
 
     VALUE buffer;
@@ -858,6 +862,24 @@ static VALUE rb_yajl_projector_build_simple_value(yajl_event_stream_t parser, ya
         case yajl_tok_string:;
             return rb_str_new(event.buf, event.len);
 
+        case yajl_tok_string_with_escapes:;
+            printf("decoding string with escapes\n");
+
+            yajl_buf strBuf = yajl_buf_alloc(parser->funcs);
+            yajl_string_decode(strBuf, (const unsigned char *)event.buf, event.len);
+
+            VALUE str = rb_str_new((const char *)yajl_buf_data(strBuf), yajl_buf_len(strBuf));
+            rb_enc_associate(str, utf8Encoding);
+
+            yajl_buf_free(strBuf);
+
+            rb_encoding *default_internal_enc = rb_default_internal_encoding();
+            if (default_internal_enc) {
+                str = rb_str_export_to_enc(str, default_internal_enc);
+            }
+
+            return str;
+
         case yajl_tok_eof:;
             rb_raise(cParseError, "unexpected eof while constructing value");
 
@@ -879,6 +901,8 @@ static VALUE rb_yajl_projector_project(VALUE self, VALUE schema) {
     VALUE buffer = rb_str_new(0, buffer_size);
 
     struct yajl_event_stream_s parser = {
+        .funcs = &allocFuncs,
+
         .stream = stream,
 
         .buffer = buffer,

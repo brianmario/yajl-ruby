@@ -397,7 +397,15 @@ EOJ
 
   it "handles strings with unicode escape sequences as object values"
 
-  it "handles strings with unicode escape sequences as array values" do
-    expect(project(nil, json: '["\\u1f600"]')).to eql(["\u{1f600}"])
+  it "handles strings with utf16 escape sequences as array values" do
+    projection = project(nil, json: '["\ud83d\ude00"]')
+    puts projection.first.inspect
+    puts projection.first.bytes
+
+    literal = ["😀"]
+    puts literal.first.inspect
+    puts literal.first.bytes
+
+    expect(projection).to eql(literal)
   end
 end
