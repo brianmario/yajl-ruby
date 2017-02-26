@@ -22,5 +22,6 @@ Gem::Specification.new do |s|
   # benchmarks
   s.add_development_dependency 'activesupport', '~> 3.1.2'
   s.add_development_dependency 'json'
+  s.add_development_dependency "benchmark-memory", "~> 0.1"
 end
 

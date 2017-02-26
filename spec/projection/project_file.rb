@@ -1,5 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
+require 'benchmark'
+
 describe "file projection" do
   it "projects file streams" do
     schema = {
@@ -30,11 +32,8 @@ describe "file projection" do
       return
     end
 
-    file = File.open(file_path, 'r')
-    begin
-      puts Yajl::Projector.new(file).project(schema)
-    ensure
-      file.close
-    end
+    Benchmark.bmbm { |x|
+      x.report("project (yajl)") { Yajl::Projector.new(File.open(file_path, 'r')).project(schema) }
+    }
   end
 end
