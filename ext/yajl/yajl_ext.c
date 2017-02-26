@@ -596,7 +596,7 @@ static yajl_event_t yajl_event_stream_next(yajl_event_stream_t parser, int pop) 
 
     while (1) {
         if (parser->offset >= RSTRING_LEN(parser->buffer)) {
-            printf("reading offset %d size %ld\n", parser->offset, RSTRING_LEN(parser->buffer));
+            //printf("reading offset %d size %ld\n", parser->offset, RSTRING_LEN(parser->buffer));
 
             // Refill the buffer
             rb_funcall(parser->stream, intern_io_read, 2, INT2FIX(RSTRING_LEN(parser->buffer)), parser->buffer);
@@ -615,9 +615,9 @@ static yajl_event_t yajl_event_stream_next(yajl_event_stream_t parser, int pop) 
 
         yajl_tok token;
         if (pop == 0) {
-            printf("peeking %p %ld %d\n", RSTRING_PTR(parser->buffer), RSTRING_LEN(parser->buffer), parser->offset);
+            //printf("peeking %p %ld %d\n", RSTRING_PTR(parser->buffer), RSTRING_LEN(parser->buffer), parser->offset);
             token = yajl_lex_peek(parser->lexer, (const unsigned char *)RSTRING_PTR(parser->buffer), RSTRING_LEN(parser->buffer), parser->offset);
-            printf("peeked event %d\n", token);
+            //printf("peeked event %d\n", token);
 
             if (token == yajl_tok_eof) {
                 parser->offset = RSTRING_LEN(parser->buffer);
@@ -629,9 +629,9 @@ static yajl_event_t yajl_event_stream_next(yajl_event_stream_t parser, int pop) 
             return event;
         }
 
-        printf("popping\n");
+        //printf("popping\n");
         token = yajl_lex_lex(parser->lexer, (const unsigned char *)RSTRING_PTR(parser->buffer), RSTRING_LEN(parser->buffer), &parser->offset, (const unsigned char **)&event.buf, &event.len);
-        printf("popped event %d\n", token);
+        //printf("popped event %d\n", token);
 
         if (token == yajl_tok_eof) {
            continue;
@@ -887,7 +887,7 @@ static VALUE rb_yajl_projector_build_string(yajl_event_stream_t parser, yajl_eve
         }
 
         case yajl_tok_string_with_escapes:; {
-            printf("decoding string with escapes\n");
+            //printf("decoding string with escapes\n");
 
             yajl_buf strBuf = yajl_buf_alloc(parser->funcs);
             yajl_string_decode(strBuf, (const unsigned char *)event.buf, event.len);
