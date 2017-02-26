@@ -370,14 +370,14 @@ EOJ
     expect(project(nil, json: json)).to eql(Array.new(2048, 1))
   end
 
-  # it "supports parsing big strings" do
-  #   json = [
-  #     "a",
-  #     "b"*10_000,
-  #     "c",
-  #   ]
-  #   expect(project(nil, over: json)).to eql(json)
-  # end
+  it "supports parsing big strings" do
+    json = [
+      "a",
+      "b"*10_000,
+      "c",
+    ]
+    expect(project(nil, over: json)).to eql(json)
+  end
 
   it "errors if starting with closing object"
 
