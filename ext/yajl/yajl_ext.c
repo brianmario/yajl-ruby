@@ -611,8 +611,9 @@ static yajl_event_t yajl_event_stream_next(yajl_event_stream_t parser, int pop) 
 
         yajl_tok token;
         if (pop == 0) {
+            printf("peeking %p %d %d\n", RSTRING_PTR(parser->buffer), RSTRING_LEN(parser->buffer), parser->offset);
             token = yajl_lex_peek(parser->lexer, (const unsigned char *)RSTRING_PTR(parser->buffer), RSTRING_LEN(parser->buffer), parser->offset);
-            printf("peeking event %d\n", token);
+            printf("peeked event %d\n", token);
 
             if (token == yajl_tok_eof) {
                 parser->offset = RSTRING_LEN(parser->buffer);
@@ -624,8 +625,9 @@ static yajl_event_t yajl_event_stream_next(yajl_event_stream_t parser, int pop) 
             return event;
         }
 
+        printf("popping\n");
         token = yajl_lex_lex(parser->lexer, (const unsigned char *)RSTRING_PTR(parser->buffer), RSTRING_LEN(parser->buffer), &parser->offset, (const unsigned char **)&event.buf, &event.len);
-        printf("popping event %d\n", token);
+        printf("popped event %d\n", token);
 
         if (token == yajl_tok_eof) {
            continue;
