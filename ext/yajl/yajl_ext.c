@@ -791,6 +791,7 @@ static void rb_yajl_projector_ignore_value(yajl_event_stream_t parser) {
         case yajl_tok_integer:
         case yajl_tok_double:
         case yajl_tok_string:
+        case yajl_tok_string_with_escapes:
             return;
         default:
             break;
