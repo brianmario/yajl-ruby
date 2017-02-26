@@ -875,13 +875,15 @@ static VALUE rb_yajl_projector_project(VALUE self, VALUE schema) {
     yajl_set_default_alloc_funcs(&allocFuncs);
 
     VALUE stream = rb_iv_get(self, "@stream");
-    VALUE buffer = rb_str_new(0, 4096);
+
+    long buffer_size = FIX2LONG(rb_iv_get(self, "@buffer_size"));
+    VALUE buffer = rb_str_new(0, buffer_size);
 
     struct yajl_event_stream_s parser = {
         .stream = stream,
 
         .buffer = buffer,
-        .offset = 4096,
+        .offset = buffer_size,
 
         .lexer = yajl_lex_alloc(&allocFuncs, 0, 1),
     };

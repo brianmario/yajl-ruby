@@ -24,9 +24,9 @@ module Yajl
   end
 
   class Projector
-    def initialize(stream)
+    def initialize(stream, read_bufsize=4096)
       @stream = stream
-      puts stream
+      @buffer_size = read_bufsize
     end
   end
 
