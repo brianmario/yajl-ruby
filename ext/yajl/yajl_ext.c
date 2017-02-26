@@ -611,7 +611,7 @@ static yajl_event_t yajl_event_stream_next(yajl_event_stream_t parser, int pop) 
 
         yajl_tok token;
         if (pop == 0) {
-            printf("peeking %p %d %d\n", RSTRING_PTR(parser->buffer), RSTRING_LEN(parser->buffer), parser->offset);
+            printf("peeking %p %ld %d\n", RSTRING_PTR(parser->buffer), RSTRING_LEN(parser->buffer), parser->offset);
             token = yajl_lex_peek(parser->lexer, (const unsigned char *)RSTRING_PTR(parser->buffer), RSTRING_LEN(parser->buffer), parser->offset);
             printf("peeked event %d\n", token);
 
