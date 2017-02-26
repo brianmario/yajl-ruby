@@ -650,6 +650,7 @@ static VALUE rb_yajl_projector_filter_object_subtree(yajl_event_stream_t parser,
 static void rb_yajl_projector_ignore_value(yajl_event_stream_t parser);
 static void rb_yajl_projector_ignore_container(yajl_event_stream_t parser);
 static VALUE rb_yajl_projector_build_simple_value(yajl_event_stream_t parser, yajl_event_t event);
+static VALUE rb_yajl_projector_build_string(yajl_event_stream_t parser, yajl_event_t event);
 
 static VALUE rb_yajl_projector_filter_subtree(yajl_event_stream_t parser, VALUE schema, yajl_event_t event) {
     assert(parser->stream);
@@ -716,11 +717,11 @@ static VALUE rb_yajl_projector_filter_object_subtree(yajl_event_stream_t parser,
             break;
         }
 
-        if (event.token != yajl_tok_string) {
+        if (!(event.token == yajl_tok_string || event.token == yajl_tok_string_with_escapes)) {
             rb_raise(cParseError, "Expected string, unexpected stream event %d", event.token);
         }
 
-        VALUE key = rb_str_new(event.buf, event.len);
+        VALUE key = rb_yajl_projector_build_string(parser, event);
 
         event = yajl_event_stream_next(parser, 1);
         if (!(event.token == yajl_tok_colon)) {
@@ -859,6 +860,20 @@ static VALUE rb_yajl_projector_build_simple_value(yajl_event_stream_t parser, ya
             
             return val;
 
+        case yajl_tok_string:;
+        case yajl_tok_string_with_escapes:;
+            return rb_yajl_projector_build_string(parser, event);
+
+        case yajl_tok_eof:;
+            rb_raise(cParseError, "unexpected eof while constructing value");
+
+        default:;
+            assert(0);
+    }
+}
+
+static VALUE rb_yajl_projector_build_string(yajl_event_stream_t parser, yajl_event_t event) {
+    switch (event.token) {
         case yajl_tok_string:; {
             VALUE str = rb_str_new(event.buf, event.len);
             rb_enc_associate(str, utf8Encoding);
@@ -890,11 +905,9 @@ static VALUE rb_yajl_projector_build_simple_value(yajl_event_stream_t parser, ya
             return str;
         }
 
-        case yajl_tok_eof:;
-            rb_raise(cParseError, "unexpected eof while constructing value");
-
-        default:;
+        default:; {
             assert(0);
+        }
     }
 }
 
