@@ -740,6 +740,10 @@ yajl_tok yajl_lex_peek(yajl_lexer lexer, const unsigned char * jsonText,
     tok = yajl_lex_lex(lexer, jsonText, jsonTextLen, &offset,
                        &outBuf, &outLen);
 
+    if (tok == yajl_tok_eof) {
+        return tok;
+    }
+
     lexer->bufOff = bufOff;
     lexer->bufInUse = bufInUse;
     yajl_buf_truncate(lexer->buf, bufLen);
