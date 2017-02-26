@@ -366,6 +366,7 @@ EOJ
   it "reads into a second buffer" do
     json = "[" + "1,"*2047 + "1 ]"
     expect(json.size).to eql(4098)
+    expect(JSON.parse(json)).to eql(Array.new(2048, 1))
     expect(project(nil, json: json)).to eql(Array.new(2048, 1))
   end
 
