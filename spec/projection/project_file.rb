@@ -15,7 +15,7 @@ describe "file projection" do
       "ref" => nil,
       "compare" => nil,
       "commits" => {
-        "discinct" => nil,
+        "distinct" => nil,
         "message" => nil,
         "url" => nil,
         "id" => nil,
