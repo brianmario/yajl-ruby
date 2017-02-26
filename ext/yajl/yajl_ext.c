@@ -762,7 +762,7 @@ static VALUE rb_yajl_projector_filter_object_subtree(yajl_event_stream_t parser,
             assert(event.token == yajl_tok_comma);
 
             event = yajl_event_stream_next(parser, 0);
-            if (event.token != yajl_tok_string) {
+            if (!(event.token == yajl_tok_string || event.token == yajl_tok_string_with_escapes)) {
                 rb_raise(cParseError, "read a comma, expected a key to follow, actually read %d", event.token);
             }
         } else if (event.token != yajl_tok_right_bracket) {
