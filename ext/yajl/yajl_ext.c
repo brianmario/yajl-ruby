@@ -592,7 +592,7 @@ static yajl_event_t yajl_event_stream_next(yajl_event_stream_t parser, int pop) 
 
     while (1) {
         if (parser->offset >= RSTRING_LEN(parser->buffer)) {
-            printf("reading from stream %p %ld %p\n", (void *)parser->stream, RSTRING_LEN(parser->buffer), (void *)parser->buffer);
+            printf("reading offset %d size %ld\n", parser->offset, RSTRING_LEN(parser->buffer));
 
             // Refill the buffer
             rb_funcall(parser->stream, intern_io_read, 2, INT2FIX(RSTRING_LEN(parser->buffer)), parser->buffer);
