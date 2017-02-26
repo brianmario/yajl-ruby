@@ -408,4 +408,6 @@ EOJ
 
     expect(projection).to eql(literal)
   end
+
+  it "handles strings with non-ascii utf8 bytes as array values"
 end
