@@ -397,5 +397,7 @@ EOJ
 
   it "handles strings with unicode escape sequences as object values"
 
-  it "handles strings with unicode escape sequences as array vaues"
+  it "handles strings with unicode escape sequences as array values" do
+    expect(project(nil, json: '["\\u1f600"]')).to eql(["\u{1f600}"])
+  end
 end
