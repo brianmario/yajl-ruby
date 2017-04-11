@@ -13,6 +13,15 @@ describe "Chunked parser" do
     @parser.on_parse_complete = @callback
   end
 
+  it "should take the callback as block parameter" do
+    @callback = lambda { |hash|
+      # no-op
+    }
+    @parser = Yajl::Parser.new(&@callback)
+    @callback.should_receive(:call).with(@final)
+    @parser << '[{"abc": 123},{"def": 456}]'
+  end
+
   it "should parse a single chunk" do
     expect(@callback).to receive(:call).with(@final)
     @parser << '[{"abc": 123},{"def": 456}]'
