@@ -4,6 +4,7 @@ require 'socket'
 require 'yajl'
 require 'yajl/version' unless defined? Yajl::VERSION
 require 'uri'
+require 'cgi'
 
 module Yajl
   # This module is for making HTTP requests to which the response bodies (and possibly requests in the near future)
@@ -101,7 +102,7 @@ module Yajl
           default_headers["Content-Type"] = opts["Content-Type"] || "application/x-www-form-urlencoded"
           body = opts.delete(:body)
           if body.is_a?(Hash)
-            body = body.keys.collect {|param| "#{URI.escape(param.to_s)}=#{URI.escape(body[param].to_s)}"}.join('&')
+            body = body.keys.collect {|param| "#{CGI.escape(param.to_s)}=#{CGI.escape(body[param].to_s)}"}.join('&')
           end
           default_headers["Content-Length"] = body.length
         end
@@ -161,7 +162,7 @@ module Yajl
           if block_given?
             chunkLeft = 0
             while !socket.eof? && (line = socket.gets)
-              break if line.match /^0.*?\r\n/
+              break if line.match(/^0.*?\r\n/)
               next if line == "\r\n"
               size = line.hex
               json = socket.read(size)
