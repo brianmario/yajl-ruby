@@ -30,6 +30,7 @@
 #define RSTRING_NOT_MODIFIED
 
 #include <ruby.h>
+#include <ruby/st.h>
 
 #ifdef HAVE_RUBY_ENCODING_H
 #include <ruby/encoding.h>
@@ -98,6 +99,8 @@ typedef struct {
     int objectsFound;
     int symbolizeKeys;
     yajl_handle parser;
+    st_table * strings;
+    st_table * keycache;
 } yajl_parser_wrapper;
 
 typedef struct {
