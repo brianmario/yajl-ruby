@@ -2,6 +2,13 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe "One-off JSON examples" do
+  it "should not blow up with a bad surrogate trailer" do
+    # https://github.com/brianmario/yajl-ruby/issues/176
+    bad_json = "{\"e\":{\"\\uD800\\\\DC00\":\"a\"}}"
+
+    Yajl::Parser.new.parse(bad_json)
+  end
+
   it "should parse 23456789012E666 and return Infinity" do
     infinity = (1.0/0)
     silence_warnings do
