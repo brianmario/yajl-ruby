@@ -1,7 +1,7 @@
 require 'rake/extensiontask'
 
 def gemspec
-  @clean_gemspec ||= eval(File.read(File.expand_path('../../yajl-ruby.gemspec', __FILE__)))
+  @clean_gemspec ||= eval(File.read(File.expand_path('../../yajl.gemspec', __FILE__)))
 end
 
 Rake::ExtensionTask.new('yajl', gemspec) do |ext|

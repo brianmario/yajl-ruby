@@ -22,7 +22,7 @@ You can read more info at the project's website http://lloyd.github.com/yajl or 
 Go ahead and install it as usual:
 
 ```
-gem install yajl-ruby
+gem install yajl
 ```
 
 Or use your Gemfile:
