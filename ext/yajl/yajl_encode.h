@@ -33,6 +33,8 @@
 #ifndef __YAJL_ENCODE_H__
 #define __YAJL_ENCODE_H__
 
+#define NDEBUG FALSE
+
 #include "yajl_buf.h"
 #include "api/yajl_gen.h"
 
