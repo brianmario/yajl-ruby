@@ -18,6 +18,14 @@ describe "projection" do
     expect(projection['age']).to eql(nil)
   end
 
+  it "should raise an exception and not leak memory" do
+    stream = StringIO.new('foo')
+    projector = Yajl::Projector.new(stream)
+    expect {
+      projector.project({"name" => nil})
+    }.to raise_error(Yajl::ParseError)
+  end
+
   def project(schema, over: "", json: nil, stream: nil)
     if stream.nil?
       if json.nil?

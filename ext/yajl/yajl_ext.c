@@ -663,8 +663,6 @@ static VALUE rb_yajl_projector_filter_subtree(yajl_event_stream_t parser, VALUE 
         return rb_yajl_projector_filter_object_subtree(parser, schema, event);
     }
 
-    rb_raise(cParseError, "expected left bracket or brace, actually read %s", yajl_tok_name(event.token));
-
     return Qnil;
 }
 
@@ -739,14 +737,14 @@ static VALUE rb_yajl_projector_filter_object_subtree(yajl_event_stream_t parser,
         yajl_event_t value_event = yajl_event_stream_next(parser, 1);
 
         VALUE val;
-        if (value_event.token == yajl_tok_left_bracket || value_event.token == yajl_tok_left_brace) {
-            VALUE key_schema;
-            if (schema == Qnil) {
-                key_schema = Qnil;
-            } else {
-                key_schema = rb_hash_aref(schema, key);
-            }
+        VALUE key_schema;
+        if (schema == Qnil) {
+            key_schema = Qnil;
+        } else {
+            key_schema = rb_hash_aref(schema, key);
+        }
 
+        if (value_event.token == yajl_tok_left_bracket || value_event.token == yajl_tok_left_brace) {
             val = rb_yajl_projector_filter_subtree(parser, key_schema, value_event);
         } else {
             val = rb_yajl_projector_build_simple_value(parser, value_event);
@@ -936,12 +934,21 @@ static VALUE rb_yajl_projector_project(VALUE self, VALUE schema) {
         .lexer = yajl_lex_alloc(&allocFuncs, 0, 1),
     };
 
-    VALUE result = rb_yajl_projector_filter_subtree(&parser, schema, yajl_event_stream_next(&parser, 1));
-
-    yajl_lex_free(parser.lexer);
+    yajl_event_t event = yajl_event_stream_next(&parser, 1);
 
     RB_GC_GUARD(stream);
     RB_GC_GUARD(buffer);
+
+    VALUE result;
+
+    if (event.token == yajl_tok_left_brace || event.token == yajl_tok_left_bracket) {
+        result = rb_yajl_projector_filter_subtree(&parser, schema, event);
+    } else {
+        yajl_lex_free(parser.lexer);
+        rb_raise(cParseError, "expected left bracket or brace, actually read %s", yajl_tok_name(event.token));
+    }
+
+    yajl_lex_free(parser.lexer);
 
     return result;
 }
