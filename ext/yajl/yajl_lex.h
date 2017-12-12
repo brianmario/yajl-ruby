@@ -36,33 +36,34 @@
 #include "api/yajl_common.h"
 
 typedef enum {
-    yajl_tok_bool,         
-    yajl_tok_colon,
-    yajl_tok_comma,     
-    yajl_tok_eof,
-    yajl_tok_error,
-    yajl_tok_left_brace,     
-    yajl_tok_left_bracket,
-    yajl_tok_null,         
-    yajl_tok_right_brace,     
-    yajl_tok_right_bracket,
+    yajl_tok_bool,         // 0
+    yajl_tok_colon,        // 1
+    yajl_tok_comma,        // 2
+    yajl_tok_eof,          // 3
+    yajl_tok_error,        // 4
+    yajl_tok_left_brace,   // 5
+    yajl_tok_left_bracket, // 6
+    yajl_tok_null,         // 7
+    yajl_tok_right_brace,  // 8
+    yajl_tok_right_bracket, // 9
 
     /* we differentiate between integers and doubles to allow the
      * parser to interpret the number without re-scanning */
-    yajl_tok_integer, 
-    yajl_tok_double, 
+    yajl_tok_integer, // 10
+    yajl_tok_double,  // 11
 
     /* we differentiate between strings which require further processing,
      * and strings that do not */
-    yajl_tok_string,
-    yajl_tok_string_with_escapes,
+    yajl_tok_string, // 12
+    yajl_tok_string_with_escapes, // 13
 
     /* comment tokens are not currently returned to the parser, ever */
-    yajl_tok_comment
+    yajl_tok_comment // 14
 } yajl_tok;
 
 typedef struct yajl_lexer_t * yajl_lexer;
 
+const char *yajl_tok_name(yajl_tok tok);
 
 YAJL_API
 yajl_lexer yajl_lex_alloc(yajl_alloc_funcs * alloc,

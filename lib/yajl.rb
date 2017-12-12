@@ -23,6 +23,13 @@ module Yajl
     Encoder.encode(obj, args, &block)
   end
 
+  class Projector
+    def initialize(stream, read_bufsize=4096)
+      @stream = stream
+      @buffer_size = read_bufsize
+    end
+  end
+
   class Parser
     # A helper method for parse-and-forget use-cases
     #
