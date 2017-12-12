@@ -45,12 +45,12 @@ static void yajl_check_and_fire_callback(void * ctx) {
 
     /* No need to do any of this if the callback isn't even setup */
     if (wrapper->parse_complete_callback != Qnil) {
-        int len = RARRAY_LEN(wrapper->builderStack);
+        long len = RARRAY_LEN(wrapper->builderStack);
         if (len == 1 && wrapper->nestedArrayLevel == 0 && wrapper->nestedHashLevel == 0) {
             rb_funcall(wrapper->parse_complete_callback, intern_call, 1, rb_ary_pop(wrapper->builderStack));
         }
     } else {
-        int len = RARRAY_LEN(wrapper->builderStack);
+        long len = RARRAY_LEN(wrapper->builderStack);
         if (len == 1 && wrapper->nestedArrayLevel == 0 && wrapper->nestedHashLevel == 0) {
             wrapper->objectsFound++;
             if (wrapper->objectsFound > 1) {
@@ -82,7 +82,7 @@ static char *yajl_raise_encode_error_for_status(yajl_gen_status status, VALUE ob
 static void yajl_set_static_value(void * ctx, VALUE val) {
     yajl_parser_wrapper * wrapper;
     VALUE lastEntry, hash;
-    int len;
+    long len;
 
     GetParser((VALUE)ctx, wrapper);
 
@@ -204,7 +204,7 @@ void yajl_encode_part(void * wrapper, VALUE obj, VALUE io) {
         case T_BIGNUM:
             str = rb_funcall(obj, intern_to_s, 0);
             cptr = RSTRING_PTR(str);
-            len = RSTRING_LEN(str);
+            len = (unsigned int)RSTRING_LEN(str);
             if (memcmp(cptr, "NaN", 3) == 0 || memcmp(cptr, "Infinity", 8) == 0 || memcmp(cptr, "-Infinity", 9) == 0) {
                 rb_raise(cEncodeError, "'%s' is an invalid number", cptr);
             }
@@ -212,7 +212,7 @@ void yajl_encode_part(void * wrapper, VALUE obj, VALUE io) {
             break;
         case T_STRING:
             cptr = RSTRING_PTR(obj);
-            len = RSTRING_LEN(obj);
+            len = (unsigned int)RSTRING_LEN(obj);
             CHECK_STATUS(yajl_gen_string(w->encoder, (const unsigned char *)cptr, len));
             break;
         default:
@@ -220,13 +220,13 @@ void yajl_encode_part(void * wrapper, VALUE obj, VALUE io) {
                 str = rb_funcall(obj, intern_to_json, 0);
                 Check_Type(str, T_STRING);
                 cptr = RSTRING_PTR(str);
-                len = RSTRING_LEN(str);
+		len = (unsigned int)RSTRING_LEN(str);
                 CHECK_STATUS(yajl_gen_number(w->encoder, cptr, len));
             } else {
                 str = rb_funcall(obj, intern_to_s, 0);
                 Check_Type(str, T_STRING);
                 cptr = RSTRING_PTR(str);
-                len = RSTRING_LEN(str);
+		len = (unsigned int)RSTRING_LEN(str);
                 CHECK_STATUS(yajl_gen_string(w->encoder, (const unsigned char *)cptr, len));
             }
             break;
@@ -495,13 +495,13 @@ static VALUE rb_yajl_parser_parse(int argc, VALUE * argv, VALUE self) {
 
     if (TYPE(input) == T_STRING) {
         cptr = RSTRING_PTR(input);
-        len = RSTRING_LEN(input);
+        len = (unsigned int)RSTRING_LEN(input);
         yajl_parse_chunk((const unsigned char*)cptr, len, wrapper->parser);
     } else if (rb_respond_to(input, intern_io_read)) {
         VALUE parsed = rb_str_new(0, FIX2LONG(rbufsize));
         while (rb_funcall(input, intern_io_read, 2, rbufsize, parsed) != Qnil) {
             cptr = RSTRING_PTR(parsed);
-            len = RSTRING_LEN(parsed);
+            len = (unsigned int)RSTRING_LEN(parsed);
             yajl_parse_chunk((const unsigned char*)cptr, len, wrapper->parser);
         }
     } else {
@@ -541,7 +541,7 @@ static VALUE rb_yajl_parser_parse_chunk(VALUE self, VALUE chunk) {
 
     if (wrapper->parse_complete_callback != Qnil) {
         const char * cptr = RSTRING_PTR(chunk);
-        len = RSTRING_LEN(chunk);
+        len = (unsigned int)RSTRING_LEN(chunk);
         yajl_parse_chunk((const unsigned char*)cptr, len, wrapper->parser);
     } else {
         rb_raise(cParseError, "The on_parse_complete callback isn't setup, parsing useless.");
@@ -616,11 +616,11 @@ static yajl_event_t yajl_event_stream_next(yajl_event_stream_t parser, int pop) 
         yajl_tok token;
         if (pop == 0) {
             //printf("peeking %p %ld %d\n", RSTRING_PTR(parser->buffer), RSTRING_LEN(parser->buffer), parser->offset);
-            token = yajl_lex_peek(parser->lexer, (const unsigned char *)RSTRING_PTR(parser->buffer), RSTRING_LEN(parser->buffer), parser->offset);
+            token = yajl_lex_peek(parser->lexer, (const unsigned char *)RSTRING_PTR(parser->buffer), (unsigned int)RSTRING_LEN(parser->buffer), parser->offset);
             //printf("peeked event %d\n", token);
 
             if (token == yajl_tok_eof) {
-                parser->offset = RSTRING_LEN(parser->buffer);
+                parser->offset = (unsigned int)RSTRING_LEN(parser->buffer);
                 continue;
             }
 
@@ -630,7 +630,7 @@ static yajl_event_t yajl_event_stream_next(yajl_event_stream_t parser, int pop) 
         }
 
         //printf("popping\n");
-        token = yajl_lex_lex(parser->lexer, (const unsigned char *)RSTRING_PTR(parser->buffer), RSTRING_LEN(parser->buffer), &parser->offset, (const unsigned char **)&event.buf, &event.len);
+        token = yajl_lex_lex(parser->lexer, (const unsigned char *)RSTRING_PTR(parser->buffer), (unsigned int)RSTRING_LEN(parser->buffer), &parser->offset, (const unsigned char **)&event.buf, &event.len);
         //printf("popped event %d\n", token);
 
         if (token == yajl_tok_eof) {
@@ -930,7 +930,7 @@ static VALUE rb_yajl_projector_project(VALUE self, VALUE schema) {
         .stream = stream,
 
         .buffer = buffer,
-        .offset = buffer_size,
+        .offset = (unsigned int)buffer_size,
 
         .lexer = yajl_lex_alloc(&allocFuncs, 0, 1),
     };
@@ -945,9 +945,9 @@ static VALUE rb_yajl_projector_project(VALUE self, VALUE schema) {
 
     if (event.token == yajl_tok_left_brace || event.token == yajl_tok_left_bracket) {
         VALUE args[3];
-        args[0] = &parser;
+        args[0] = (VALUE)&parser;
         args[1] = schema;
-        args[2] = &event;
+        args[2] = (VALUE)&event;
         result = rb_protect(rb_protected_yajl_projector_filter,
                             (VALUE)args,
                             &state);
