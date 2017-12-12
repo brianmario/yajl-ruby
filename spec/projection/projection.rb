@@ -42,6 +42,39 @@ describe "projection" do
     }.to raise_error(Yajl::ParseError)
   end
 
+  it "should behave the same way as the regular parser on bad tokens like comma" do
+    bad_json = '{"name": "keith", "age":, 27}'
+    stream = StringIO.new(bad_json)
+    projector = Yajl::Projector.new(stream)
+    expect {
+      projector.project({"name" => nil})
+    }.to raise_error(capture_exception_for(bad_json).class)
+  end
+
+  it "should behave the same way as the regular parser on bad tokens like colon" do
+    bad_json = '{"name": "keith", "age":: 27}'
+    stream = StringIO.new(bad_json)
+    projector = Yajl::Projector.new(stream)
+    expect {
+      projector.project({"name" => nil})
+    }.to raise_error(capture_exception_for(bad_json).class)
+  end
+
+  it "should behave the same way as the regular parser on not enough json" do
+    bad_json = '{"name": "keith", "age":'
+    stream = StringIO.new(bad_json)
+    projector = Yajl::Projector.new(stream)
+    expect {
+      projector.project({"name" => nil})
+    }.to raise_error(capture_exception_for(bad_json).class)
+  end
+
+  def capture_exception_for(bad_json)
+    Yajl::Parser.new.parse(bad_json)
+  rescue Exception => e
+    e
+  end
+
   def project(schema, over: "", json: nil, stream: nil)
     if stream.nil?
       if json.nil?

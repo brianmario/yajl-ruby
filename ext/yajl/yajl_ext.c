@@ -792,7 +792,7 @@ static void rb_yajl_projector_ignore_value(yajl_event_stream_t parser) {
         return;
     }
 
-    rb_raise(cStandardError, "unknown value type to ignore %s", yajl_tok_name(value_event.token));
+    rb_raise(cParseError, "unknown value type to ignore %s", yajl_tok_name(value_event.token));
 }
 
 /*
