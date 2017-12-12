@@ -664,7 +664,7 @@ static VALUE rb_yajl_projector_filter_subtree(yajl_event_stream_t parser, VALUE 
     }
 
     rb_raise(cParseError, "expected left bracket or brace, actually read %s", yajl_tok_name(event.token));
-    
+
     return Qnil;
 }
 
@@ -751,7 +751,7 @@ static VALUE rb_yajl_projector_filter_object_subtree(yajl_event_stream_t parser,
         } else {
             val = rb_yajl_projector_build_simple_value(parser, value_event);
         }
-        
+
         rb_hash_aset(hsh, key, val);
 
     peek_comma:
@@ -858,7 +858,7 @@ static VALUE rb_yajl_projector_build_simple_value(yajl_event_stream_t parser, ya
                 val = rb_cstr2inum(buf, 10);
             }
             free(buf);
-            
+
             return val;
 
         case yajl_tok_string:;
