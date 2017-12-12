@@ -220,13 +220,13 @@ void yajl_encode_part(void * wrapper, VALUE obj, VALUE io) {
                 str = rb_funcall(obj, intern_to_json, 0);
                 Check_Type(str, T_STRING);
                 cptr = RSTRING_PTR(str);
-		len = (unsigned int)RSTRING_LEN(str);
+                len = (unsigned int)RSTRING_LEN(str);
                 CHECK_STATUS(yajl_gen_number(w->encoder, cptr, len));
             } else {
                 str = rb_funcall(obj, intern_to_s, 0);
                 Check_Type(str, T_STRING);
                 cptr = RSTRING_PTR(str);
-		len = (unsigned int)RSTRING_LEN(str);
+                len = (unsigned int)RSTRING_LEN(str);
                 CHECK_STATUS(yajl_gen_string(w->encoder, (const unsigned char *)cptr, len));
             }
             break;
@@ -860,6 +860,9 @@ static VALUE rb_yajl_projector_build_simple_value(yajl_event_stream_t parser, ya
 
         case yajl_tok_comma:
             rb_raise(cParseError, "unexpected comma while constructing value");
+
+        case yajl_tok_colon:
+            rb_raise(cParseError, "unexpected colon while constructing value");
 
         default:;
             assert(0);

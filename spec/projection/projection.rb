@@ -34,6 +34,14 @@ describe "projection" do
     }.to raise_error(Yajl::ParseError)
   end
 
+  it "should raise an exception and not segv on colons" do
+    stream = StringIO.new('[::::]')
+    projector = Yajl::Projector.new(stream)
+    expect {
+      projector.project({"name" => nil})
+    }.to raise_error(Yajl::ParseError)
+  end
+
   def project(schema, over: "", json: nil, stream: nil)
     if stream.nil?
       if json.nil?
