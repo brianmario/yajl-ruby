@@ -905,6 +905,13 @@ static VALUE rb_yajl_projector_build_string(yajl_event_stream_t parser, yajl_eve
     }
 }
 
+static VALUE rb_protected_yajl_projector_filter(VALUE pointer) {
+    VALUE *args = (VALUE *)pointer;
+    return rb_yajl_projector_filter((struct yajl_event_stream_s *)args[0],
+                                                                  args[1],
+                                                 *(yajl_event_t *)args[2]);
+}
+
 /*
  * Document-method: project
  */
@@ -934,15 +941,23 @@ static VALUE rb_yajl_projector_project(VALUE self, VALUE schema) {
     RB_GC_GUARD(buffer);
 
     VALUE result;
+    int state = 0;
 
     if (event.token == yajl_tok_left_brace || event.token == yajl_tok_left_bracket) {
-        result = rb_yajl_projector_filter(&parser, schema, event);
+        VALUE args[3];
+        args[0] = &parser;
+        args[1] = schema;
+        args[2] = &event;
+        result = rb_protect(rb_protected_yajl_projector_filter,
+                            (VALUE)args,
+                            &state);
     } else {
         yajl_lex_free(parser.lexer);
         rb_raise(cParseError, "expected left bracket or brace, actually read %s", yajl_tok_name(event.token));
     }
 
     yajl_lex_free(parser.lexer);
+    if (state) rb_jump_tag(state);
 
     return result;
 }
