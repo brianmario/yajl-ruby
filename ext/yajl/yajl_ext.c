@@ -752,6 +752,7 @@ static VALUE rb_yajl_projector_filter_object_subtree(yajl_event_stream_t parser,
             val = rb_yajl_projector_build_simple_value(parser, value_event);
         }
 
+        rb_str_freeze(key);
         rb_hash_aset(hsh, key, val);
 
     peek_comma:
