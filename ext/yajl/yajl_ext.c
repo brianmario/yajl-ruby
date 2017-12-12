@@ -652,18 +652,19 @@ static void rb_yajl_projector_ignore_container(yajl_event_stream_t parser);
 static VALUE rb_yajl_projector_build_simple_value(yajl_event_stream_t parser, yajl_event_t event);
 static VALUE rb_yajl_projector_build_string(yajl_event_stream_t parser, yajl_event_t event);
 
-static VALUE rb_yajl_projector_filter_subtree(yajl_event_stream_t parser, VALUE schema, yajl_event_t event) {
+static VALUE rb_yajl_projector_filter(yajl_event_stream_t parser, VALUE schema, yajl_event_t event) {
     assert(parser->stream);
 
-    if (event.token == yajl_tok_left_brace) {
-        return rb_yajl_projector_filter_array_subtree(parser, schema, event);
+    switch(event.token) {
+        case yajl_tok_left_brace:
+            return rb_yajl_projector_filter_array_subtree(parser, schema, event);
+            break;
+        case yajl_tok_left_bracket:
+            return rb_yajl_projector_filter_object_subtree(parser, schema, event);
+            break;
+        default:
+            return rb_yajl_projector_build_simple_value(parser, event);
     }
-
-    if (event.token == yajl_tok_left_bracket) {
-        return rb_yajl_projector_filter_object_subtree(parser, schema, event);
-    }
-
-    return Qnil;
 }
 
 static VALUE rb_yajl_projector_filter_array_subtree(yajl_event_stream_t parser, VALUE schema, yajl_event_t event) {
@@ -678,12 +679,7 @@ static VALUE rb_yajl_projector_filter_array_subtree(yajl_event_stream_t parser, 
             break;
         }
 
-        VALUE val;
-        if (event.token == yajl_tok_left_brace || event.token == yajl_tok_left_bracket) {
-            val = rb_yajl_projector_filter_subtree(parser, schema, event);
-        } else {
-            val = rb_yajl_projector_build_simple_value(parser, event);
-        }
+        VALUE val = rb_yajl_projector_filter(parser, schema, event);
         rb_ary_push(ary, val);
 
         event = yajl_event_stream_next(parser, 0);
@@ -736,7 +732,6 @@ static VALUE rb_yajl_projector_filter_object_subtree(yajl_event_stream_t parser,
 
         yajl_event_t value_event = yajl_event_stream_next(parser, 1);
 
-        VALUE val;
         VALUE key_schema;
         if (schema == Qnil) {
             key_schema = Qnil;
@@ -744,11 +739,7 @@ static VALUE rb_yajl_projector_filter_object_subtree(yajl_event_stream_t parser,
             key_schema = rb_hash_aref(schema, key);
         }
 
-        if (value_event.token == yajl_tok_left_bracket || value_event.token == yajl_tok_left_brace) {
-            val = rb_yajl_projector_filter_subtree(parser, key_schema, value_event);
-        } else {
-            val = rb_yajl_projector_build_simple_value(parser, value_event);
-        }
+        VALUE val = rb_yajl_projector_filter(parser, key_schema, value_event);
 
         rb_str_freeze(key);
         rb_hash_aset(hsh, key, val);
@@ -942,7 +933,7 @@ static VALUE rb_yajl_projector_project(VALUE self, VALUE schema) {
     VALUE result;
 
     if (event.token == yajl_tok_left_brace || event.token == yajl_tok_left_bracket) {
-        result = rb_yajl_projector_filter_subtree(&parser, schema, event);
+        result = rb_yajl_projector_filter(&parser, schema, event);
     } else {
         yajl_lex_free(parser.lexer);
         rb_raise(cParseError, "expected left bracket or brace, actually read %s", yajl_tok_name(event.token));
