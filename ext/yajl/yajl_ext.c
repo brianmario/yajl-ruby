@@ -858,6 +858,9 @@ static VALUE rb_yajl_projector_build_simple_value(yajl_event_stream_t parser, ya
         case yajl_tok_eof:;
             rb_raise(cParseError, "unexpected eof while constructing value");
 
+        case yajl_tok_comma:
+            rb_raise(cParseError, "unexpected comma while constructing value");
+
         default:;
             assert(0);
     }
