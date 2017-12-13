@@ -14,3 +14,8 @@ require "yajl"
 # put lib and test dirs directly on load path
 $LOAD_PATH.unshift File.expand_path("../../lib", __FILE__)
 $LOAD_PATH.unshift File.expand_path("..", __FILE__)
+
+# This is ridiculous...
+if !defined? MiniTest::Test
+  MiniTest::Test = MiniTest::Unit::TestCase
+end
