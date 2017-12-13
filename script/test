@@ -5,7 +5,7 @@ cd "$(dirname "$0")/.."
 ruby --version 1>&2
 
 # run minitest suite
-exec ruby -I. -rubygems \
+exec ruby -I. \
     -r "$(pwd)/test/setup" \
     -e "ARGV.each { |f| require(f) }" \
     -- ${*:-`find test -name '*_test.rb'`}
