@@ -7,3 +7,4 @@ rvm:
   - 2.4.1
   - ruby-head
 before_install: gem install bundler --no-document
+script: script/cibuild
