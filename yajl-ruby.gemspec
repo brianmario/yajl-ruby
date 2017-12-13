@@ -14,7 +14,7 @@ Gem::Specification.new do |s|
   s.rubygems_version = %q{1.4.2}
   s.summary = %q{Ruby C bindings to the excellent Yajl JSON stream-based parser library.}
   s.test_files = `git ls-files spec examples`.split("\n")
-  s.required_ruby_version = ">= 1.8.6"
+  s.required_ruby_version = ">= 2.0.0"
 
   # tests
   s.add_development_dependency "rake-compiler"
