@@ -73,6 +73,21 @@ describe "One-off JSON examples" do
     expect(Yajl::Parser.parse("{\"id\": 1046289770033519442869495707521600000000}")).to eql({"id" => 1046289770033519442869495707521600000000})
   end
 
+  it "should not crash on JSON with broken surrogate pair, but should raise exception instead" do
+    expect {
+      Yajl::Parser.parse('["\\ud800\\\\a"]')
+    }.to raise_error(Yajl::ParseError)
+    expect {
+      Yajl::Parser.parse('["\\ud800\\\\u"]')
+    }.to raise_error(Yajl::ParseError)
+  end
+
+  it "should accept correct surrogate pairs" do
+    expect {
+      expect(Yajl::Parser.parse('["\\ud800\\udf02"]')).to eql(["𐌂"])
+    }.not_to raise_error
+  end
+
   if RUBY_VERSION =~ /^1.9/
     it "should encode non-ascii symbols in utf-8" do
       parsed = Yajl::Parser.parse('{"曦": 1234}', :symbolize_keys => true)
