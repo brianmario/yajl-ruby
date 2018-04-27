@@ -38,6 +38,25 @@
  }                                                        \
  return rb_yajl_encoder_encode(1, &self, rb_encoder);     \
 
+static void *rb_internal_malloc(void *ctx, unsigned int sz) {
+  return xmalloc(sz);
+}
+
+static void *rb_internal_realloc(void *ctx, void *previous, unsigned int sz) {
+  return xrealloc(previous, sz);
+}
+
+static void rb_internal_free(void *ctx, void *ptr) {
+  xfree(ptr);
+}
+
+static yajl_alloc_funcs rb_alloc_funcs = {
+  rb_internal_malloc,
+  rb_internal_realloc,
+  rb_internal_free,
+  NULL
+};
+
 /* Helpers for building objects */
 static void yajl_check_and_fire_callback(void * ctx) {
     yajl_parser_wrapper * wrapper;
@@ -426,7 +445,7 @@ static VALUE rb_yajl_parser_new(int argc, VALUE * argv, VALUE klass) {
     cfg = (yajl_parser_config){allowComments, checkUTF8};
 
     obj = Data_Make_Struct(klass, yajl_parser_wrapper, yajl_parser_wrapper_mark, yajl_parser_wrapper_free, wrapper);
-    wrapper->parser = yajl_alloc(&callbacks, &cfg, NULL, (void *)obj);
+    wrapper->parser = yajl_alloc(&callbacks, &cfg, &rb_alloc_funcs, (void *)obj);
     wrapper->nestedArrayLevel = 0;
     wrapper->nestedHashLevel = 0;
     wrapper->objectsFound = 0;
@@ -919,23 +938,20 @@ static VALUE rb_protected_yajl_projector_filter(VALUE pointer) {
  * Document-method: project
  */
 static VALUE rb_yajl_projector_project(VALUE self, VALUE schema) {
-    yajl_alloc_funcs allocFuncs;
-    yajl_set_default_alloc_funcs(&allocFuncs);
-
     VALUE stream = rb_iv_get(self, "@stream");
 
     long buffer_size = FIX2LONG(rb_iv_get(self, "@buffer_size"));
     VALUE buffer = rb_str_new(0, buffer_size);
 
     struct yajl_event_stream_s parser = {
-        .funcs = &allocFuncs,
+        .funcs = &rb_alloc_funcs,
 
         .stream = stream,
 
         .buffer = buffer,
         .offset = (unsigned int)buffer_size,
 
-        .lexer = yajl_lex_alloc(&allocFuncs, 0, 1),
+        .lexer = yajl_lex_alloc(&rb_alloc_funcs, 0, 1),
     };
 
     yajl_event_t event = yajl_event_stream_next(&parser, 1);
@@ -1025,7 +1041,7 @@ static VALUE rb_yajl_encoder_new(int argc, VALUE * argv, VALUE klass) {
 
     obj = Data_Make_Struct(klass, yajl_encoder_wrapper, yajl_encoder_wrapper_mark, yajl_encoder_wrapper_free, wrapper);
     wrapper->indentString = actualIndent;
-    wrapper->encoder = yajl_gen_alloc(&cfg, NULL);
+    wrapper->encoder = yajl_gen_alloc(&cfg, &rb_alloc_funcs);
     wrapper->on_progress_callback = Qnil;
     if (opts != Qnil && rb_funcall(opts, intern_has_key, 1, sym_terminator) == Qtrue) {
         wrapper->terminator = rb_hash_aref(opts, sym_terminator);
