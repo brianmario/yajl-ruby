@@ -1030,8 +1030,13 @@ static VALUE rb_yajl_encoder_new(int argc, VALUE * argv, VALUE klass) {
                 actualIndent = indentString;
             }
         }
+
         if (rb_hash_aref(opts, sym_html_safe) == Qtrue) {
           htmlSafe = 1;
+        }
+
+        if (rb_hash_aref(opts, sym_entities) == Qtrue) {
+          htmlSafe = 2;
         }
     }
     if (!indentString) {
@@ -1356,6 +1361,7 @@ void Init_yajl() {
     sym_pretty = ID2SYM(rb_intern("pretty"));
     sym_indent = ID2SYM(rb_intern("indent"));
     sym_html_safe = ID2SYM(rb_intern("html_safe"));
+    sym_entities = ID2SYM(rb_intern("entities"));
     sym_terminator = ID2SYM(rb_intern("terminator"));
     sym_symbolize_keys = ID2SYM(rb_intern("symbolize_keys"));
     sym_symbolize_names = ID2SYM(rb_intern("symbolize_names"));

@@ -59,12 +59,18 @@ yajl_string_encode2(const yajl_print_t print,
                     unsigned int htmlSafe)
 {
     unsigned int beg = 0;
-    unsigned int end = 0;    
+    unsigned int end = 0;
+    unsigned int increment = 0;
     char hexBuf[7];
+    char entityBuffer[7];
     hexBuf[0] = '\\'; hexBuf[1] = 'u'; hexBuf[2] = '0'; hexBuf[3] = '0';
     hexBuf[6] = 0;
 
+    entityBuffer[0] = '\\'; entityBuffer[1] = 'u'; entityBuffer[2] = '2'; entityBuffer[3] = '0';
+    entityBuffer[6] = 0;
+
     while (end < len) {
+        increment = 1;
         const char * escaped = NULL;
         switch (str[end]) {
             case '\r': escaped = "\\r"; break;
@@ -76,8 +82,37 @@ yajl_string_encode2(const yajl_print_t print,
             case '\b': escaped = "\\b"; break;
             case '\t': escaped = "\\t"; break;
             case '/':
-              if (htmlSafe) {
+              if (htmlSafe == 1 || htmlSafe == 2) {
                 escaped = "\\/";
+              }
+              break;
+            /* Escaping 0xe280a8 0xe280a9 */
+            case 0xe2:
+              if (htmlSafe == 2) {
+                  if (len - end >= 2 && str[end + 1] == 0x80) {
+                      if (str[end + 2] == 0xa8) {
+                          increment = 3;
+                          entityBuffer[4] = '2';
+                          entityBuffer[5] = '8';
+                          escaped = entityBuffer;
+                          break;
+                      }
+
+                      if (str[end + 2] == 0xa9) {
+                          increment = 3;
+                          entityBuffer[4] = '2';
+                          entityBuffer[5] = '9';
+                          escaped = entityBuffer;
+                          break;
+                      }
+                  }
+              }
+            case '<':
+            case '>':
+            case '&':
+              if (htmlSafe == 2) {
+                  CharToHex(str[end], hexBuf + 4);
+                  escaped = hexBuf;
               }
               break;
             default:
@@ -90,7 +125,8 @@ yajl_string_encode2(const yajl_print_t print,
         if (escaped != NULL) {
             print(ctx, (const char *) (str + beg), end - beg);
             print(ctx, escaped, (unsigned int)strlen(escaped));
-            beg = ++end;
+            end += increment;
+            beg = end;
         } else {
             ++end;
         }
