@@ -275,9 +275,25 @@ describe "Yajl JSON encoder" do
     expect(safe_encoder.encode("</script>")).to eql("\"<\\/script>\"")
   end
 
+  it "should not encode characters with entities by default" do
+    expect(Yajl.dump("\u2028\u2029><&")).to eql("\"\u2028\u2029><&\"")
+  end
+
+  it "should encode characters with entities when enabled" do
+    expect(Yajl.dump("\u2028\u2029><&", entities: true)).to eql("\"\\u2028\\u2029\\u003E\\u003C\\u0026\"")
+  end
+
   it "should default to *not* escaping / characters" do
     unsafe_encoder = Yajl::Encoder.new
     expect(unsafe_encoder.encode("</script>")).not_to eql("\"<\\/script>\"")
+  end
+
+  it "should encode slashes when enabled" do
+    unsafe_encoder = Yajl::Encoder.new(:entities => false)
+    safe_encoder   = Yajl::Encoder.new(:entities => true)
+
+    expect(unsafe_encoder.encode("</script>")).not_to eql("\"<\\/script>\"")
+    expect(safe_encoder.encode("</script>")).to eql("\"\\u003C\\/script\\u003E\"")
   end
 
   it "return value of #to_json must be a string" do
