@@ -152,6 +152,7 @@ static void yajl_encoder_wrapper_mark(void * wrapper) {
     if (w) {
         rb_gc_mark(w->on_progress_callback);
         rb_gc_mark(w->terminator);
+        rb_gc_mark(w->as_json_options);
     }
 }
 
@@ -237,7 +238,7 @@ void yajl_encode_part(void * wrapper, VALUE obj, VALUE io) {
         default:
             if (rb_respond_to(obj, intern_as_json)) {
                 VALUE json_obj;
-                json_obj = rb_funcall(obj, intern_as_json, 0);
+                json_obj = rb_funcall(obj, intern_as_json, 1, w->as_json_options);
                 if (json_obj != obj) {
                   return yajl_encode_part(wrapper, json_obj, io);
                 }
@@ -1016,9 +1017,11 @@ static unsigned char * defaultIndentString = (unsigned char *)"  ";
 static VALUE rb_yajl_encoder_new(int argc, VALUE * argv, VALUE klass) {
     yajl_encoder_wrapper * wrapper;
     yajl_gen_config cfg;
-    VALUE opts, obj, indent;
+    VALUE opts, obj, indent, as_json_options;
     unsigned char *indentString = NULL, *actualIndent = NULL;
     int beautify = 0, htmlSafe = 0;
+
+    as_json_options = Qnil;
 
     /* Scan off config vars */
     if (rb_scan_args(argc, argv, "01", &opts) == 1) {
@@ -1039,6 +1042,8 @@ static VALUE rb_yajl_encoder_new(int argc, VALUE * argv, VALUE klass) {
             }
         }
 
+        as_json_options = rb_hash_aref(opts, sym_as_json);
+
         if (rb_hash_aref(opts, sym_html_safe) == Qtrue) {
           htmlSafe = 1;
         }
@@ -1054,6 +1059,7 @@ static VALUE rb_yajl_encoder_new(int argc, VALUE * argv, VALUE klass) {
 
     obj = Data_Make_Struct(klass, yajl_encoder_wrapper, yajl_encoder_wrapper_mark, yajl_encoder_wrapper_free, wrapper);
     wrapper->indentString = actualIndent;
+    wrapper->as_json_options = as_json_options;
     wrapper->encoder = yajl_gen_alloc(&cfg, &rb_alloc_funcs);
     wrapper->on_progress_callback = Qnil;
     if (opts != Qnil && rb_funcall(opts, intern_has_key, 1, sym_terminator) == Qtrue) {
@@ -1368,6 +1374,7 @@ void Init_yajl() {
     sym_check_utf8 = ID2SYM(rb_intern("check_utf8"));
     sym_pretty = ID2SYM(rb_intern("pretty"));
     sym_indent = ID2SYM(rb_intern("indent"));
+    sym_as_json = ID2SYM(rb_intern("as_json"));
     sym_html_safe = ID2SYM(rb_intern("html_safe"));
     sym_entities = ID2SYM(rb_intern("entities"));
     sym_terminator = ID2SYM(rb_intern("terminator"));

@@ -31,6 +31,12 @@ class AsJsonClass
   end
 end
 
+class AsJsonWithOptionsClass
+  def as_json(options = {})
+    options
+  end
+end
+
 describe "Yajl JSON encoder" do
   FILES = Dir[File.dirname(__FILE__)+'/../../benchmark/subjects/*.json']
 
@@ -124,6 +130,13 @@ describe "Yajl JSON encoder" do
     encoder.encode(obj, io)
     io.rewind
     expect(io.read).to eq(output)
+  end
+
+  it "should pass options to as_json" do
+    object = AsJsonWithOptionsClass.new
+    json = Yajl::Encoder.encode(object, as_json: { only: "foo" })
+    hash = Yajl.load(json)
+    expect(hash).to eql({ "only" => "foo" })
   end
 
   it "should encode with :pretty turned on and a single space indent, and return a String" do
