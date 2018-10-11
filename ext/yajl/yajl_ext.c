@@ -235,6 +235,14 @@ void yajl_encode_part(void * wrapper, VALUE obj, VALUE io) {
             CHECK_STATUS(yajl_gen_string(w->encoder, (const unsigned char *)cptr, len));
             break;
         default:
+            if (rb_respond_to(obj, intern_as_json)) {
+                VALUE json_obj;
+                json_obj = rb_funcall(obj, intern_as_json, 0);
+                if (json_obj != obj) {
+                  return yajl_encode_part(wrapper, json_obj, io);
+                }
+            }
+
             if (rb_respond_to(obj, intern_to_json)) {
                 str = rb_funcall(obj, intern_to_json, 0);
                 Check_Type(str, T_STRING);

@@ -21,6 +21,16 @@ class TheMindKillerDuce
   end
 end
 
+class AsJsonClass
+  def initialize(as_json)
+    @as_json = as_json
+  end
+
+  def as_json(options = nil)
+    @as_json
+  end
+end
+
 describe "Yajl JSON encoder" do
   FILES = Dir[File.dirname(__FILE__)+'/../../benchmark/subjects/*.json']
 
@@ -95,6 +105,16 @@ describe "Yajl JSON encoder" do
        end
      end
    end
+
+  it "should use as_json for representing an object" do
+    as_json_obj = AsJsonClass.new({ foo: "bar" })
+    expect(Yajl.load(Yajl.dump(as_json_obj))).to eq({ "foo" => "bar" })
+  end
+
+  it "should escape string returned by as_json" do
+    as_json_obj = AsJsonClass.new("\u2028\u2029><&")
+    expect(Yajl.dump(as_json_obj, entities: true)).to eql("\"\\u2028\\u2029\\u003E\\u003C\\u0026\"")
+  end
 
   it "should encode with :pretty turned on and a single space indent, to an IO" do
     output = "{\n \"foo\": 1234\n}"
