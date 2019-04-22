@@ -475,13 +475,13 @@ static VALUE rb_yajl_parser_init(int argc, VALUE * argv, VALUE self) {
  * Document-method: parse
  *
  * call-seq:
- *  parse(input, buffer_size=8092)
- *  parse(input, buffer_size=8092) { |obj| ... }
+ *  parse(input, buffer_size=8192)
+ *  parse(input, buffer_size=8192) { |obj| ... }
  *
  * +input+ can either be a string or an IO to parse JSON from
  *
  * +buffer_size+ is the size of chunk that will be parsed off the input (if it's an IO) for each loop of the parsing process.
- * 8092 is a good balance between the different types of streams (off disk, off a socket, etc...), but this option
+ * 8192 is a good balance between the different types of streams (off disk, off a socket, etc...), but this option
  * is here so the caller can better tune their parsing depending on the type of stream being passed.
  * A larger read buffer will perform better for files off disk, where as a smaller size may be more efficient for
  * reading off of a socket directly.
