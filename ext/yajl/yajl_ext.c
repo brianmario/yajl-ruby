@@ -192,7 +192,12 @@ void yajl_encode_part(void * wrapper, VALUE obj, VALUE io) {
             keys = rb_funcall(obj, intern_keys, 0);
             for(idx=0; idx<RARRAY_LEN(keys); idx++) {
                 entry = rb_ary_entry(keys, idx);
-                keyStr = rb_funcall(entry, intern_to_s, 0); /* key must be a string */
+                /* key must be encoded as a string */
+                if(RB_TYPE_P(entry, T_STRING) || RB_TYPE_P(entry, T_SYMBOL)) {
+                    keyStr = entry;
+                } else {
+                    keyStr = rb_funcall(entry, intern_to_s, 0);
+                }
                 /* the key */
                 yajl_encode_part(w, keyStr, io);
                 /* the value */
@@ -219,6 +224,11 @@ void yajl_encode_part(void * wrapper, VALUE obj, VALUE io) {
             CHECK_STATUS(yajl_gen_bool(w->encoder, 0));
             break;
         case T_FIXNUM:
+            str = rb_fix2str(obj, 10);
+            cptr = RSTRING_PTR(str);
+            len = RSTRING_LEN(str);
+            CHECK_STATUS(yajl_gen_number(w->encoder, cptr, len));
+            break;
         case T_FLOAT:
         case T_BIGNUM:
             str = rb_funcall(obj, intern_to_s, 0);
@@ -232,6 +242,12 @@ void yajl_encode_part(void * wrapper, VALUE obj, VALUE io) {
         case T_STRING:
             cptr = RSTRING_PTR(obj);
             len = (unsigned int)RSTRING_LEN(obj);
+            CHECK_STATUS(yajl_gen_string(w->encoder, (const unsigned char *)cptr, len));
+            break;
+        case T_SYMBOL:
+            str = rb_id2str(SYM2ID(obj));
+            cptr = RSTRING_PTR(str);
+            len = RSTRING_LEN(str);
             CHECK_STATUS(yajl_gen_string(w->encoder, (const unsigned char *)cptr, len));
             break;
         default:
