@@ -155,6 +155,36 @@ static void yajl_encoder_wrapper_mark(void * wrapper) {
     }
 }
 
+static VALUE yajl_key_to_string(VALUE obj) {
+    switch (TYPE(obj)) {
+        case T_STRING:
+            return obj;
+        case T_SYMBOL:
+            return rb_sym2str(obj);
+        default:
+            return rb_funcall(obj, intern_to_s, 0);
+    }
+}
+
+void yajl_encode_part(void * wrapper, VALUE obj, VALUE io);
+struct yajl_encode_hash_iter {
+    void *w;
+    VALUE io;
+};
+
+static int yajl_encode_part_hash_i(VALUE key, VALUE val, VALUE iter_v) {
+    struct yajl_encode_hash_iter *iter = (struct yajl_encode_hash_iter *)iter_v;
+    /* key must be a string */
+    VALUE keyStr = yajl_key_to_string(key);
+
+    /* the key */
+    yajl_encode_part(iter->w, keyStr, iter->io);
+    /* the value */
+    yajl_encode_part(iter->w, val, iter->io);
+
+    return ST_CONTINUE;
+}
+
 #define CHECK_STATUS(call) \
     if ((status = (call)) != yajl_gen_status_ok) { break; }
 
@@ -166,7 +196,7 @@ void yajl_encode_part(void * wrapper, VALUE obj, VALUE io) {
     const unsigned char * buffer;
     const char * cptr;
     unsigned int len;
-    VALUE keys, entry, keyStr;
+    VALUE *ptr;
 
     if (io != Qnil || w->on_progress_callback != Qnil) {
         status = yajl_gen_get_buf(w->encoder, &buffer, &len);
@@ -188,24 +218,19 @@ void yajl_encode_part(void * wrapper, VALUE obj, VALUE io) {
         case T_HASH:
             CHECK_STATUS(yajl_gen_map_open(w->encoder));
 
-            /* TODO: itterate through keys in the hash */
-            keys = rb_funcall(obj, intern_keys, 0);
-            for(idx=0; idx<RARRAY_LEN(keys); idx++) {
-                entry = rb_ary_entry(keys, idx);
-                keyStr = rb_funcall(entry, intern_to_s, 0); /* key must be a string */
-                /* the key */
-                yajl_encode_part(w, keyStr, io);
-                /* the value */
-                yajl_encode_part(w, rb_hash_aref(obj, entry), io);
-            }
+            struct yajl_encode_hash_iter iter;
+            iter.w = w;
+            iter.io = io;
+            rb_hash_foreach(obj, yajl_encode_part_hash_i, (VALUE)&iter);
 
             CHECK_STATUS(yajl_gen_map_close(w->encoder));
             break;
         case T_ARRAY:
             CHECK_STATUS(yajl_gen_array_open(w->encoder));
+
+	    VALUE *ptr = RARRAY_PTR(obj);
             for(idx=0; idx<RARRAY_LEN(obj); idx++) {
-                otherObj = rb_ary_entry(obj, idx);
-                yajl_encode_part(w, otherObj, io);
+                yajl_encode_part(w, ptr[idx], io);
             }
             CHECK_STATUS(yajl_gen_array_close(w->encoder));
             break;
@@ -219,6 +244,8 @@ void yajl_encode_part(void * wrapper, VALUE obj, VALUE io) {
             CHECK_STATUS(yajl_gen_bool(w->encoder, 0));
             break;
         case T_FIXNUM:
+            CHECK_STATUS(yajl_gen_long(w->encoder, FIX2LONG(obj)));
+            break;
         case T_FLOAT:
         case T_BIGNUM:
             str = rb_funcall(obj, intern_to_s, 0);
@@ -232,6 +259,12 @@ void yajl_encode_part(void * wrapper, VALUE obj, VALUE io) {
         case T_STRING:
             cptr = RSTRING_PTR(obj);
             len = (unsigned int)RSTRING_LEN(obj);
+            CHECK_STATUS(yajl_gen_string(w->encoder, (const unsigned char *)cptr, len));
+            break;
+        case T_SYMBOL:
+            str = rb_sym2str(obj);
+            cptr = RSTRING_PTR(str);
+            len = (unsigned int)RSTRING_LEN(str);
             CHECK_STATUS(yajl_gen_string(w->encoder, (const unsigned char *)cptr, len));
             break;
         default:
