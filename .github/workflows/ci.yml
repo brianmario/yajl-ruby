@@ -1,0 +1,22 @@
+name: CI
+
+on: [push]
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        ruby_version: [2.6.x, 2.7.x]
+      fail-fast: false
+    runs-on: ubuntu-latest
+    name: Test on Ruby ${{ matrix.ruby_version }}
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup Ruby ${{ matrix.ruby_version }}
+      uses: actions/setup-ruby@v1
+      with:
+        ruby-version: ${{ matrix.ruby_version }}
+    - name: Install dependencies
+      run: bundle install
+    - name: Run tests
+      run: bundle exec rake spec
