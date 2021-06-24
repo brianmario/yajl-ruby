@@ -63,7 +63,9 @@ extern "C" {
         yajl_gen_invalid_number,
         /** A print callback was passed in, so there is no internal
          * buffer to get from */
-        yajl_gen_no_buf
+        yajl_gen_no_buf,
+        /** Tried to decrement at depth 0 */
+        yajl_depth_underflow
     } yajl_gen_status;
 
     /** an opaque handle to a generator */
