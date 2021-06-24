@@ -129,6 +129,7 @@ extern "C" {
      *  NaN, as these have no representation in JSON.  In these cases the
      *  generator will return 'yajl_gen_invalid_number' */
     YAJL_API yajl_gen_status yajl_gen_double(yajl_gen hand, double number);
+    YAJL_API yajl_gen_status yajl_gen_long(yajl_gen hand, long value);
     YAJL_API yajl_gen_status yajl_gen_number(yajl_gen hand,
                                              const char * num,
                                              unsigned int len);
