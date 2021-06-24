@@ -18,5 +18,9 @@ jobs:
         ruby-version: ${{ matrix.ruby_version }}
     - name: Install dependencies
       run: bundle install
+    - name: Build gem
+      run: gem build yajl-ruby.gemspec
+    - name: Install gem
+      run: gem install yajl-ruby
     - name: Run tests
       run: bundle exec rake spec
