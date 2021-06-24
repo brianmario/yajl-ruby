@@ -6,7 +6,7 @@ jobs:
   test:
     strategy:
       matrix:
-        ruby_version: [2.6.x, 2.7.x]
+        ruby_version: [2.6.x, 2.7.x, 3.0.x]
       fail-fast: false
     runs-on: ubuntu-latest
     name: Test on Ruby ${{ matrix.ruby_version }}
