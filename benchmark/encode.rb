@@ -4,7 +4,6 @@ $LOAD_PATH.unshift File.expand_path(File.dirname(__FILE__) + '/../lib')
 require 'rubygems'
 require 'benchmark'
 require 'yajl'
-require 'stringio'
 begin
   require 'json'
 rescue LoadError
@@ -29,7 +28,7 @@ Benchmark.bmbm { |x|
 
   x.report("Yajl::Encoder#encode (to an IO)") {
     times.times {
-      io_encoder.encode(hash, StringIO.new)
+      io_encoder.encode(hash, File.open(File::NULL, 'w'))
     }
   }
   x.report("Yajl::Encoder#encode (to a String)") {
@@ -53,7 +52,7 @@ Benchmark.bmbm { |x|
     if defined?(Psych::JSON::Stream)
       x.report("Psych::JSON::Stream") {
         times.times {
-          io = StringIO.new
+          io = File.open(File::NULL, 'w')
           stream = Psych::JSON::Stream.new io
           stream.start
           stream.push hash
