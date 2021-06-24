@@ -231,6 +231,36 @@ yajl_gen_double(yajl_gen g, double number)
 }
 
 yajl_gen_status
+yajl_gen_long(yajl_gen g, long val)
+{
+    char buf[32], *b = buf + sizeof buf;
+    unsigned int len = 0;
+    unsigned long uval;
+
+    ENSURE_VALID_STATE; ENSURE_NOT_KEY; INSERT_SEP; INSERT_WHITESPACE;
+
+    if (val < 0) {
+        g->print(g->ctx, "-", 1);
+        // Avoid overflow. This shouldn't happen because FIXNUMs are 1 bit less
+        // than LONGs, but good to be safe.
+        uval = 1 + (unsigned long)(-(val + 1));
+    } else {
+        uval = val;
+    }
+
+    do {
+        *--b = "0123456789"[uval % 10];
+        uval /= 10;
+        len++;
+    } while(uval);
+    g->print(g->ctx, b, len);
+
+    APPENDED_ATOM;
+    FINAL_NEWLINE;
+    return yajl_gen_status_ok;
+}
+
+yajl_gen_status
 yajl_gen_number(yajl_gen g, const char * s, unsigned int l)
 {
     ENSURE_VALID_STATE; ENSURE_NOT_KEY; INSERT_SEP; INSERT_WHITESPACE;
