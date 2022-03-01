@@ -38,35 +38,82 @@
 
 #define YAJL_BUF_INIT_SIZE 2048
 
+typedef enum {
+     yajl_buf_ok = 0,
+     yajl_buf_alloc_failed,
+     yajl_buf_overflow
+} yajl_buf_state;
+
 struct yajl_buf_t {
+    yajl_buf_state state;
     unsigned int len;
     unsigned int used;
     unsigned char * data;
     yajl_alloc_funcs * alloc;
 };
 
+#include <stdio.h>
+
 static
-void yajl_buf_ensure_available(yajl_buf buf, unsigned int want)
+yajl_buf_state yajl_buf_set_error(yajl_buf buf, yajl_buf_state err)
+{
+    buf->state = err;
+
+    // free and clear all data from the buffer
+    YA_FREE(buf->alloc, buf->data);
+    buf->len = 0;
+    buf->data = 0;
+    buf->used = 0;
+
+    return err;
+}
+
+static
+yajl_buf_state yajl_buf_ensure_available(yajl_buf buf, unsigned int want)
 {
     unsigned int need;
     
     assert(buf != NULL);
 
+    if (buf->state != yajl_buf_ok) {
+        return buf->state;
+    }
+
     /* first call */
     if (buf->data == NULL) {
         buf->len = YAJL_BUF_INIT_SIZE;
         buf->data = (unsigned char *) YA_MALLOC(buf->alloc, buf->len);
+        if (buf->data == NULL)  {
+            return yajl_buf_set_error(buf, yajl_buf_overflow);
+        }
+
         buf->data[0] = 0;
+    }
+
+    if (want == 0) {
+        return yajl_buf_ok;
     }
 
     need = buf->len;
 
     while (want >= (need - buf->used)) need <<= 1;
 
+    // overflow
+    if (need == 0) {
+        return yajl_buf_set_error(buf, yajl_buf_overflow);
+    }
+
     if (need != buf->len) {
         buf->data = (unsigned char *) YA_REALLOC(buf->alloc, buf->data, need);
+
+        if (buf->data == NULL)  {
+            return yajl_buf_set_error(buf, yajl_buf_overflow);
+        }
+
         buf->len = need;
     }
+
+    return yajl_buf_ok;
 }
 
 yajl_buf yajl_buf_alloc(yajl_alloc_funcs * alloc)
@@ -86,7 +133,9 @@ void yajl_buf_free(yajl_buf buf)
 
 void yajl_buf_append(yajl_buf buf, const void * data, unsigned int len)
 {
-    yajl_buf_ensure_available(buf, len);
+    if (yajl_buf_ensure_available(buf, len)) {
+        return;
+    }
     if (len > 0) {
         assert(data != NULL);
         memcpy(buf->data + buf->used, data, len);
