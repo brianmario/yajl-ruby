@@ -38,12 +38,6 @@
 
 #define YAJL_BUF_INIT_SIZE 2048
 
-typedef enum {
-     yajl_buf_ok = 0,
-     yajl_buf_alloc_failed,
-     yajl_buf_overflow
-} yajl_buf_state;
-
 struct yajl_buf_t {
     yajl_buf_state state;
     unsigned int len;
@@ -58,6 +52,12 @@ static struct yajl_buf_t buf_alloc_error = {
 };
 
 #include <stdio.h>
+
+yajl_buf_state yajl_buf_err(yajl_buf buf)
+{
+    assert(buf);
+    return buf->state;
+}
 
 static
 yajl_buf_state yajl_buf_set_error(yajl_buf buf, yajl_buf_state err)
@@ -161,17 +161,22 @@ void yajl_buf_clear(yajl_buf buf)
 
 const unsigned char * yajl_buf_data(yajl_buf buf)
 {
+    assert(buf);
+    assert(!yajl_buf_err(buf));
     return buf->data;
 }
 
 unsigned int yajl_buf_len(yajl_buf buf)
 {
+    assert(buf);
+    assert(!yajl_buf_err(buf));
     return buf->used;
 }
 
 void
 yajl_buf_truncate(yajl_buf buf, unsigned int len)
 {
+    assert(buf);
     assert(len <= buf->used);
     buf->used = len;
 }
