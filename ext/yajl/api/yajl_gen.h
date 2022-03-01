@@ -65,7 +65,9 @@ extern "C" {
          * buffer to get from */
         yajl_gen_no_buf,
         /** Tried to decrement at depth 0 */
-        yajl_depth_underflow
+        yajl_depth_underflow,
+        /** Allocation error */
+        yajl_gen_alloc_error
     } yajl_gen_status;
 
     /** an opaque handle to a generator */
@@ -148,7 +150,7 @@ extern "C" {
     /** access the null terminated generator buffer.  If incrementally
      *  outputing JSON, one should call yajl_gen_clear to clear the
      *  buffer.  This allows stream generation. */
-    YAJL_API yajl_gen_status yajl_gen_get_buf(yajl_gen hand,
+    YAJL_API YAJL_WARN_UNUSED yajl_gen_status yajl_gen_get_buf(yajl_gen hand,
                                               const unsigned char ** buf,
                                               unsigned int * len);
 
