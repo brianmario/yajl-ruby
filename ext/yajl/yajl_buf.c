@@ -52,6 +52,11 @@ struct yajl_buf_t {
     yajl_alloc_funcs * alloc;
 };
 
+// A buffer to be returned if the initial allocation fails
+static struct yajl_buf_t buf_alloc_error = {
+    .state = yajl_buf_alloc_failed
+};
+
 #include <stdio.h>
 
 static
@@ -119,6 +124,10 @@ yajl_buf_state yajl_buf_ensure_available(yajl_buf buf, unsigned int want)
 yajl_buf yajl_buf_alloc(yajl_alloc_funcs * alloc)
 {
     yajl_buf b = YA_MALLOC(alloc, sizeof(struct yajl_buf_t));
+    if (b == NULL) {
+        return &buf_alloc_error;
+    }
+
     memset((void *) b, 0, sizeof(struct yajl_buf_t));
     b->alloc = alloc;
     return b;
