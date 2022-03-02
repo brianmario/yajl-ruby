@@ -113,12 +113,14 @@ yajl_alloc(const yajl_callbacks * callbacks,
 
 void
 yajl_reset_parser(yajl_handle hand) {
+    assert(hand);
     hand->lexer = yajl_lex_realloc(hand->lexer);
 }
 
 void
 yajl_free(yajl_handle handle)
 {
+    assert(handle);
     yajl_bs_free(handle->stateStack);
     yajl_buf_free(handle->decodeBuf);
     yajl_lex_free(handle->lexer);
@@ -129,6 +131,7 @@ yajl_status
 yajl_parse(yajl_handle hand, const unsigned char * jsonText,
            unsigned int jsonTextLen)
 {
+    assert(hand);
     yajl_status status;
     status = yajl_do_parse(hand, jsonText, jsonTextLen);
     return status;
@@ -137,6 +140,7 @@ yajl_parse(yajl_handle hand, const unsigned char * jsonText,
 yajl_status
 yajl_parse_complete(yajl_handle hand)
 {
+    assert(hand);
     /* The particular case we want to handle is a trailing number.
      * Further input consisting of digits could cause our interpretation
      * of the number to change (buffered "1" but "2" comes in).
@@ -150,6 +154,7 @@ unsigned char *
 yajl_get_error(yajl_handle hand, int verbose,
                const unsigned char * jsonText, unsigned int jsonTextLen)
 {
+    assert(hand);
     return yajl_render_error_string(hand, jsonText, jsonTextLen, verbose);
 }
 
