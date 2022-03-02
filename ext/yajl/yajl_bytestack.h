@@ -66,15 +66,16 @@ typedef struct yajl_bytestack_t
 #define yajl_bs_current(obs)               \
     (assert((obs).used > 0), (obs).stack[(obs).used - 1])
 
-#define yajl_bs_push(obs, byte) {                       \
-    if (((obs).size - (obs).used) == 0) {               \
-        (obs).size += YAJL_BS_INC;                      \
-        (obs).stack = (obs).yaf->realloc((obs).yaf->ctx,\
-                                         (void *) (obs).stack, (obs).size);\
-    }                                                   \
-    (obs).stack[((obs).used)++] = (byte);               \
+static inline void yajl_bs_push_inline(yajl_bytestack *obs, unsigned char byte) {
+    if ((obs->size - obs->used) == 0) {
+        obs->size += YAJL_BS_INC;
+        obs->stack = obs->yaf->realloc(obs->yaf->ctx, (void *)obs->stack, obs->size);
+    }
+    obs->stack[obs->used++] = byte;
 }
-    
+
+#define yajl_bs_push(obs, byte) yajl_bs_push_inline(&(obs), (byte))
+
 /* removes the top item of the stack, returns nothing */
 #define yajl_bs_pop(obs) { ((obs).used)--; }
 
