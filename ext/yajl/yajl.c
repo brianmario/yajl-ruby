@@ -86,6 +86,8 @@ yajl_alloc(const yajl_callbacks * callbacks,
     }
 
     hand = (yajl_handle) YA_MALLOC(afs, sizeof(struct yajl_handle_t));
+    if (hand == NULL)
+        return NULL;
 
     /* copy in pointers to allocation routines */
     memcpy((void *) &(hand->alloc), (void *) afs, sizeof(yajl_alloc_funcs));
@@ -97,12 +99,14 @@ yajl_alloc(const yajl_callbacks * callbacks,
 
     hand->callbacks = callbacks;
     hand->ctx = ctx;
-    hand->lexer = yajl_lex_alloc(&(hand->alloc), allowComments, validateUTF8);
+    hand->lexer = yajl_lex_alloc(&(hand->alloc), allowComments, validateUTF8); // fixme: check allocation
     hand->bytesConsumed = 0;
-    hand->decodeBuf = yajl_buf_alloc(&(hand->alloc));
+    hand->decodeBuf = yajl_buf_alloc(&(hand->alloc)); // fixme: check allocation
     yajl_bs_init(hand->stateStack, &(hand->alloc));
 
-    yajl_bs_push(hand->stateStack, yajl_state_start);    
+    if (yajl_bs_push(hand->stateStack, yajl_state_start)) {
+        return NULL;
+    }
 
     return hand;
 }
