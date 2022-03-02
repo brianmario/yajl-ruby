@@ -170,6 +170,8 @@ void yajl_buf_append(yajl_buf buf, const void * data, unsigned int len)
 
 void yajl_buf_clear(yajl_buf buf)
 {
+    assert(buf);
+    assert(!yajl_buf_err(buf));
     buf->used = 0;
     if (buf->data) buf->data[buf->used] = 0;
 }
@@ -192,6 +194,7 @@ void
 yajl_buf_truncate(yajl_buf buf, unsigned int len)
 {
     assert(buf);
+    assert(!yajl_buf_err(buf));
     assert(len <= buf->used);
     buf->used = len;
 }
