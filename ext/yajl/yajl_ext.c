@@ -921,7 +921,7 @@ static VALUE rb_yajl_projector_build_simple_value(yajl_event_stream_t parser, ya
             rb_raise(cParseError, "unexpected colon while constructing value");
 
         default:;
-            assert(0);
+            rb_bug("we should never get here");
     }
 }
 
@@ -959,7 +959,7 @@ static VALUE rb_yajl_projector_build_string(yajl_event_stream_t parser, yajl_eve
         }
 
         default:; {
-            assert(0);
+            rb_bug("we should never get here");
         }
     }
 }
