@@ -949,6 +949,9 @@ static VALUE rb_yajl_projector_build_string(yajl_event_stream_t parser, yajl_eve
 
             yajl_buf strBuf = yajl_buf_alloc(parser->funcs);
             yajl_string_decode(strBuf, (const unsigned char *)event.buf, event.len);
+            if (yajl_buf_err(strBuf)) {
+                rb_raise(cParseError, "YAJL internal error: failed to allocate memory");
+            }
 
             VALUE str = rb_str_new((const char *)yajl_buf_data(strBuf), yajl_buf_len(strBuf));
             rb_enc_associate(str, utf8Encoding);
