@@ -135,9 +135,12 @@ yajl_render_error_string(yajl_handle hand, const unsigned char * jsonText,
     }
 
 /* check for buffer error */
-#define _BUF_CHK(x)                        \
-    if (yajl_buf_err(x)) {                 \
-        return yajl_status_alloc_failed;   \
+#define _BUF_CHK(x)                                               \
+    if (yajl_buf_err(x)) {                                        \
+        yajl_bs_set(hand->stateStack, yajl_state_parse_error);    \
+        hand->parseError =                                        \
+            "allocation failed";                                  \
+        return yajl_status_alloc_failed;                          \
     }
 
 yajl_status
