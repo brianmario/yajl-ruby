@@ -314,10 +314,16 @@ void yajl_parse_chunk(const unsigned char * chunk, unsigned int len, yajl_handle
 
     stat = yajl_parse(parser, chunk, len);
 
-    if (stat != yajl_status_ok && stat != yajl_status_insufficient_data) {
+    if (stat == yajl_status_ok || stat == yajl_status_insufficient_data) {
+        // success
+    } else if (stat == yajl_status_error) {
         unsigned char * str = yajl_get_error(parser, 1, chunk, len);
         VALUE errobj = rb_exc_new2(cParseError, (const char*) str);
         yajl_free_error(parser, str);
+        rb_exc_raise(errobj);
+    } else {
+        const char * str = yajl_status_to_string(stat);
+        VALUE errobj = rb_exc_new2(cParseError, (const char*) str);
         rb_exc_raise(errobj);
     }
 }

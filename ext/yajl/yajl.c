@@ -56,6 +56,9 @@ yajl_status_to_string(yajl_status stat)
         case yajl_status_error:
             statStr = "parse error";
             break;
+        case yajl_status_alloc_failed:
+            statStr = "allocation failed";
+            break;
     }
     return statStr;
 }
