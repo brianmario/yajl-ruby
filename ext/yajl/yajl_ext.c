@@ -193,14 +193,13 @@ static int yajl_encode_part_hash_i(VALUE key, VALUE val, VALUE iter_v) {
     if ((status = (call)) != yajl_gen_status_ok) { break; }
 
 void yajl_encode_part(void * wrapper, VALUE obj, VALUE io) {
-    VALUE str, outBuff, otherObj;
+    VALUE str, outBuff;
     yajl_encoder_wrapper * w = wrapper;
     yajl_gen_status status;
     int idx = 0;
     const unsigned char * buffer;
     const char * cptr;
     unsigned int len;
-    VALUE *ptr;
 
     if (io != Qnil || w->on_progress_callback != Qnil) {
         status = yajl_gen_get_buf(w->encoder, &buffer, &len);
