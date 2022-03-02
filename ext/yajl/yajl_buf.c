@@ -35,6 +35,7 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 #define YAJL_BUF_INIT_SIZE 2048
 
@@ -46,9 +47,23 @@ struct yajl_buf_t {
     yajl_alloc_funcs * alloc;
 };
 
+static void *noop_realloc(void *ctx, void *ptr, unsigned int sz) {
+    fprintf(stderr, "Attempt to allocate on invalid yajl_buf_t\n");
+    abort();
+}
+static void *noop_malloc(void *ctx, unsigned int sz) { return noop_realloc(ctx, NULL, sz); }
+static void noop_free(void *ctx, void *ptr) { }
+
+static yajl_alloc_funcs noop_allocs = {
+    .malloc = &noop_malloc,
+    .realloc = &noop_realloc,
+    .free = &noop_free,
+};
+
 // A buffer to be returned if the initial allocation fails
 static struct yajl_buf_t buf_alloc_error = {
-    .state = yajl_buf_alloc_failed
+    .state = yajl_buf_alloc_failed,
+    .alloc = &noop_allocs
 };
 
 #include <stdio.h>
