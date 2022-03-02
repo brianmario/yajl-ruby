@@ -93,7 +93,11 @@ static char *yajl_raise_encode_error_for_status(yajl_gen_status status, VALUE ob
             rb_raise(cEncodeError, "Invalid number: cannot encode Infinity, -Infinity, or NaN");
         case yajl_gen_no_buf:
             rb_raise(cEncodeError, "YAJL internal error: yajl_gen_get_buf was called, but a print callback was specified, so no internal buffer is available");
+        case yajl_gen_alloc_error:
+            rb_raise(cEncodeError, "YAJL internal error: failed to allocate memory");
         default:
+            // fixme: why wasn't this already here??
+            rb_raise(cEncodeError, "Encountered unknown YAJL status %d during JSON generation", status);
             return NULL;
     }
 }
@@ -1135,6 +1139,7 @@ static VALUE rb_yajl_encoder_encode(int argc, VALUE * argv, VALUE self) {
     const unsigned char * buffer;
     unsigned int len;
     VALUE obj, io, blk, outBuff;
+    yajl_gen_status status;
 
     GetEncoder(self, wrapper);
 
@@ -1148,7 +1153,11 @@ static VALUE rb_yajl_encoder_encode(int argc, VALUE * argv, VALUE self) {
     yajl_encode_part(wrapper, obj, io);
 
     /* just make sure we output the remaining buffer */
-    yajl_gen_get_buf(wrapper->encoder, &buffer, &len);
+    status = yajl_gen_get_buf(wrapper->encoder, &buffer, &len);
+    if (status != yajl_gen_status_ok) {
+        yajl_raise_encode_error_for_status(status, obj);
+    }
+
     outBuff = rb_str_new((const char *)buffer, len);
 #ifdef HAVE_RUBY_ENCODING_H
     rb_enc_associate(outBuff, utf8Encoding);
