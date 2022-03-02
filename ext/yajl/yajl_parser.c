@@ -134,6 +134,11 @@ yajl_render_error_string(yajl_handle hand, const unsigned char * jsonText,
         return yajl_status_client_canceled;                       \
     }
 
+/* check for buffer error */
+#define _BUF_CHK(x)                        \
+    if (yajl_buf_err(x)) {                 \
+        return yajl_status_alloc_failed;   \
+    }
 
 yajl_status
 yajl_do_parse(yajl_handle hand, const unsigned char * jsonText,
@@ -185,8 +190,7 @@ yajl_do_parse(yajl_handle hand, const unsigned char * jsonText,
                     if (hand->callbacks && hand->callbacks->yajl_string) {
                         yajl_buf_clear(hand->decodeBuf);
                         yajl_string_decode(hand->decodeBuf, buf, bufLen);
-                        if (yajl_buf_err(hand->decodeBuf))
-                            return yajl_status_alloc_failed;
+                        _BUF_CHK(hand->decodeBuf);
                         _CC_CHK(hand->callbacks->yajl_string(
                                     hand->ctx, yajl_buf_data(hand->decodeBuf),
                                     yajl_buf_len(hand->decodeBuf)));
@@ -236,6 +240,7 @@ yajl_do_parse(yajl_handle hand, const unsigned char * jsonText,
                             long int i = 0;
                             yajl_buf_clear(hand->decodeBuf);
                             yajl_buf_append(hand->decodeBuf, buf, bufLen);
+                            _BUF_CHK(hand->decodeBuf);
                             buf = yajl_buf_data(hand->decodeBuf);
                             i = strtol((const char *) buf, NULL, 10);
                             if ((i == LONG_MIN || i == LONG_MAX) &&
@@ -263,6 +268,7 @@ yajl_do_parse(yajl_handle hand, const unsigned char * jsonText,
                             double d = 0.0;
                             yajl_buf_clear(hand->decodeBuf);
                             yajl_buf_append(hand->decodeBuf, buf, bufLen);
+                            _BUF_CHK(hand->decodeBuf);
                             buf = yajl_buf_data(hand->decodeBuf);
                             d = strtod((char *) buf, NULL);
                             if ((d == HUGE_VAL || d == -HUGE_VAL) &&
@@ -344,6 +350,7 @@ yajl_do_parse(yajl_handle hand, const unsigned char * jsonText,
                     if (hand->callbacks && hand->callbacks->yajl_map_key) {
                         yajl_buf_clear(hand->decodeBuf);
                         yajl_string_decode(hand->decodeBuf, buf, bufLen);
+                        _BUF_CHK(hand->decodeBuf);
                         buf = yajl_buf_data(hand->decodeBuf);
                         bufLen = yajl_buf_len(hand->decodeBuf);
                     }

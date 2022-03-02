@@ -633,7 +633,12 @@ yajl_lex_lex(yajl_lexer lexer, const unsigned char * jsonText,
         lexer->bufInUse = 1;
         yajl_buf_append(lexer->buf, jsonText + startOffset, *offset - startOffset);
         lexer->bufOff = 0;
-        
+
+        if (yajl_buf_err(lexer->buf)) {
+            lexer->error = yajl_lex_alloc_failed;
+            return yajl_tok_error;
+        }
+
         if (tok != yajl_tok_eof) {
             *outBuf = yajl_buf_data(lexer->buf);
             *outLen = yajl_buf_len(lexer->buf);
@@ -700,6 +705,8 @@ yajl_lex_error_to_string(yajl_lex_error error)
         case yajl_lex_unallowed_comment:
             return "probable comment found in input text, comments are "
                    "not enabled.";
+        case yajl_lex_alloc_failed:
+            return "allocation failed";
     }
     return "unknown error code";
 }
