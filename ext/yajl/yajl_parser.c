@@ -328,7 +328,9 @@ yajl_do_parse(yajl_handle hand, const unsigned char * jsonText,
                 }
             }
             if (stateToPush != yajl_state_start) {
-                yajl_bs_push(hand->stateStack, stateToPush);
+                if (yajl_bs_push(hand->stateStack, stateToPush)) {
+                    return yajl_status_alloc_failed;
+                }
             }
 
             goto around_again;
