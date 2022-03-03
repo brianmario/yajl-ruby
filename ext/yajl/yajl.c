@@ -99,9 +99,13 @@ yajl_alloc(const yajl_callbacks * callbacks,
 
     hand->callbacks = callbacks;
     hand->ctx = ctx;
-    hand->lexer = yajl_lex_alloc(&(hand->alloc), allowComments, validateUTF8); // fixme: check allocation
+    hand->lexer = yajl_lex_alloc(&(hand->alloc), allowComments, validateUTF8);
+    if (!hand->lexer) {
+        YA_FREE(afs, hand);
+        return NULL;
+    }
     hand->bytesConsumed = 0;
-    hand->decodeBuf = yajl_buf_alloc(&(hand->alloc)); // fixme: check allocation
+    hand->decodeBuf = yajl_buf_alloc(&(hand->alloc));
     yajl_bs_init(hand->stateStack, &(hand->alloc));
 
     if (yajl_bs_push(hand->stateStack, yajl_state_start)) {

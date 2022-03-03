@@ -118,6 +118,8 @@ yajl_lex_alloc(yajl_alloc_funcs * alloc,
                unsigned int allowComments, unsigned int validateUTF8)
 {
     yajl_lexer lxr = (yajl_lexer) YA_MALLOC(alloc, sizeof(struct yajl_lexer_t));
+    if (!lxr)
+        return NULL;
     memset((void *) lxr, 0, sizeof(struct yajl_lexer_t));
     lxr->buf = yajl_buf_alloc(alloc);
     lxr->allowComments = allowComments;
