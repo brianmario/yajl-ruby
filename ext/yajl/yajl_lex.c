@@ -118,6 +118,8 @@ yajl_lex_alloc(yajl_alloc_funcs * alloc,
                unsigned int allowComments, unsigned int validateUTF8)
 {
     yajl_lexer lxr = (yajl_lexer) YA_MALLOC(alloc, sizeof(struct yajl_lexer_t));
+    if (!lxr)
+        return NULL;
     memset((void *) lxr, 0, sizeof(struct yajl_lexer_t));
     lxr->buf = yajl_buf_alloc(alloc);
     lxr->allowComments = allowComments;
@@ -633,7 +635,12 @@ yajl_lex_lex(yajl_lexer lexer, const unsigned char * jsonText,
         lexer->bufInUse = 1;
         yajl_buf_append(lexer->buf, jsonText + startOffset, *offset - startOffset);
         lexer->bufOff = 0;
-        
+
+        if (yajl_buf_err(lexer->buf)) {
+            lexer->error = yajl_lex_alloc_failed;
+            return yajl_tok_error;
+        }
+
         if (tok != yajl_tok_eof) {
             *outBuf = yajl_buf_data(lexer->buf);
             *outLen = yajl_buf_len(lexer->buf);
@@ -700,6 +707,8 @@ yajl_lex_error_to_string(yajl_lex_error error)
         case yajl_lex_unallowed_comment:
             return "probable comment found in input text, comments are "
                    "not enabled.";
+        case yajl_lex_alloc_failed:
+            return "allocation failed";
     }
     return "unknown error code";
 }

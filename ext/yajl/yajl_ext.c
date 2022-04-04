@@ -93,7 +93,11 @@ static char *yajl_raise_encode_error_for_status(yajl_gen_status status, VALUE ob
             rb_raise(cEncodeError, "Invalid number: cannot encode Infinity, -Infinity, or NaN");
         case yajl_gen_no_buf:
             rb_raise(cEncodeError, "YAJL internal error: yajl_gen_get_buf was called, but a print callback was specified, so no internal buffer is available");
+        case yajl_gen_alloc_error:
+            rb_raise(cEncodeError, "YAJL internal error: failed to allocate memory");
         default:
+            // fixme: why wasn't this already here??
+            rb_raise(cEncodeError, "Encountered unknown YAJL status %d during JSON generation", status);
             return NULL;
     }
 }
@@ -189,14 +193,13 @@ static int yajl_encode_part_hash_i(VALUE key, VALUE val, VALUE iter_v) {
     if ((status = (call)) != yajl_gen_status_ok) { break; }
 
 void yajl_encode_part(void * wrapper, VALUE obj, VALUE io) {
-    VALUE str, outBuff, otherObj;
+    VALUE str, outBuff;
     yajl_encoder_wrapper * w = wrapper;
     yajl_gen_status status;
     int idx = 0;
     const unsigned char * buffer;
     const char * cptr;
     unsigned int len;
-    VALUE *ptr;
 
     if (io != Qnil || w->on_progress_callback != Qnil) {
         status = yajl_gen_get_buf(w->encoder, &buffer, &len);
@@ -311,10 +314,16 @@ void yajl_parse_chunk(const unsigned char * chunk, unsigned int len, yajl_handle
 
     stat = yajl_parse(parser, chunk, len);
 
-    if (stat != yajl_status_ok && stat != yajl_status_insufficient_data) {
+    if (stat == yajl_status_ok || stat == yajl_status_insufficient_data) {
+        // success
+    } else if (stat == yajl_status_error) {
         unsigned char * str = yajl_get_error(parser, 1, chunk, len);
         VALUE errobj = rb_exc_new2(cParseError, (const char*) str);
         yajl_free_error(parser, str);
+        rb_exc_raise(errobj);
+    } else {
+        const char * str = yajl_status_to_string(stat);
+        VALUE errobj = rb_exc_new2(cParseError, (const char*) str);
         rb_exc_raise(errobj);
     }
 }
@@ -917,7 +926,7 @@ static VALUE rb_yajl_projector_build_simple_value(yajl_event_stream_t parser, ya
             rb_raise(cParseError, "unexpected colon while constructing value");
 
         default:;
-            assert(0);
+            rb_bug("we should never get here");
     }
 }
 
@@ -940,6 +949,9 @@ static VALUE rb_yajl_projector_build_string(yajl_event_stream_t parser, yajl_eve
 
             yajl_buf strBuf = yajl_buf_alloc(parser->funcs);
             yajl_string_decode(strBuf, (const unsigned char *)event.buf, event.len);
+            if (yajl_buf_err(strBuf)) {
+                rb_raise(cParseError, "YAJL internal error: failed to allocate memory");
+            }
 
             VALUE str = rb_str_new((const char *)yajl_buf_data(strBuf), yajl_buf_len(strBuf));
             rb_enc_associate(str, utf8Encoding);
@@ -955,7 +967,7 @@ static VALUE rb_yajl_projector_build_string(yajl_event_stream_t parser, yajl_eve
         }
 
         default:; {
-            assert(0);
+            rb_bug("we should never get here");
         }
     }
 }
@@ -1135,6 +1147,7 @@ static VALUE rb_yajl_encoder_encode(int argc, VALUE * argv, VALUE self) {
     const unsigned char * buffer;
     unsigned int len;
     VALUE obj, io, blk, outBuff;
+    yajl_gen_status status;
 
     GetEncoder(self, wrapper);
 
@@ -1148,7 +1161,11 @@ static VALUE rb_yajl_encoder_encode(int argc, VALUE * argv, VALUE self) {
     yajl_encode_part(wrapper, obj, io);
 
     /* just make sure we output the remaining buffer */
-    yajl_gen_get_buf(wrapper->encoder, &buffer, &len);
+    status = yajl_gen_get_buf(wrapper->encoder, &buffer, &len);
+    if (status != yajl_gen_status_ok) {
+        yajl_raise_encode_error_for_status(status, obj);
+    }
+
     outBuff = rb_str_new((const char *)buffer, len);
 #ifdef HAVE_RUBY_ENCODING_H
     rb_enc_associate(outBuff, utf8Encoding);

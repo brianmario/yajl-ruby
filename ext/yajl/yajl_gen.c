@@ -362,6 +362,10 @@ yajl_gen_get_buf(yajl_gen g, const unsigned char ** buf,
                  unsigned int * len)
 {
     if (g->print != (yajl_print_t)&yajl_buf_append) return yajl_gen_no_buf;
+    yajl_buf_state buf_err = yajl_buf_err((yajl_buf)g->ctx);
+    if (buf_err) {
+        return yajl_gen_alloc_error;
+    }
     *buf = yajl_buf_data((yajl_buf)g->ctx);
     *len = yajl_buf_len((yajl_buf)g->ctx);
     return yajl_gen_status_ok;
