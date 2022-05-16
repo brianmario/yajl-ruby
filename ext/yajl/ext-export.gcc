@@ -1,0 +1,6 @@
+yajl_1.0.12 { 
+  global: 
+    ruby_abi_version;
+  local: 
+    *;
+};
