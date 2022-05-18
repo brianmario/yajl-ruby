@@ -1379,6 +1379,7 @@ void Init_yajl() {
     cStandardError = rb_const_get(rb_cObject, rb_intern("StandardError"));
 
     cParser = rb_define_class_under(mYajl, "Parser", rb_cObject);
+    rb_undef_alloc_func(cParser);
     rb_define_singleton_method(cParser, "new", rb_yajl_parser_new, -1);
     rb_define_method(cParser, "initialize", rb_yajl_parser_init, -1);
     rb_define_method(cParser, "parse", rb_yajl_parser_parse, -1);
@@ -1390,6 +1391,7 @@ void Init_yajl() {
     rb_define_method(cProjector, "project", rb_yajl_projector_project, 1);
 
     cEncoder = rb_define_class_under(mYajl, "Encoder", rb_cObject);
+    rb_undef_alloc_func(cEncoder);
     rb_define_singleton_method(cEncoder, "new", rb_yajl_encoder_new, -1);
     rb_define_method(cEncoder, "initialize", rb_yajl_encoder_init, -1);
     rb_define_method(cEncoder, "encode", rb_yajl_encoder_encode, -1);
