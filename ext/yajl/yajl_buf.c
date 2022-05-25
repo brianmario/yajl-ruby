@@ -116,10 +116,10 @@ yajl_buf_state yajl_buf_ensure_available(yajl_buf buf, unsigned int want)
 
     need = buf->len;
 
-    while (want >= (need - buf->used)) need <<= 1;
+    while (want >= (need - buf->used) && need > 0) need <<= 1;
 
     // Check for overflow
-    if (need < buf->used) {
+    if (need < buf->used || need == 0) {
         return yajl_buf_set_error(buf, yajl_buf_overflow);
     }
 
