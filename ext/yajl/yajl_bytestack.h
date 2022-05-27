@@ -38,9 +38,12 @@
 #ifndef __YAJL_BYTESTACK_H__
 #define __YAJL_BYTESTACK_H__
 
+#include <limits.h>
+#include <assert.h>
 #include "api/yajl_common.h"
 
 #define YAJL_BS_INC 128
+#define YAJL_BS_MAX_SIZE UINT_MAX
 
 typedef struct yajl_bytestack_t
 {
@@ -66,20 +69,34 @@ typedef struct yajl_bytestack_t
 #define yajl_bs_current(obs)               \
     (assert((obs).used > 0), (obs).stack[(obs).used - 1])
 
-#define yajl_bs_push(obs, byte) {                       \
-    if (((obs).size - (obs).used) == 0) {               \
-        (obs).size += YAJL_BS_INC;                      \
-        (obs).stack = (obs).yaf->realloc((obs).yaf->ctx,\
-                                         (void *) (obs).stack, (obs).size);\
-    }                                                   \
-    (obs).stack[((obs).used)++] = (byte);               \
+/* 0: success, 1: error */
+static inline YAJL_WARN_UNUSED
+int yajl_bs_push_inline(yajl_bytestack *obs, unsigned char byte) {
+    if ((obs->size - obs->used) == 0) {
+        if (obs->size > YAJL_BS_MAX_SIZE - YAJL_BS_INC)
+            return 1;
+        obs->size += YAJL_BS_INC;
+        obs->stack = obs->yaf->realloc(obs->yaf->ctx, (void *)obs->stack, obs->size);
+        if (!obs->stack)
+            return 1;
+    }
+    obs->stack[obs->used++] = byte;
+    return 0;
 }
-    
+
+#define yajl_bs_push(obs, byte) yajl_bs_push_inline(&(obs), (byte))
+
 /* removes the top item of the stack, returns nothing */
 #define yajl_bs_pop(obs) { ((obs).used)--; }
 
-#define yajl_bs_set(obs, byte)                          \
-    (obs).stack[((obs).used) - 1] = (byte);             
-    
+static inline
+void
+yajl_bs_set_inline(yajl_bytestack *obs, unsigned char byte) {
+    assert(obs->used > 0);
+    assert(obs->size >= obs->used);
+    obs->stack[obs->used - 1] = byte;
+}
+
+#define yajl_bs_set(obs, byte) yajl_bs_set_inline(&obs, byte)
 
 #endif

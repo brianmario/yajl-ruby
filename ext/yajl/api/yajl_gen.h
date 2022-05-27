@@ -63,7 +63,11 @@ extern "C" {
         yajl_gen_invalid_number,
         /** A print callback was passed in, so there is no internal
          * buffer to get from */
-        yajl_gen_no_buf
+        yajl_gen_no_buf,
+        /** Tried to decrement at depth 0 */
+        yajl_depth_underflow,
+        /** Allocation error */
+        yajl_gen_alloc_error
     } yajl_gen_status;
 
     /** an opaque handle to a generator */
@@ -129,6 +133,7 @@ extern "C" {
      *  NaN, as these have no representation in JSON.  In these cases the
      *  generator will return 'yajl_gen_invalid_number' */
     YAJL_API yajl_gen_status yajl_gen_double(yajl_gen hand, double number);
+    YAJL_API yajl_gen_status yajl_gen_long(yajl_gen hand, long value);
     YAJL_API yajl_gen_status yajl_gen_number(yajl_gen hand,
                                              const char * num,
                                              unsigned int len);
@@ -145,7 +150,7 @@ extern "C" {
     /** access the null terminated generator buffer.  If incrementally
      *  outputing JSON, one should call yajl_gen_clear to clear the
      *  buffer.  This allows stream generation. */
-    YAJL_API yajl_gen_status yajl_gen_get_buf(yajl_gen hand,
+    YAJL_API YAJL_WARN_UNUSED yajl_gen_status yajl_gen_get_buf(yajl_gen hand,
                                               const unsigned char ** buf,
                                               unsigned int * len);
 

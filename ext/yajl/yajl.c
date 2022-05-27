@@ -56,6 +56,9 @@ yajl_status_to_string(yajl_status stat)
         case yajl_status_error:
             statStr = "parse error";
             break;
+        case yajl_status_alloc_failed:
+            statStr = "allocation failed";
+            break;
     }
     return statStr;
 }
@@ -83,6 +86,8 @@ yajl_alloc(const yajl_callbacks * callbacks,
     }
 
     hand = (yajl_handle) YA_MALLOC(afs, sizeof(struct yajl_handle_t));
+    if (hand == NULL)
+        return NULL;
 
     /* copy in pointers to allocation routines */
     memcpy((void *) &(hand->alloc), (void *) afs, sizeof(yajl_alloc_funcs));
@@ -95,23 +100,31 @@ yajl_alloc(const yajl_callbacks * callbacks,
     hand->callbacks = callbacks;
     hand->ctx = ctx;
     hand->lexer = yajl_lex_alloc(&(hand->alloc), allowComments, validateUTF8);
+    if (!hand->lexer) {
+        YA_FREE(afs, hand);
+        return NULL;
+    }
     hand->bytesConsumed = 0;
     hand->decodeBuf = yajl_buf_alloc(&(hand->alloc));
     yajl_bs_init(hand->stateStack, &(hand->alloc));
 
-    yajl_bs_push(hand->stateStack, yajl_state_start);    
+    if (yajl_bs_push(hand->stateStack, yajl_state_start)) {
+        return NULL;
+    }
 
     return hand;
 }
 
 void
 yajl_reset_parser(yajl_handle hand) {
+    assert(hand);
     hand->lexer = yajl_lex_realloc(hand->lexer);
 }
 
 void
 yajl_free(yajl_handle handle)
 {
+    assert(handle);
     yajl_bs_free(handle->stateStack);
     yajl_buf_free(handle->decodeBuf);
     yajl_lex_free(handle->lexer);
@@ -122,6 +135,7 @@ yajl_status
 yajl_parse(yajl_handle hand, const unsigned char * jsonText,
            unsigned int jsonTextLen)
 {
+    assert(hand);
     yajl_status status;
     status = yajl_do_parse(hand, jsonText, jsonTextLen);
     return status;
@@ -130,6 +144,7 @@ yajl_parse(yajl_handle hand, const unsigned char * jsonText,
 yajl_status
 yajl_parse_complete(yajl_handle hand)
 {
+    assert(hand);
     /* The particular case we want to handle is a trailing number.
      * Further input consisting of digits could cause our interpretation
      * of the number to change (buffered "1" but "2" comes in).
@@ -143,6 +158,7 @@ unsigned char *
 yajl_get_error(yajl_handle hand, int verbose,
                const unsigned char * jsonText, unsigned int jsonTextLen)
 {
+    assert(hand);
     return yajl_render_error_string(hand, jsonText, jsonTextLen, verbose);
 }
 

@@ -56,6 +56,12 @@ extern "C" {
 #  endif
 #endif 
 
+#if defined(__GNUC__)
+#define YAJL_WARN_UNUSED __attribute__ ((warn_unused_result))
+#else
+#define YAJL_WARN_UNUSED
+#endif
+
 /** pointer to a malloc function, supporting client overriding memory
  *  allocation routines */
 typedef void * (*yajl_malloc_func)(void *ctx, unsigned int sz);

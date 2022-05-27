@@ -230,6 +230,16 @@ describe "Yajl JSON encoder" do
     expect(s.read).to eql("{\"foo\":\"bar\"}")
   end
 
+  it "should encode all integers correctly" do
+    0.upto(129).each do |b|
+      b = 1 << b
+      [b, b-1, b-2, b+1, b+2].each do |i|
+        expect(Yajl::Encoder.encode(i)).to eq(i.to_s)
+        expect(Yajl::Encoder.encode(-i)).to eq((-i).to_s)
+      end
+    end
+  end
+
   it "should not encode NaN" do
     expect {
       Yajl::Encoder.encode(0.0/0.0)

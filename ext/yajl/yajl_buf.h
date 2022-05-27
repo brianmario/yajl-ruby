@@ -43,6 +43,12 @@
  * call overhead.  YMMV.
  */
 
+typedef enum {
+     yajl_buf_ok = 0,
+     yajl_buf_alloc_failed,
+     yajl_buf_overflow
+} yajl_buf_state;
+
 /**
  * yajl_buf is a buffer with exponential growth.  the buffer ensures that
  * you are always null padded.
@@ -76,5 +82,8 @@ unsigned int yajl_buf_len(yajl_buf buf);
 /* truncate the buffer */
 YAJL_API
 void yajl_buf_truncate(yajl_buf buf, unsigned int len);
+
+/* get the state of buffer */
+yajl_buf_state yajl_buf_err(yajl_buf buf);
 
 #endif

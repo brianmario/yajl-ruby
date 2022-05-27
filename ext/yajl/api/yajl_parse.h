@@ -55,7 +55,9 @@ extern "C" {
         yajl_status_insufficient_data,
         /** An error occured during the parse.  Call yajl_get_error for
          *  more information about the encountered error */
-        yajl_status_error
+        yajl_status_error,
+        /** an allocation failed */
+        yajl_status_alloc_failed,
     } yajl_status;
 
     /** attain a human readable, english, string for an error */

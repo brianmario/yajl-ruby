@@ -178,7 +178,7 @@ yajl_gen_free(yajl_gen g)
     if (++(g->depth) >= YAJL_MAX_DEPTH) return yajl_max_depth_exceeded;
 
 #define DECREMENT_DEPTH \
-    if (--(g->depth) >= YAJL_MAX_DEPTH) return yajl_gen_error;
+    if (--(g->depth) >= YAJL_MAX_DEPTH) return yajl_depth_underflow;
 
 #define APPENDED_ATOM \
     switch (g->state[g->depth]) {                   \
@@ -225,6 +225,36 @@ yajl_gen_double(yajl_gen g, double number)
     INSERT_SEP; INSERT_WHITESPACE;
     sprintf(i, "%.20g", number);
     g->print(g->ctx, i, (unsigned int)strlen(i));
+    APPENDED_ATOM;
+    FINAL_NEWLINE;
+    return yajl_gen_status_ok;
+}
+
+yajl_gen_status
+yajl_gen_long(yajl_gen g, long val)
+{
+    char buf[32], *b = buf + sizeof buf;
+    unsigned int len = 0;
+    unsigned long uval;
+
+    ENSURE_VALID_STATE; ENSURE_NOT_KEY; INSERT_SEP; INSERT_WHITESPACE;
+
+    if (val < 0) {
+        g->print(g->ctx, "-", 1);
+        // Avoid overflow. This shouldn't happen because FIXNUMs are 1 bit less
+        // than LONGs, but good to be safe.
+        uval = 1 + (unsigned long)(-(val + 1));
+    } else {
+        uval = val;
+    }
+
+    do {
+        *--b = "0123456789"[uval % 10];
+        uval /= 10;
+        len++;
+    } while(uval);
+    g->print(g->ctx, b, len);
+
     APPENDED_ATOM;
     FINAL_NEWLINE;
     return yajl_gen_status_ok;
@@ -332,6 +362,10 @@ yajl_gen_get_buf(yajl_gen g, const unsigned char ** buf,
                  unsigned int * len)
 {
     if (g->print != (yajl_print_t)&yajl_buf_append) return yajl_gen_no_buf;
+    yajl_buf_state buf_err = yajl_buf_err((yajl_buf)g->ctx);
+    if (buf_err) {
+        return yajl_gen_alloc_error;
+    }
     *buf = yajl_buf_data((yajl_buf)g->ctx);
     *len = yajl_buf_len((yajl_buf)g->ctx);
     return yajl_gen_status_ok;

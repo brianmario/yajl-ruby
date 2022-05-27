@@ -120,7 +120,8 @@ typedef enum {
     yajl_lex_missing_integer_after_decimal,
     yajl_lex_missing_integer_after_exponent,
     yajl_lex_missing_integer_after_minus,
-    yajl_lex_unallowed_comment
+    yajl_lex_unallowed_comment,
+    yajl_lex_alloc_failed
 } yajl_lex_error;
 
 YAJL_API

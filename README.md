@@ -126,7 +126,7 @@ url = URI.parse("http://search.twitter.com/search.json?q=engineyard")
 results = Yajl::HttpStream.get(url)
 ```
 
-Since yajl-ruby parses JSON as a stream, supporting API's like Twitter's Streaming API are a piece-of-cake.
+Since yajl-ruby parses JSON as a stream, supporting APIs like Twitter's Streaming API are a piece-of-cake.
 You can simply supply a block to `Yajl::HttpStream.get`, which is used as the callback for when a JSON object has been
 unserialized off the stream. For the case of this Twitter Streaming API call, the callback gets fired a few times a second (depending on your connection speed).
 The code below is all that's needed to make the request and stream unserialized Ruby hashes off the response, continuously.
