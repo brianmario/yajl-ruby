@@ -67,6 +67,32 @@ describe "One-off JSON examples" do
     expect(output).to eq({"key" => 1234})
   end
 
+  %w(
+    {"hi":
+    "worl
+    1.
+    tru
+    nu
+    [[[[[f
+    ["hey","babe"
+    [{"wtf...
+  ).each do |example|
+    it "should not parse #{example.inspect}" do
+      lambda {
+        Yajl::Parser.parse(example)
+      }.should raise_error "unexpected end of JSON string"
+    end
+  end
+
+  it "should not parse tails after incomplete heads" do
+      lambda {
+        Yajl::Parser.parse('{"hi":')
+      }.should raise_error
+      lambda {
+        Yajl::Parser.parse('"hi"}')
+      }.should raise_error
+  end
+
   it "should parse numbers greater than 2,147,483,648" do
     expect(Yajl::Parser.parse("{\"id\": 2147483649}")).to eql({"id" => 2147483649})
     expect(Yajl::Parser.parse("{\"id\": 5687389800}")).to eql({"id" => 5687389800})
