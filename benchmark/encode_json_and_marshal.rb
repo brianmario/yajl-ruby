@@ -4,7 +4,6 @@ $LOAD_PATH.unshift File.expand_path(File.dirname(__FILE__) + '/../lib')
 require 'rubygems'
 require 'benchmark'
 require 'yajl'
-require 'stringio'
 begin
   require 'json'
 rescue LoadError
@@ -22,7 +21,7 @@ Benchmark.bmbm { |x|
   x.report {
     puts "Yajl::Encoder#encode"
     times.times {
-      encoder.encode(hash, StringIO.new)
+      encoder.encode(hash, File.open(File::NULL, 'w'))
     }
   }
   if defined?(JSON)
