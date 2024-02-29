@@ -7,7 +7,7 @@ Gem::Specification.new do |s|
   s.authors = ["Brian Lopez", "Lloyd Hilaiel"]
   s.email = %q{seniorlopez@gmail.com}
   s.extensions = ["ext/yajl/extconf.rb"]
-  s.files = `git ls-files`.split("\n")
+  s.files = Dir['lib/**/*.rb', 'ext/**/*.*']
   s.homepage = %q{https://github.com/brianmario/yajl-ruby}
   s.require_paths = ["lib"]
   s.summary = %q{Ruby C bindings to the excellent Yajl JSON stream-based parser library.}
