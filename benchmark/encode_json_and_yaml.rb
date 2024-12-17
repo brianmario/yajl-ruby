@@ -23,7 +23,7 @@ Benchmark.bmbm { |x|
   x.report {
     puts "Yajl::Encoder#encode"
     times.times {
-      encoder.encode(hash, StringIO.new)
+      encoder.encode(hash, File.open(File::NULL, 'w'))
     }
   }
   if defined?(JSON)
@@ -47,7 +47,7 @@ Benchmark.bmbm { |x|
   x.report {
     puts "YAML.dump"
     times.times {
-      YAML.dump(data, StringIO.new)
+      YAML.dump(data, File.open(File::NULL, 'w'))
     }
   }
 }
