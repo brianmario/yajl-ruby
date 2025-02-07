@@ -1,0 +1,20 @@
+#!/bin/sh
+# Usage: script/cibuild
+# CI build script.
+set -e
+
+# change into root dir and setup path
+cd $(dirname "$0")/..
+
+PATH="$(pwd)/bin:$(pwd)/script:$PATH"
+
+# Write commit we're building at
+git log -n 1 || true
+echo
+
+echo "Bootstraping"
+script/bootstrap
+echo
+
+echo "Starting test suite"
+script/test
