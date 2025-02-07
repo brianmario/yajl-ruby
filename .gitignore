@@ -11,3 +11,4 @@ vendor/gems
 Gemfile.lock
 .rbx
 bin/
+ext/yajl/yajl.so
