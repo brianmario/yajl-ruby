@@ -1352,18 +1352,18 @@ static VALUE rb_yajl_json_ext_nil_to_json(int argc, VALUE * argv, VALUE self) {
  * Enables the JSON gem compatibility API
  */
 static VALUE rb_yajl_encoder_enable_json_gem_ext(VALUE klass) {
-    rb_define_method(rb_cHash, "to_json", rb_yajl_json_ext_hash_to_json, -1);
-    rb_define_method(rb_cArray, "to_json", rb_yajl_json_ext_array_to_json, -1);
+    rb_define_method(rb_cHash, "to_json", RUBY_METHOD_FUNC(rb_yajl_json_ext_hash_to_json), -1);
+    rb_define_method(rb_cArray, "to_json", RUBY_METHOD_FUNC(rb_yajl_json_ext_array_to_json), -1);
 #ifdef RUBY_INTEGER_UNIFICATION
-    rb_define_method(rb_cInteger, "to_json", rb_yajl_json_ext_fixnum_to_json, -1);
+    rb_define_method(rb_cInteger, "to_json", RUBY_METHOD_FUNC(rb_yajl_json_ext_fixnum_to_json), -1);
 #else
-    rb_define_method(rb_cFixnum, "to_json", rb_yajl_json_ext_fixnum_to_json, -1);
+    rb_define_method(rb_cFixnum, "to_json", RUBY_METHOD_FUNC(rb_yajl_json_ext_fixnum_to_json), -1);
 #endif
-    rb_define_method(rb_cFloat, "to_json", rb_yajl_json_ext_float_to_json, -1);
-    rb_define_method(rb_cString, "to_json", rb_yajl_json_ext_string_to_json, -1);
-    rb_define_method(rb_cTrueClass, "to_json", rb_yajl_json_ext_true_to_json, -1);
-    rb_define_method(rb_cFalseClass, "to_json", rb_yajl_json_ext_false_to_json, -1);
-    rb_define_method(rb_cNilClass, "to_json", rb_yajl_json_ext_nil_to_json, -1);
+    rb_define_method(rb_cFloat, "to_json", RUBY_METHOD_FUNC(rb_yajl_json_ext_float_to_json), -1);
+    rb_define_method(rb_cString, "to_json", RUBY_METHOD_FUNC(rb_yajl_json_ext_string_to_json), -1);
+    rb_define_method(rb_cTrueClass, "to_json", RUBY_METHOD_FUNC(rb_yajl_json_ext_true_to_json), -1);
+    rb_define_method(rb_cFalseClass, "to_json", RUBY_METHOD_FUNC(rb_yajl_json_ext_false_to_json), -1);
+    rb_define_method(rb_cNilClass, "to_json", RUBY_METHOD_FUNC(rb_yajl_json_ext_nil_to_json), -1);
     return Qnil;
 }
 
@@ -1380,24 +1380,24 @@ void Init_yajl() {
 
     cParser = rb_define_class_under(mYajl, "Parser", rb_cObject);
     rb_undef_alloc_func(cParser);
-    rb_define_singleton_method(cParser, "new", rb_yajl_parser_new, -1);
-    rb_define_method(cParser, "initialize", rb_yajl_parser_init, -1);
-    rb_define_method(cParser, "parse", rb_yajl_parser_parse, -1);
-    rb_define_method(cParser, "parse_chunk", rb_yajl_parser_parse_chunk, 1);
-    rb_define_method(cParser, "<<", rb_yajl_parser_parse_chunk, 1);
-    rb_define_method(cParser, "on_parse_complete=", rb_yajl_parser_set_complete_cb, 1);
+    rb_define_singleton_method(cParser, "new", RUBY_METHOD_FUNC(rb_yajl_parser_new), -1);
+    rb_define_method(cParser, "initialize", RUBY_METHOD_FUNC(rb_yajl_parser_init), -1);
+    rb_define_method(cParser, "parse", RUBY_METHOD_FUNC(rb_yajl_parser_parse), -1);
+    rb_define_method(cParser, "parse_chunk", RUBY_METHOD_FUNC(rb_yajl_parser_parse_chunk), 1);
+    rb_define_method(cParser, "<<", RUBY_METHOD_FUNC(rb_yajl_parser_parse_chunk), 1);
+    rb_define_method(cParser, "on_parse_complete=", RUBY_METHOD_FUNC(rb_yajl_parser_set_complete_cb), 1);
 
     cProjector = rb_define_class_under(mYajl, "Projector", rb_cObject);
-    rb_define_method(cProjector, "project", rb_yajl_projector_project, 1);
+    rb_define_method(cProjector, "project", RUBY_METHOD_FUNC(rb_yajl_projector_project), 1);
 
     cEncoder = rb_define_class_under(mYajl, "Encoder", rb_cObject);
     rb_undef_alloc_func(cEncoder);
-    rb_define_singleton_method(cEncoder, "new", rb_yajl_encoder_new, -1);
-    rb_define_method(cEncoder, "initialize", rb_yajl_encoder_init, -1);
-    rb_define_method(cEncoder, "encode", rb_yajl_encoder_encode, -1);
-    rb_define_method(cEncoder, "on_progress=", rb_yajl_encoder_set_progress_cb, 1);
+    rb_define_singleton_method(cEncoder, "new", RUBY_METHOD_FUNC(rb_yajl_encoder_new), -1);
+    rb_define_method(cEncoder, "initialize", RUBY_METHOD_FUNC(rb_yajl_encoder_init), -1);
+    rb_define_method(cEncoder, "encode", RUBY_METHOD_FUNC(rb_yajl_encoder_encode), -1);
+    rb_define_method(cEncoder, "on_progress=", RUBY_METHOD_FUNC(rb_yajl_encoder_set_progress_cb), 1);
 
-    rb_define_singleton_method(cEncoder, "enable_json_gem_compatability", rb_yajl_encoder_enable_json_gem_ext, 0);
+    rb_define_singleton_method(cEncoder, "enable_json_gem_compatability", RUBY_METHOD_FUNC(rb_yajl_encoder_enable_json_gem_ext), 0);
 
     intern_io_read = rb_intern("read");
     intern_call = rb_intern("call");
