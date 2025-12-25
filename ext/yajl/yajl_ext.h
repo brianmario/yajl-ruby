@@ -58,8 +58,10 @@ static ID intern_io_read, intern_call, intern_keys, intern_to_s,
             intern_to_json, intern_has_key, intern_to_sym, intern_as_json;
 static ID sym_allow_comments, sym_check_utf8, sym_pretty, sym_indent, sym_terminator, sym_symbolize_keys, sym_symbolize_names, sym_html_safe, sym_entities;
 
-#define GetParser(obj, sval) Data_Get_Struct(obj, yajl_parser_wrapper, sval);
-#define GetEncoder(obj, sval) Data_Get_Struct(obj, yajl_encoder_wrapper, sval);
+static const rb_data_type_t yajl_parser_wrapper_type, yajl_encoder_wrapper_type;
+
+#define GetParser(obj, sval) TypedData_Get_Struct(obj, yajl_parser_wrapper, &yajl_parser_wrapper_type, sval)
+#define GetEncoder(obj, sval) TypedData_Get_Struct(obj, yajl_encoder_wrapper, &yajl_encoder_wrapper_type, sval)
 
 static void yajl_check_and_fire_callback(void * ctx);
 static void yajl_set_static_value(void * ctx, VALUE val);

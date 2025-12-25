@@ -159,6 +159,14 @@ static void yajl_encoder_wrapper_mark(void * wrapper) {
     }
 }
 
+static const rb_data_type_t yajl_encoder_wrapper_type = {
+    "YAJL::Encoder",
+    {
+        yajl_encoder_wrapper_mark,
+        yajl_encoder_wrapper_free,
+    }
+};
+
 static VALUE yajl_key_to_string(VALUE obj) {
     switch (TYPE(obj)) {
         case T_STRING:
@@ -308,6 +316,14 @@ void yajl_parser_wrapper_mark(void * wrapper) {
         rb_gc_mark(w->parse_complete_callback);
     }
 }
+
+static const rb_data_type_t yajl_parser_wrapper_type = {
+    "YAJL::Parser",
+    {
+        yajl_parser_wrapper_mark,
+        yajl_parser_wrapper_free,
+    }
+};
 
 void yajl_parse_chunk(const unsigned char * chunk, unsigned int len, yajl_handle parser) {
     yajl_status stat;
@@ -486,7 +502,7 @@ static VALUE rb_yajl_parser_new(int argc, VALUE * argv, VALUE klass) {
     }
     cfg = (yajl_parser_config){allowComments, checkUTF8};
 
-    obj = Data_Make_Struct(klass, yajl_parser_wrapper, yajl_parser_wrapper_mark, yajl_parser_wrapper_free, wrapper);
+    obj = TypedData_Make_Struct(klass, yajl_parser_wrapper, &yajl_parser_wrapper_type, wrapper);
     wrapper->parser = yajl_alloc(&callbacks, &cfg, &rb_alloc_funcs, (void *)obj);
     wrapper->nestedArrayLevel = 0;
     wrapper->nestedHashLevel = 0;
@@ -1089,7 +1105,7 @@ static VALUE rb_yajl_encoder_new(int argc, VALUE * argv, VALUE klass) {
     }
     cfg = (yajl_gen_config){beautify, (const char *)indentString, htmlSafe};
 
-    obj = Data_Make_Struct(klass, yajl_encoder_wrapper, yajl_encoder_wrapper_mark, yajl_encoder_wrapper_free, wrapper);
+    obj = TypedData_Make_Struct(klass, yajl_encoder_wrapper, &yajl_encoder_wrapper_type, wrapper);
     wrapper->indentString = actualIndent;
     wrapper->encoder = yajl_gen_alloc(&cfg, &rb_alloc_funcs);
     wrapper->on_progress_callback = Qnil;
