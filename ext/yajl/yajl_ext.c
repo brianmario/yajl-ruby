@@ -93,7 +93,11 @@ static char *yajl_raise_encode_error_for_status(yajl_gen_status status, VALUE ob
             rb_raise(cEncodeError, "Invalid number: cannot encode Infinity, -Infinity, or NaN");
         case yajl_gen_no_buf:
             rb_raise(cEncodeError, "YAJL internal error: yajl_gen_get_buf was called, but a print callback was specified, so no internal buffer is available");
+        case yajl_gen_alloc_error:
+            rb_raise(cEncodeError, "YAJL internal error: failed to allocate memory");
         default:
+            // fixme: why wasn't this already here??
+            rb_raise(cEncodeError, "Encountered unknown YAJL status %d during JSON generation", status);
             return NULL;
     }
 }
@@ -155,18 +159,55 @@ static void yajl_encoder_wrapper_mark(void * wrapper) {
     }
 }
 
+static const rb_data_type_t yajl_encoder_wrapper_type = {
+    "YAJL::Encoder",
+    {
+        yajl_encoder_wrapper_mark,
+        yajl_encoder_wrapper_free,
+    }
+};
+
+static VALUE yajl_key_to_string(VALUE obj) {
+    switch (TYPE(obj)) {
+        case T_STRING:
+            return obj;
+        case T_SYMBOL:
+            return rb_sym2str(obj);
+        default:
+            return rb_funcall(obj, intern_to_s, 0);
+    }
+}
+
+void yajl_encode_part(void * wrapper, VALUE obj, VALUE io);
+struct yajl_encode_hash_iter {
+    void *w;
+    VALUE io;
+};
+
+static int yajl_encode_part_hash_i(VALUE key, VALUE val, VALUE iter_v) {
+    struct yajl_encode_hash_iter *iter = (struct yajl_encode_hash_iter *)iter_v;
+    /* key must be a string */
+    VALUE keyStr = yajl_key_to_string(key);
+
+    /* the key */
+    yajl_encode_part(iter->w, keyStr, iter->io);
+    /* the value */
+    yajl_encode_part(iter->w, val, iter->io);
+
+    return ST_CONTINUE;
+}
+
 #define CHECK_STATUS(call) \
     if ((status = (call)) != yajl_gen_status_ok) { break; }
 
 void yajl_encode_part(void * wrapper, VALUE obj, VALUE io) {
-    VALUE str, outBuff, otherObj;
+    VALUE str, outBuff;
     yajl_encoder_wrapper * w = wrapper;
     yajl_gen_status status;
     int idx = 0;
     const unsigned char * buffer;
     const char * cptr;
     unsigned int len;
-    VALUE keys, entry, keyStr;
 
     if (io != Qnil || w->on_progress_callback != Qnil) {
         status = yajl_gen_get_buf(w->encoder, &buffer, &len);
@@ -188,24 +229,19 @@ void yajl_encode_part(void * wrapper, VALUE obj, VALUE io) {
         case T_HASH:
             CHECK_STATUS(yajl_gen_map_open(w->encoder));
 
-            /* TODO: itterate through keys in the hash */
-            keys = rb_funcall(obj, intern_keys, 0);
-            for(idx=0; idx<RARRAY_LEN(keys); idx++) {
-                entry = rb_ary_entry(keys, idx);
-                keyStr = rb_funcall(entry, intern_to_s, 0); /* key must be a string */
-                /* the key */
-                yajl_encode_part(w, keyStr, io);
-                /* the value */
-                yajl_encode_part(w, rb_hash_aref(obj, entry), io);
-            }
+            struct yajl_encode_hash_iter iter;
+            iter.w = w;
+            iter.io = io;
+            rb_hash_foreach(obj, yajl_encode_part_hash_i, (VALUE)&iter);
 
             CHECK_STATUS(yajl_gen_map_close(w->encoder));
             break;
         case T_ARRAY:
             CHECK_STATUS(yajl_gen_array_open(w->encoder));
+
+	    VALUE *ptr = RARRAY_PTR(obj);
             for(idx=0; idx<RARRAY_LEN(obj); idx++) {
-                otherObj = rb_ary_entry(obj, idx);
-                yajl_encode_part(w, otherObj, io);
+                yajl_encode_part(w, ptr[idx], io);
             }
             CHECK_STATUS(yajl_gen_array_close(w->encoder));
             break;
@@ -219,6 +255,8 @@ void yajl_encode_part(void * wrapper, VALUE obj, VALUE io) {
             CHECK_STATUS(yajl_gen_bool(w->encoder, 0));
             break;
         case T_FIXNUM:
+            CHECK_STATUS(yajl_gen_long(w->encoder, FIX2LONG(obj)));
+            break;
         case T_FLOAT:
         case T_BIGNUM:
             str = rb_funcall(obj, intern_to_s, 0);
@@ -232,6 +270,12 @@ void yajl_encode_part(void * wrapper, VALUE obj, VALUE io) {
         case T_STRING:
             cptr = RSTRING_PTR(obj);
             len = (unsigned int)RSTRING_LEN(obj);
+            CHECK_STATUS(yajl_gen_string(w->encoder, (const unsigned char *)cptr, len));
+            break;
+        case T_SYMBOL:
+            str = rb_sym2str(obj);
+            cptr = RSTRING_PTR(str);
+            len = (unsigned int)RSTRING_LEN(str);
             CHECK_STATUS(yajl_gen_string(w->encoder, (const unsigned char *)cptr, len));
             break;
         default:
@@ -273,15 +317,29 @@ void yajl_parser_wrapper_mark(void * wrapper) {
     }
 }
 
+static const rb_data_type_t yajl_parser_wrapper_type = {
+    "YAJL::Parser",
+    {
+        yajl_parser_wrapper_mark,
+        yajl_parser_wrapper_free,
+    }
+};
+
 void yajl_parse_chunk(const unsigned char * chunk, unsigned int len, yajl_handle parser) {
     yajl_status stat;
 
     stat = yajl_parse(parser, chunk, len);
 
-    if (stat != yajl_status_ok && stat != yajl_status_insufficient_data) {
+    if (stat == yajl_status_ok || stat == yajl_status_insufficient_data) {
+        // success
+    } else if (stat == yajl_status_error) {
         unsigned char * str = yajl_get_error(parser, 1, chunk, len);
         VALUE errobj = rb_exc_new2(cParseError, (const char*) str);
         yajl_free_error(parser, str);
+        rb_exc_raise(errobj);
+    } else {
+        const char * str = yajl_status_to_string(stat);
+        VALUE errobj = rb_exc_new2(cParseError, (const char*) str);
         rb_exc_raise(errobj);
     }
 }
@@ -444,7 +502,7 @@ static VALUE rb_yajl_parser_new(int argc, VALUE * argv, VALUE klass) {
     }
     cfg = (yajl_parser_config){allowComments, checkUTF8};
 
-    obj = Data_Make_Struct(klass, yajl_parser_wrapper, yajl_parser_wrapper_mark, yajl_parser_wrapper_free, wrapper);
+    obj = TypedData_Make_Struct(klass, yajl_parser_wrapper, &yajl_parser_wrapper_type, wrapper);
     wrapper->parser = yajl_alloc(&callbacks, &cfg, &rb_alloc_funcs, (void *)obj);
     wrapper->nestedArrayLevel = 0;
     wrapper->nestedHashLevel = 0;
@@ -884,7 +942,7 @@ static VALUE rb_yajl_projector_build_simple_value(yajl_event_stream_t parser, ya
             rb_raise(cParseError, "unexpected colon while constructing value");
 
         default:;
-            assert(0);
+            rb_bug("we should never get here");
     }
 }
 
@@ -907,6 +965,9 @@ static VALUE rb_yajl_projector_build_string(yajl_event_stream_t parser, yajl_eve
 
             yajl_buf strBuf = yajl_buf_alloc(parser->funcs);
             yajl_string_decode(strBuf, (const unsigned char *)event.buf, event.len);
+            if (yajl_buf_err(strBuf)) {
+                rb_raise(cParseError, "YAJL internal error: failed to allocate memory");
+            }
 
             VALUE str = rb_str_new((const char *)yajl_buf_data(strBuf), yajl_buf_len(strBuf));
             rb_enc_associate(str, utf8Encoding);
@@ -922,7 +983,7 @@ static VALUE rb_yajl_projector_build_string(yajl_event_stream_t parser, yajl_eve
         }
 
         default:; {
-            assert(0);
+            rb_bug("we should never get here");
         }
     }
 }
@@ -1044,7 +1105,7 @@ static VALUE rb_yajl_encoder_new(int argc, VALUE * argv, VALUE klass) {
     }
     cfg = (yajl_gen_config){beautify, (const char *)indentString, htmlSafe};
 
-    obj = Data_Make_Struct(klass, yajl_encoder_wrapper, yajl_encoder_wrapper_mark, yajl_encoder_wrapper_free, wrapper);
+    obj = TypedData_Make_Struct(klass, yajl_encoder_wrapper, &yajl_encoder_wrapper_type, wrapper);
     wrapper->indentString = actualIndent;
     wrapper->encoder = yajl_gen_alloc(&cfg, &rb_alloc_funcs);
     wrapper->on_progress_callback = Qnil;
@@ -1102,6 +1163,7 @@ static VALUE rb_yajl_encoder_encode(int argc, VALUE * argv, VALUE self) {
     const unsigned char * buffer;
     unsigned int len;
     VALUE obj, io, blk, outBuff;
+    yajl_gen_status status;
 
     GetEncoder(self, wrapper);
 
@@ -1115,7 +1177,11 @@ static VALUE rb_yajl_encoder_encode(int argc, VALUE * argv, VALUE self) {
     yajl_encode_part(wrapper, obj, io);
 
     /* just make sure we output the remaining buffer */
-    yajl_gen_get_buf(wrapper->encoder, &buffer, &len);
+    status = yajl_gen_get_buf(wrapper->encoder, &buffer, &len);
+    if (status != yajl_gen_status_ok) {
+        yajl_raise_encode_error_for_status(status, obj);
+    }
+
     outBuff = rb_str_new((const char *)buffer, len);
 #ifdef HAVE_RUBY_ENCODING_H
     rb_enc_associate(outBuff, utf8Encoding);
@@ -1329,6 +1395,7 @@ void Init_yajl() {
     cStandardError = rb_const_get(rb_cObject, rb_intern("StandardError"));
 
     cParser = rb_define_class_under(mYajl, "Parser", rb_cObject);
+    rb_undef_alloc_func(cParser);
     rb_define_singleton_method(cParser, "new", rb_yajl_parser_new, -1);
     rb_define_method(cParser, "initialize", rb_yajl_parser_init, -1);
     rb_define_method(cParser, "parse", rb_yajl_parser_parse, -1);
@@ -1340,6 +1407,7 @@ void Init_yajl() {
     rb_define_method(cProjector, "project", rb_yajl_projector_project, 1);
 
     cEncoder = rb_define_class_under(mYajl, "Encoder", rb_cObject);
+    rb_undef_alloc_func(cEncoder);
     rb_define_singleton_method(cEncoder, "new", rb_yajl_encoder_new, -1);
     rb_define_method(cEncoder, "initialize", rb_yajl_encoder_init, -1);
     rb_define_method(cEncoder, "encode", rb_yajl_encoder_encode, -1);
