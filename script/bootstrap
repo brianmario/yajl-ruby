@@ -2,4 +2,10 @@
 set -e
 
 cd "$(dirname "$0")/.."
-exec bundle install --binstubs --path vendor/gems "$@"
+if bundle check 1>/dev/null 2>&1; then
+    echo "Gem environment up-to-date"
+else
+    exec bundle install --binstubs --path vendor/gems "$@"
+fi
+
+exec bundle exec rake clean compile

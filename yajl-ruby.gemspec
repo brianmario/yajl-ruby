@@ -14,10 +14,11 @@ Gem::Specification.new do |s|
   s.required_ruby_version = ">= 2.6.0"
 
   # tests
-  s.add_development_dependency 'rake-compiler'
-  s.add_development_dependency 'rspec'
+  s.add_development_dependency "rake-compiler"
+  s.add_development_dependency "rspec"
+  s.add_development_dependency "minitest"
   # benchmarks
-  s.add_development_dependency 'activesupport'
-  s.add_development_dependency 'json'
+  s.add_development_dependency "activesupport"
+  s.add_development_dependency "json"
   s.add_development_dependency "benchmark-memory"
 end
