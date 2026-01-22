@@ -39,7 +39,7 @@ describe 'Parsing very long text' do
     end
 
     it 'runs successfully' do
-      out, err, status = capture('ruby', script)
+      out, err, status = capture('bundle exec ruby', script)
       expect([err, status.exitstatus]).to eq(['', 0])
     end
   end
