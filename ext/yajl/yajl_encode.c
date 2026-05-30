@@ -89,7 +89,7 @@ yajl_string_encode2(const yajl_print_t print,
             /* Escaping 0xe280a8 0xe280a9 */
             case 0xe2:
               if (htmlSafe == 2) {
-                  if (len - end >= 2 && str[end + 1] == 0x80) {
+                  if (len - end >= 3 && str[end + 1] == 0x80) {
                       if (str[end + 2] == 0xa8) {
                           increment = 3;
                           entityBuffer[4] = '2';
