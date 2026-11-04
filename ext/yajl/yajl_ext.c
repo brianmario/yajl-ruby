@@ -239,9 +239,8 @@ void yajl_encode_part(void * wrapper, VALUE obj, VALUE io) {
         case T_ARRAY:
             CHECK_STATUS(yajl_gen_array_open(w->encoder));
 
-	    VALUE *ptr = RARRAY_PTR(obj);
             for(idx=0; idx<RARRAY_LEN(obj); idx++) {
-                yajl_encode_part(w, ptr[idx], io);
+                yajl_encode_part(w, rb_ary_entry(obj, idx), io);
             }
             CHECK_STATUS(yajl_gen_array_close(w->encoder));
             break;
