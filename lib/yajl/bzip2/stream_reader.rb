@@ -1,3 +1,5 @@
+require 'stringio'
+
 module Yajl
   module Bzip2
     # This is a wrapper around Bzip::Reader to allow it's #read method to adhere
