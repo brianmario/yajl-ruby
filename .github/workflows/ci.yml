@@ -1,26 +1,44 @@
 name: CI
 
-on: [push, pull_request]
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   test:
+    name: Ruby ${{ matrix.ruby }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    continue-on-error: ${{ matrix.ruby == 'head' }}
     strategy:
-      matrix:
-        ruby_version: [2.6, 2.7, 3.0]
       fail-fast: false
-    runs-on: ubuntu-latest
-    name: Test on Ruby ${{ matrix.ruby_version }}
+      matrix:
+        os: [ubuntu-latest]
+        # 2.6 is the required_ruby_version floor in the gemspec; 3.3 and up are
+        # the versions Ruby core still maintains. Keep these quoted: YAML reads
+        # a bare 4.0 as the number 4, which selects the newest 4.x instead.
+        ruby: ['2.6', '3.3', '3.4', '4.0', head]
+        include:
+          - os: macos-latest
+            ruby: '4.0'
     steps:
-    - uses: actions/checkout@v4
-    - name: Setup Ruby ${{ matrix.ruby_version }}
-      uses: ruby/setup-ruby@v1
-      with:
-        ruby-version: ${{ matrix.ruby_version }}
-    - name: Install dependencies
-      run: bundle install
-    - name: Build gem
-      run: gem build yajl-ruby.gemspec
-    - name: Install gem
-      run: gem install yajl-ruby
-    - name: Run tests
-      run: bundle exec rake spec
+      - uses: actions/checkout@v7
+      - name: Set up Ruby ${{ matrix.ruby }}
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+          bundler-cache: true
+      - name: Run tests
+        run: bundle exec rake spec
+      - name: Build and install gem
+        run: |
+          gem build yajl-ruby.gemspec
+          gem install --local --no-document yajl-ruby-*.gem
+      - name: Smoke test installed gem
+        working-directory: ${{ runner.temp }}
+        run: |
+          ruby -ryajl -e 'raise "round trip failed" unless Yajl::Parser.parse(Yajl::Encoder.encode({"a" => 1})) == {"a" => 1}'
