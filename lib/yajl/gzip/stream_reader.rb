@@ -1,3 +1,5 @@
+require 'stringio'
+
 module Yajl
   module Gzip
     # This is a wrapper around Zlib::GzipReader to allow it's #read method to adhere

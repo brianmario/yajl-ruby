@@ -1,3 +1,5 @@
+require 'stringio'
+
 module Yajl
   module Deflate
     # This is a wrapper around Zlib::Inflate, creating a #read method that adheres
@@ -34,7 +36,7 @@ module Yajl
         if options.is_a?(Hash)
           deflate_options = options.delete(:deflate_options)
           Yajl::Parser.new(options).parse(new(input, deflate_options), buffer_size, &block)
-        elsif options.is_a?(Fixnum)
+        elsif options.is_a?(Integer)
           Yajl::Parser.new.parse(new(input, options), buffer_size, &block)
         end
       end
