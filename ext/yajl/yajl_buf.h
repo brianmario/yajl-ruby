@@ -67,6 +67,11 @@ void yajl_buf_free(yajl_buf buf);
 YAJL_API
 void yajl_buf_append(yajl_buf buf, const void * data, unsigned int len);
 
+/* yajl_buf_append with the type of yajl_print_t, for use as a print
+ * callback whose context is a yajl_buf */
+YAJL_API
+void yajl_buf_print(void * ctx, const char * data, unsigned int len);
+
 /* empty the buffer */
 YAJL_API
 void yajl_buf_clear(yajl_buf buf);
