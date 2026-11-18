@@ -168,6 +168,11 @@ void yajl_buf_append(yajl_buf buf, const void * data, unsigned int len)
     }
 }
 
+void yajl_buf_print(void * ctx, const char * data, unsigned int len)
+{
+    yajl_buf_append((yajl_buf) ctx, data, len);
+}
+
 void yajl_buf_clear(yajl_buf buf)
 {
     assert(buf);

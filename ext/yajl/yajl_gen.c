@@ -124,7 +124,7 @@ yajl_gen_alloc2(const yajl_print_t callback,
         g->print = callback;
         g->ctx = ctx;
     } else {
-        g->print = (yajl_print_t)&yajl_buf_append;
+        g->print = &yajl_buf_print;
         g->ctx = yajl_buf_alloc(&(g->alloc));
     }
 
@@ -134,7 +134,7 @@ yajl_gen_alloc2(const yajl_print_t callback,
 void
 yajl_gen_free(yajl_gen g)
 {
-    if (g->print == (yajl_print_t)&yajl_buf_append) yajl_buf_free((yajl_buf)g->ctx);
+    if (g->print == &yajl_buf_print) yajl_buf_free((yajl_buf)g->ctx);
     YA_FREE(&(g->alloc), g);
 }
 
@@ -361,7 +361,7 @@ yajl_gen_status
 yajl_gen_get_buf(yajl_gen g, const unsigned char ** buf,
                  unsigned int * len)
 {
-    if (g->print != (yajl_print_t)&yajl_buf_append) return yajl_gen_no_buf;
+    if (g->print != &yajl_buf_print) return yajl_gen_no_buf;
     yajl_buf_state buf_err = yajl_buf_err((yajl_buf)g->ctx);
     if (buf_err) {
         return yajl_gen_alloc_error;
@@ -374,5 +374,5 @@ yajl_gen_get_buf(yajl_gen g, const unsigned char ** buf,
 void
 yajl_gen_clear(yajl_gen g)
 {
-    if (g->print == (yajl_print_t)&yajl_buf_append) yajl_buf_clear((yajl_buf)g->ctx);
+    if (g->print == &yajl_buf_print) yajl_buf_clear((yajl_buf)g->ctx);
 }
